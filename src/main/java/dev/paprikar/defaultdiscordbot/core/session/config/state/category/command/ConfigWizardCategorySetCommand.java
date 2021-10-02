@@ -54,7 +54,7 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCommand {
             return null;
         }
         String value = parts.getOther();
-        DiscordCategory category = categoryService.getCategoryById(session.getEntityId());
+        DiscordCategory category = categoryService.getById(session.getEntityId());
 
         ConfigWizardSetterResponse response = setter.set(value, category, categoryService);
 

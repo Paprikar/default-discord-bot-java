@@ -33,7 +33,7 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
             );
         }
         provider.setSuggestionChannelId(id);
-        discordProviderService.saveProvider(provider);
+        discordProviderService.save(provider);
         logger.debug("The discordProvider={id={}} suggestionChannelId is set to '{}'", provider.getId(), value);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

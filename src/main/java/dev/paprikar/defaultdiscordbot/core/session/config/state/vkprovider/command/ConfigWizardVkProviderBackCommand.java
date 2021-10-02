@@ -26,9 +26,9 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardCommand {
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      @Nullable String argsString) {
-        logger.trace("onExitCommand(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
+        logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        session.setEntityId(vkProviderService.getProviderById(session.getEntityId()).getCategory().getId());
+        session.setEntityId(vkProviderService.getById(session.getEntityId()).getCategory().getId());
         return ConfigWizardState.VK_PROVIDERS;
     }
 }

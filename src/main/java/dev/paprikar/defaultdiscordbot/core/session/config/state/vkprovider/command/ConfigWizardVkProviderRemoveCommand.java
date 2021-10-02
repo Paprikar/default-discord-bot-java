@@ -30,9 +30,9 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardCommand 
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      @Nullable String argsString) {
-        logger.trace("onExitCommand(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
+        logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        DiscordProviderFromVk provider = vkProviderService.getProviderById(session.getEntityId());
+        DiscordProviderFromVk provider = vkProviderService.getById(session.getEntityId());
         if (provider.isEnabled()) {
             session.getResponses().add(new EmbedBuilder()
                     .setColor(Color.RED)
@@ -44,7 +44,7 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardCommand 
             return null;
         }
         session.setEntityId(provider.getCategory().getId());
-        vkProviderService.deleteProvider(provider);
+        vkProviderService.delete(provider);
         session.getResponses().add(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")

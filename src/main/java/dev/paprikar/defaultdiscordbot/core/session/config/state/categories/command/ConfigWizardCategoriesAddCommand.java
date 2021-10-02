@@ -1,12 +1,12 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
+import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -25,9 +25,8 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
 
     private final DiscordCategoryService categoryService;
 
-    public ConfigWizardCategoriesAddCommand(
-            DiscordGuildService guildService,
-            DiscordCategoryService categoryService) {
+    public ConfigWizardCategoriesAddCommand(DiscordGuildService guildService,
+                                            DiscordCategoryService categoryService) {
         this.guildService = guildService;
         this.categoryService = categoryService;
     }
@@ -57,7 +56,7 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
             return null;
         }
         long guildId = session.getEntityId();
-        for (DiscordCategory c : categoryService.findCategoriesByGuildId(guildId)) {
+        for (DiscordCategory c : categoryService.findAllByGuildId(guildId)) {
             if (c.getName().equals(argsString)) {
                 session.getResponses().add(new EmbedBuilder()
                         .setColor(Color.RED)
@@ -72,7 +71,7 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
 
         DiscordCategory category = new DiscordCategory();
         category.setName(argsString);
-        DiscordGuild guild = guildService.getGuildById(guildId);
+        DiscordGuild guild = guildService.getById(guildId);
         category = categoryService.attach(category, guild);
 
         session.setEntityId(category.getId());

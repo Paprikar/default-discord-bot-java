@@ -42,7 +42,7 @@ public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCatego
             );
         }
         category.setReserveDays(reserveDays);
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         logger.debug("The category={id={}} reserveDays is set to '{}'", category.getId(), value);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

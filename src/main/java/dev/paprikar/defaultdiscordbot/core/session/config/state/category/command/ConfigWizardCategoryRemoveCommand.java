@@ -30,9 +30,9 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCommand {
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      @Nullable String argsString) {
-        logger.trace("onExitCommand(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
+        logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        DiscordCategory category = categoryService.getCategoryById(session.getEntityId());
+        DiscordCategory category = categoryService.getById(session.getEntityId());
         if (category.isEnabled()) {
             session.getResponses().add(new EmbedBuilder()
                     .setColor(Color.RED)
@@ -45,7 +45,7 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCommand {
         }
 
         session.setEntityId(category.getGuild().getId());
-        categoryService.deleteCategory(category);
+        categoryService.detach(category);
         session.getResponses().add(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")

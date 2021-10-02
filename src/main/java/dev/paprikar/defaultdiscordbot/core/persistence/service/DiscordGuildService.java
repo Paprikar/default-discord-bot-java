@@ -21,44 +21,44 @@ public class DiscordGuildService {
     }
 
     @Nonnull
-    public List<DiscordGuild> findAllGuilds() {
+    public List<DiscordGuild> findAll() {
         return repository.findAll();
     }
 
     @Nonnull
-    public Optional<DiscordGuild> findGuildById(long id) {
+    public Optional<DiscordGuild> findById(long id) {
         return repository.findById(id);
     }
 
     @Nonnull
-    public DiscordGuild getGuildById(long id) throws EntityNotFoundException {
+    public DiscordGuild getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
     }
 
     @Nonnull
-    public Optional<DiscordGuild> findGuildByDiscordId(long id) {
+    public Optional<DiscordGuild> findByDiscordId(long id) {
         return repository.findByDiscordId(id);
     }
 
     @Nonnull
-    public DiscordGuild getGuildByDiscordId(long id) throws EntityNotFoundException {
+    public DiscordGuild getByDiscordId(long id) throws EntityNotFoundException {
         return repository.getByDiscordId(id);
     }
 
     @Nonnull
-    public DiscordGuild saveGuild(@Nonnull DiscordGuild guild) {
+    public DiscordGuild save(@Nonnull DiscordGuild guild) {
         return repository.save(guild);
     }
 
-    public void deleteGuild(@Nonnull DiscordGuild guild) {
+    public void delete(@Nonnull DiscordGuild guild) {
         repository.delete(guild);
     }
 
-    public void deleteGuildById(long id) {
+    public void deleteById(long id) {
         repository.deleteById(id);
     }
 
-    public void deleteGuildByDiscordId(long id) {
+    public void deleteByDiscordId(long id) {
         repository.deleteByDiscordId(id);
     }
 

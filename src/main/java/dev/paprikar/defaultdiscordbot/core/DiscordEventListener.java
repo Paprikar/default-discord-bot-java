@@ -1,9 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core;
 
 import dev.paprikar.defaultdiscordbot.core.command.DiscordCommandHandler;
+import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.SessionService;
+import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.UnavailableGuildJoinedEvent;
@@ -27,23 +29,27 @@ public class DiscordEventListener extends ListenerAdapter {
 
     private final DiscordCommandHandler commandHandler;
 
+    private final DiscordSuggestionService discordSuggestionService;
+
     private final SessionService sessionService;
 
     public DiscordEventListener(DiscordGuildService guildService,
                                 DiscordCommandHandler commandHandler,
+                                DiscordSuggestionService discordSuggestionService,
                                 SessionService sessionService) {
         this.guildService = guildService;
         this.commandHandler = commandHandler;
+        this.discordSuggestionService = discordSuggestionService;
         this.sessionService = sessionService;
     }
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
         logger.debug("onGuildMessageReceived(GuildMessageReceivedEvent event): " +
-                        "event={guildId={}, author={}, channel={}, message='{}'}",
+                        "event={guild={id={}}, author={id={}}, channel={id={}}, message='{}'}",
                 event.getGuild().getIdLong(),
-                event.getAuthor(),
-                event.getChannel(),
+                event.getAuthor().getIdLong(),
+                event.getChannel().getIdLong(),
                 event.getMessage().getContentRaw()
         );
 
@@ -52,14 +58,15 @@ public class DiscordEventListener extends ListenerAdapter {
         }
 
         commandHandler.handle(event);
+        discordSuggestionService.handle(event);
     }
 
     @Override
     public void onPrivateMessageReceived(@Nonnull PrivateMessageReceivedEvent event) {
         logger.debug("onPrivateMessageReceived(PrivateMessageReceivedEvent event): " +
-                        "event={author={}, channel={}, message='{}'}",
-                event.getAuthor(),
-                event.getChannel(),
+                        "event={author={id={}}, channel={id={}}, message='{}'}",
+                event.getAuthor().getIdLong(),
+                event.getChannel().getIdLong(),
                 event.getMessage().getContentRaw()
         );
 
@@ -67,14 +74,14 @@ public class DiscordEventListener extends ListenerAdapter {
             return;
         }
 
-        sessionService.handlePrivateMessage(event);
+        sessionService.handle(event);
     }
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         logger.debug("onMessageReceived(MessageReceivedEvent event): " +
-                        "event={author={}, channel={}, message='{}'}",
-                event.getAuthor(),
+                        "event={author={id={}}, channel={id={}}, message='{}'}",
+                event.getAuthor().getIdLong(),
                 event.getChannel(),
                 event.getMessage().getContentRaw()
         );
@@ -82,6 +89,14 @@ public class DiscordEventListener extends ListenerAdapter {
         if (event.getAuthor().equals(event.getJDA().getSelfUser())) {
             return;
         }
+    }
+
+    @Override
+    public void onTextChannelDelete(@Nonnull TextChannelDeleteEvent event) {
+        logger.debug("onTextChannelDelete(MessageReceivedEvent event): event={channel={id={}}",
+                event.getChannel().getIdLong());
+
+        discordSuggestionService.handle(event);
     }
 
     @Override
@@ -108,11 +123,11 @@ public class DiscordEventListener extends ListenerAdapter {
         // todo default fields
         DiscordGuild guild = new DiscordGuild();
         guild.setDiscordId(discordGuildId);
-        guildService.saveGuild(guild);
+        guildService.save(guild);
     }
 
     private void removeDiscordGuild(long discordGuildId) {
         // todo delete timeout
-        guildService.deleteGuildByDiscordId(discordGuildId);
+        guildService.deleteByDiscordId(discordGuildId);
     }
 }

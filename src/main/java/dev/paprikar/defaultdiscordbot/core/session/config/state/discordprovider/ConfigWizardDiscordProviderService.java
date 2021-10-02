@@ -1,5 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider;
 
+import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
@@ -32,10 +33,14 @@ public class ConfigWizardDiscordProviderService extends ConfigWizard {
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
+    private final DiscordSuggestionService discordSuggestionService;
+
     @Autowired
-    public ConfigWizardDiscordProviderService(DiscordProviderFromDiscordService discordProviderService) {
+    public ConfigWizardDiscordProviderService(DiscordProviderFromDiscordService discordProviderService,
+                                              DiscordSuggestionService discordSuggestionService) {
         super();
         this.discordProviderService = discordProviderService;
+        this.discordSuggestionService = discordSuggestionService;
         setupCommands();
     }
 
@@ -89,7 +94,7 @@ public class ConfigWizardDiscordProviderService extends ConfigWizard {
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
         if (addStateEmbed) {
-            responses.add(getStateEmbed(discordProviderService.getProviderById(session.getEntityId())));
+            responses.add(getStateEmbed(discordProviderService.getById(session.getEntityId())));
         }
         if (!responses.isEmpty()) {
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
@@ -106,8 +111,10 @@ public class ConfigWizardDiscordProviderService extends ConfigWizard {
     private void setupCommands() {
         commands.put("back", new ConfigWizardDiscordProviderBackCommand(discordProviderService));
         commands.put("set", new ConfigWizardDiscordProviderSetCommand(discordProviderService));
-        commands.put("enable", new ConfigWizardDiscordProviderEnableCommand());
-        commands.put("disable", new ConfigWizardDiscordProviderDisableCommand());
+        commands.put("enable", new ConfigWizardDiscordProviderEnableCommand(
+                discordProviderService, discordSuggestionService));
+        commands.put("disable", new ConfigWizardDiscordProviderDisableCommand(discordProviderService,
+                discordSuggestionService));
         commands.put("remove", new ConfigWizardDiscordProviderRemoveCommand(discordProviderService));
     }
 }

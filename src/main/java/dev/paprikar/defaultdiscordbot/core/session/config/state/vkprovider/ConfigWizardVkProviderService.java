@@ -68,7 +68,8 @@ public class ConfigWizardVkProviderService extends ConfigWizard {
     @Nullable
     @Transactional
     @Override
-    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
+    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event,
+                                    @Nonnull PrivateSession session) {
         logger.trace("handle(): event={}, sessionInfo={}", event, session);
 
         String message = event.getMessage().getContentRaw();
@@ -89,7 +90,7 @@ public class ConfigWizardVkProviderService extends ConfigWizard {
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
         if (addStateEmbed) {
-            responses.add(getStateEmbed(vkProviderService.getProviderById(session.getEntityId())));
+            responses.add(getStateEmbed(vkProviderService.getById(session.getEntityId())));
         }
         if (!responses.isEmpty()) {
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();

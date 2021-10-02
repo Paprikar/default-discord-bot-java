@@ -56,7 +56,7 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardCommand {
             return null;
         }
         String value = parts.getOther();
-        DiscordProviderFromVk provider = vkProviderService.getProviderById(session.getEntityId());
+        DiscordProviderFromVk provider = vkProviderService.getById(session.getEntityId());
 
         ConfigWizardSetterResponse response = setter.set(value, provider, vkProviderService);
 

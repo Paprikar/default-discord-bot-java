@@ -1,7 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.command;
 
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import dev.paprikar.defaultdiscordbot.core.media.MediaAction;
+import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
+import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -14,7 +18,14 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardCom
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderEnableCommand.class);
 
-    public ConfigWizardDiscordProviderEnableCommand() {
+    private final DiscordProviderFromDiscordService discordProviderService;
+
+    private final DiscordSuggestionService discordSuggestionService;
+
+    public ConfigWizardDiscordProviderEnableCommand(DiscordProviderFromDiscordService discordProviderService,
+                                                    DiscordSuggestionService discordSuggestionService) {
+        this.discordProviderService = discordProviderService;
+        this.discordSuggestionService = discordSuggestionService;
     }
 
     @Nullable
@@ -22,9 +33,19 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardCom
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      @Nullable String argsString) {
-        logger.trace("onExitCommand(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
+        logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        // todo
+        DiscordProviderFromDiscord provider = discordProviderService.getById(session.getEntityId());
+        if (provider.isEnabled()) {
+            // todo already enabled response
+            return null;
+        }
+
+        provider.setEnabled(true);
+        discordProviderService.save(provider);
+
+        MediaAction.enableDiscordProvider(provider, discordSuggestionService);
+        // todo enabled response
         return null;
     }
 }

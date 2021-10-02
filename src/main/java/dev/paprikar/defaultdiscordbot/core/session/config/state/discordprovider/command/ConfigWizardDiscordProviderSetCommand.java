@@ -56,7 +56,7 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardComman
             return null;
         }
         String value = parts.getOther();
-        DiscordProviderFromDiscord provider = discordProviderService.getProviderById(session.getEntityId());
+        DiscordProviderFromDiscord provider = discordProviderService.getById(session.getEntityId());
 
         ConfigWizardSetterResponse response = setter.set(value, provider, discordProviderService);
 

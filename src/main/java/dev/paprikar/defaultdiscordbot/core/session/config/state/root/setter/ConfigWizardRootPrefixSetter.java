@@ -30,7 +30,7 @@ public class ConfigWizardRootPrefixSetter implements ConfigWizardRootSetter {
             );
         }
         guild.setPrefix(value);
-        guildService.saveGuild(guild);
+        guildService.save(guild);
         logger.debug("The guild={id={}} prefix is set to '{}'", guild.getId(), value);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

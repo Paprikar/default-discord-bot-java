@@ -37,7 +37,7 @@ public class SessionService {
         }
     }
 
-    public void handlePrivateMessage(PrivateMessageReceivedEvent event) {
+    public void handle(PrivateMessageReceivedEvent event) {
         long userId = event.getAuthor().getIdLong();
         PrivateSession session = activePrivateSessions.get(userId);
         if (session == null) {
@@ -49,7 +49,7 @@ public class SessionService {
             service.print(session, false);
             activePrivateSessions.remove(userId);
             session.getChannel().flatMap(PrivateChannel::close).queue();
-            logger.debug("Configuration session is ended: userId={}", userId);
+            logger.debug("handle(): Configuration session is ended: userId={}", userId);
             return;
         }
         if (targetState == null) {
@@ -73,7 +73,7 @@ public class SessionService {
         PrivateSession session = new PrivateSession();
         session.setChannel(event.getAuthor().openPrivateChannel());
         session.setService(initialService);
-        session.setEntityId(guildService.getGuildByDiscordId(event.getGuild().getIdLong()).getId());
+        session.setEntityId(guildService.getByDiscordId(event.getGuild().getIdLong()).getId());
         activePrivateSessions.put(userId, session);
 
         initialService.print(session, true);

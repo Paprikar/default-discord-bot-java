@@ -1,8 +1,9 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category;
 
+import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
@@ -32,11 +33,18 @@ public class ConfigWizardCategoryService extends ConfigWizard {
 
     private final DiscordCategoryService categoryService;
 
+    private final DiscordProviderFromDiscordService discordProviderService;
+
+    private final DiscordSuggestionService discordSuggestionService;
+
     @Autowired
-    public ConfigWizardCategoryService(DiscordGuildService guildService,
-                                       DiscordCategoryService categoryService) {
+    public ConfigWizardCategoryService(DiscordCategoryService categoryService,
+                                       DiscordProviderFromDiscordService discordProviderService,
+                                       DiscordSuggestionService discordSuggestionService) {
         super();
         this.categoryService = categoryService;
+        this.discordProviderService = discordProviderService;
+        this.discordSuggestionService = discordSuggestionService;
         setupCommands();
     }
 
@@ -99,7 +107,7 @@ public class ConfigWizardCategoryService extends ConfigWizard {
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
         if (addStateEmbed) {
-            responses.add(getStateEmbed(categoryService.getCategoryById(session.getEntityId())));
+            responses.add(getStateEmbed(categoryService.getById(session.getEntityId())));
         }
         if (!responses.isEmpty()) {
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
@@ -117,8 +125,10 @@ public class ConfigWizardCategoryService extends ConfigWizard {
         commands.put("back", new ConfigWizardCategoryBackCommand(categoryService));
         commands.put("set", new ConfigWizardCategorySetCommand(categoryService));
         commands.put("open", new ConfigWizardCategoryOpenCommand());
-        commands.put("enable", new ConfigWizardCategoryEnableCommand());
-        commands.put("disable", new ConfigWizardCategoryDisableCommand());
+        commands.put("enable", new ConfigWizardCategoryEnableCommand(categoryService,
+                discordProviderService, discordSuggestionService));
+        commands.put("disable", new ConfigWizardCategoryDisableCommand(categoryService, discordProviderService,
+                discordSuggestionService));
         commands.put("remove", new ConfigWizardCategoryRemoveCommand(categoryService));
     }
 }

@@ -1,6 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core;
 
 import dev.paprikar.defaultdiscordbot.config.DdbConfig;
+import dev.paprikar.defaultdiscordbot.core.media.MediaAction;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.slf4j.Logger;

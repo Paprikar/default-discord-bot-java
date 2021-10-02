@@ -34,7 +34,7 @@ public class DiscordCommandHandler {
         long guildId = event.getGuild().getIdLong();
         String message = event.getMessage().getContentRaw();
 
-        DiscordGuild guild = guildService.getGuildByDiscordId(guildId);
+        DiscordGuild guild = guildService.getByDiscordId(guildId);
         String prefix = guild.getPrefix();
         if (!message.startsWith(prefix)) {
             return;
@@ -47,7 +47,7 @@ public class DiscordCommandHandler {
         String commandName = parts.getFirstWord().toLowerCase();
         argsString = parts.getOther();
 
-        logger.debug("execute(): command='{}' args='{}'", commandName, argsString);
+        logger.debug("handle(): command='{}' args='{}'", commandName, argsString);
         DiscordCommand command = commands.get(commandName);
         if (command != null) {
             command.execute(argsString, event);

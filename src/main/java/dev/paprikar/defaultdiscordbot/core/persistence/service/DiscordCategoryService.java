@@ -22,48 +22,48 @@ public class DiscordCategoryService {
     }
 
     @Nonnull
-    public List<DiscordCategory> findAllCategories() {
+    public List<DiscordCategory> findAll() {
         return repository.findAll();
     }
 
     @Nonnull
-    public Optional<DiscordCategory> findCategoryById(long id) {
+    public Optional<DiscordCategory> findById(long id) {
         return repository.findById(id);
     }
 
     @Nonnull
-    public DiscordCategory getCategoryById(long id) throws EntityNotFoundException {
+    public DiscordCategory getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
     }
 
     @Nonnull
-    public List<DiscordCategory> findCategoriesByGuildId(long id) {
+    public List<DiscordCategory> findAllByGuildId(long id) {
         return repository.findAllByGuildId(id);
     }
 
     @Nonnull
-    public List<DiscordCategory> findCategoriesByGuildDiscordId(long id) {
+    public List<DiscordCategory> findAllByGuildDiscordId(long id) {
         return repository.findAllByGuildDiscordId(id);
     }
 
     @Nonnull
-    public DiscordCategory saveCategory(@Nonnull DiscordCategory category) {
+    public DiscordCategory save(@Nonnull DiscordCategory category) {
         return repository.save(category);
     }
 
-    public void deleteCategory(@Nonnull DiscordCategory category) {
+    public void delete(@Nonnull DiscordCategory category) {
         repository.delete(category);
     }
 
-    public void deleteCategoryById(long id) {
+    public void deleteById(long id) {
         repository.deleteById(id);
     }
 
-    public void deleteAllCategoriesByGuildId(long id) {
+    public void deleteAllByGuildId(long id) {
         repository.deleteAllByGuildId(id);
     }
 
-    public void deleteAllCategoriesByGuildDiscordId(long id) {
+    public void deleteAllByGuildDiscordId(long id) {
         repository.deleteAllByGuildDiscordId(id);
     }
 

@@ -36,7 +36,7 @@ public class ConfigWizardCategoryEndTimeSetter implements ConfigWizardCategorySe
             );
         }
         category.setEndTime(time);
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         logger.debug("The category={id={}} endTime is set to '{}'", category.getId(), time);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

@@ -64,8 +64,8 @@ public class DiscordCategory implements Serializable {
     private Boolean enabled = false;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "last_send_datetime")
-    private Date lastSendDatetime;
+    @Column(name = "last_send_date_time")
+    private Date lastSendDateTime;
 
     public DiscordCategory() {
     }
@@ -158,12 +158,12 @@ public class DiscordCategory implements Serializable {
         this.enabled = enabled;
     }
 
-    public Date getLastSendDatetime() {
-        return lastSendDatetime;
+    public Date getLastSendDateTime() {
+        return lastSendDateTime;
     }
 
-    public void setLastSendDatetime(Date lastSendDatetime) {
-        this.lastSendDatetime = lastSendDatetime;
+    public void setLastSendDateTime(Date lastSendDateTime) {
+        this.lastSendDateTime = lastSendDateTime;
     }
 
     public void attach(@Nonnull DiscordGuild guild) {

@@ -55,7 +55,7 @@ public class ConfigWizardRootSetCommand implements ConfigWizardCommand {
             return null;
         }
         String value = parts.getOther();
-        DiscordGuild guild = guildService.getGuildById(session.getEntityId());
+        DiscordGuild guild = guildService.getById(session.getEntityId());
         ConfigWizardSetterResponse response = setter.set(value, guildService, guild);
 
         session.getResponses().add(response.getEmbed());

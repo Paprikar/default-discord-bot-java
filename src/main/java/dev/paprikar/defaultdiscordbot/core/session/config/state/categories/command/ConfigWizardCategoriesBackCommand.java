@@ -22,7 +22,7 @@ public class ConfigWizardCategoriesBackCommand implements ConfigWizardCommand {
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      @Nullable String argsString) {
-        logger.trace("onExitCommand(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
+        logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
         return ConfigWizardState.ROOT;
     }
 }

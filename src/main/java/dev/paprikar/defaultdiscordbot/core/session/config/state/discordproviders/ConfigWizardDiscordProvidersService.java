@@ -1,14 +1,14 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders;
 
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command.ConfigWizardDiscordProvidersAddCommand;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command.ConfigWizardDiscordProvidersAddCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command.ConfigWizardDiscordProvidersBackCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command.ConfigWizardDiscordProvidersOpenCommand;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
@@ -98,8 +98,8 @@ public class ConfigWizardDiscordProvidersService extends ConfigWizard {
         if (addStateEmbed) {
             Long categoryId = session.getEntityId();
             responses.add(getStateEmbed(
-                    categoryService.getCategoryById(categoryId),
-                    discordProviderService.findProvidersByCategoryId(categoryId)
+                    categoryService.getById(categoryId),
+                    discordProviderService.findAllByCategoryId(categoryId)
             ));
         }
         if (!responses.isEmpty()) {

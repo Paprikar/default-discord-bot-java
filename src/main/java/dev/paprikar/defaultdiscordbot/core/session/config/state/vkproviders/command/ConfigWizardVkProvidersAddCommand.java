@@ -62,7 +62,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
             return null;
         }
         long categoryId = session.getEntityId();
-        for (DiscordProviderFromVk p : vkProviderService.findProvidersByCategoryId(categoryId)) {
+        for (DiscordProviderFromVk p : vkProviderService.findAllByCategoryId(categoryId)) {
             if (p.getName().equals(argsString)) {
                 session.getResponses().add(new EmbedBuilder()
                         .setColor(Color.RED)
@@ -76,7 +76,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
         }
         DiscordProviderFromVk provider = new DiscordProviderFromVk();
         provider.setName(argsString);
-        DiscordCategory category = categoryService.getCategoryById(categoryId);
+        DiscordCategory category = categoryService.getById(categoryId);
         provider = vkProviderService.attach(provider, category);
 
         session.setEntityId(provider.getId());

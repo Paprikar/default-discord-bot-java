@@ -49,7 +49,7 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
             );
         }
         List<DiscordProviderFromDiscord> providers = discordProviderService
-                .findProvidersByCategoryId(provider.getCategory().getId());
+                .findAllByCategoryId(provider.getCategory().getId());
         for (DiscordProviderFromDiscord p : providers) {
             if (p.getName().equals(value)) {
                 return new ConfigWizardSetterResponse(false, new EmbedBuilder()
@@ -62,7 +62,7 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
             }
         }
         provider.setName(value);
-        discordProviderService.saveProvider(provider);
+        discordProviderService.save(provider);
         logger.debug("The discordProvider={id={}} name is set to '{}'", provider.getId(), value);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

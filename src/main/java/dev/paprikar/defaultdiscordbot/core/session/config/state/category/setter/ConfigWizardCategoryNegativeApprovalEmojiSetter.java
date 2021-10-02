@@ -42,7 +42,7 @@ public class ConfigWizardCategoryNegativeApprovalEmojiSetter implements ConfigWi
             );
         }
         category.setNegativeApprovalEmoji(value.charAt(0));
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         logger.debug("The category={id={}} negativeApprovalEmoji is set to '{}'", category.getId(), value);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

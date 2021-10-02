@@ -63,7 +63,7 @@ public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardComma
             return null;
         }
         long categoryId = session.getEntityId();
-        for (DiscordProviderFromDiscord p : discordProviderService.findProvidersByCategoryId(categoryId)) {
+        for (DiscordProviderFromDiscord p : discordProviderService.findAllByCategoryId(categoryId)) {
             if (p.getName().equals(argsString)) {
                 session.getResponses().add(new EmbedBuilder()
                         .setColor(Color.RED)
@@ -77,7 +77,7 @@ public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardComma
         }
         DiscordProviderFromDiscord provider = new DiscordProviderFromDiscord();
         provider.setName(argsString);
-        DiscordCategory category = categoryService.getCategoryById(categoryId);
+        DiscordCategory category = categoryService.getById(categoryId);
         provider = discordProviderService.attach(provider, category);
 
         session.setEntityId(provider.getId());

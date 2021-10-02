@@ -33,7 +33,7 @@ public class ConfigWizardCategorySendingChannelIdSetter implements ConfigWizardC
             );
         }
         category.setSendingChannelId(id);
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         logger.debug("The category={id={}} sendingChannelId is set to '{}'", category.getId(), value);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

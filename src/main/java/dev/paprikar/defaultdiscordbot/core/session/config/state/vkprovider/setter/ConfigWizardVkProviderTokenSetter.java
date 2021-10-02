@@ -21,7 +21,7 @@ public class ConfigWizardVkProviderTokenSetter implements ConfigWizardVkProvider
                                           @Nonnull DiscordProviderFromVk provider,
                                           @Nonnull DiscordProviderFromVkService vkProviderService) {
         provider.setName(value);
-        vkProviderService.saveProvider(provider);
+        vkProviderService.save(provider);
         logger.debug("The vkProvider={id={}} token is set to '{}'", provider.getId(), value);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

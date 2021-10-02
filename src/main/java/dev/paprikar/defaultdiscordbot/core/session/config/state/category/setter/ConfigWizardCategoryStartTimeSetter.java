@@ -36,7 +36,7 @@ public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategory
             );
         }
         category.setStartTime(time);
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         logger.debug("The category={id={}} startTime is set to '{}'", category.getId(), time);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

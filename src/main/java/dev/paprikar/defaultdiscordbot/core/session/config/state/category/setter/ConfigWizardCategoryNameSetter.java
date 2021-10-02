@@ -39,7 +39,7 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
                     .build()
             );
         }
-        List<DiscordCategory> categories = categoryService.findCategoriesByGuildId(category.getGuild().getId());
+        List<DiscordCategory> categories = categoryService.findAllByGuildId(category.getGuild().getId());
         for (DiscordCategory c : categories) {
             if (c.getName().equals(value)) {
                 return new ConfigWizardSetterResponse(false, new EmbedBuilder()
@@ -52,7 +52,7 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
             }
         }
         category.setName(value);
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         logger.debug("The category={id={}} name is set to '{}'", category.getId(), value);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

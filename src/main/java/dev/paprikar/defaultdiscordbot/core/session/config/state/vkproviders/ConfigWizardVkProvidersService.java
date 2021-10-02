@@ -98,8 +98,8 @@ public class ConfigWizardVkProvidersService extends ConfigWizard {
         if (addStateEmbed) {
             Long entityId = session.getEntityId();
             responses.add(getStateEmbed(
-                    categoryService.getCategoryById(entityId),
-                    vkProviderService.findProvidersByCategoryId(entityId)
+                    categoryService.getById(entityId),
+                    vkProviderService.findAllByCategoryId(entityId)
             ));
         }
         if (!responses.isEmpty()) {

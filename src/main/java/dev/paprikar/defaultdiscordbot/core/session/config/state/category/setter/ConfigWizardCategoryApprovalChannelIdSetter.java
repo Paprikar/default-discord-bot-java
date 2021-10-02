@@ -33,7 +33,7 @@ public class ConfigWizardCategoryApprovalChannelIdSetter implements ConfigWizard
             );
         }
         category.setApprovalChannelId(id);
-        categoryService.saveCategory(category);
+        categoryService.save(category);
         logger.debug("The category={id={}} approvalChannelId is set to '{}'", category.getId(), value);
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)

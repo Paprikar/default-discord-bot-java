@@ -29,7 +29,7 @@ public class ConfigWizardDiscordProvidersOpenCommand implements ConfigWizardComm
                                      @Nonnull PrivateSession session,
                                      @Nullable String argsString) {
         List<DiscordProviderFromDiscord> providers = discordProviderService
-                .findProvidersByCategoryId(session.getEntityId());
+                .findAllByCategoryId(session.getEntityId());
         DiscordProviderFromDiscord targetProvider = null;
         for (DiscordProviderFromDiscord p : providers) {
             if (p.getName().equals(argsString)) {

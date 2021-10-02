@@ -95,7 +95,7 @@ public class ConfigWizardCategoriesService extends ConfigWizard {
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
         if (addStateEmbed) {
-            responses.add(getStateEmbed(categoryService.findCategoriesByGuildId(session.getEntityId())));
+            responses.add(getStateEmbed(categoryService.findAllByGuildId(session.getEntityId())));
         }
         if (!responses.isEmpty()) {
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();

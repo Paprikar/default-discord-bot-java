@@ -29,7 +29,7 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardCommand {
                                      @Nonnull PrivateSession session,
                                      @Nullable String argsString) {
         List<DiscordProviderFromVk> providers = vkProviderService
-                .findProvidersByCategoryId(session.getEntityId());
+                .findAllByCategoryId(session.getEntityId());
         DiscordProviderFromVk targetProvider = null;
         for (DiscordProviderFromVk p : providers) {
             if (p.getName().equals(argsString)) {

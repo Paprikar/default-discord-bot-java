@@ -22,57 +22,57 @@ public class DiscordProviderFromVkService {
     }
 
     @Nonnull
-    public List<DiscordProviderFromVk> findAllProviders() {
+    public List<DiscordProviderFromVk> findAll() {
         return repository.findAll();
     }
 
     @Nonnull
-    public Optional<DiscordProviderFromVk> findProviderById(long id) {
+    public Optional<DiscordProviderFromVk> findById(long id) {
         return repository.findById(id);
     }
 
     @Nonnull
-    public DiscordProviderFromVk getProviderById(long id) throws EntityNotFoundException {
+    public DiscordProviderFromVk getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
     }
 
     @Nonnull
-    public List<DiscordProviderFromVk> findProvidersByCategoryId(long id) {
+    public List<DiscordProviderFromVk> findAllByCategoryId(long id) {
         return repository.findAllByCategoryId(id);
     }
 
     @Nonnull
-    public List<DiscordProviderFromVk> findProvidersByCategoryGuildId(long id) {
+    public List<DiscordProviderFromVk> findAllByCategoryGuildId(long id) {
         return repository.findAllByCategoryGuildId(id);
     }
 
     @Nonnull
-    public List<DiscordProviderFromVk> findProvidersByCategoryGuildDiscordId(long id) {
+    public List<DiscordProviderFromVk> findAllByCategoryGuildDiscordId(long id) {
         return repository.findAllByCategoryGuildDiscordId(id);
     }
 
     @Nonnull
-    public DiscordProviderFromVk saveProvider(@Nonnull DiscordProviderFromVk category) {
+    public DiscordProviderFromVk save(@Nonnull DiscordProviderFromVk category) {
         return repository.save(category);
     }
 
-    public void deleteProvider(@Nonnull DiscordProviderFromVk category) {
+    public void delete(@Nonnull DiscordProviderFromVk category) {
         repository.delete(category);
     }
 
-    public void deleteProviderById(long id) {
+    public void deleteById(long id) {
         repository.deleteById(id);
     }
 
-    public void deleteAllProvidersByCategoryId(long id) {
+    public void deleteAllByCategoryId(long id) {
         repository.deleteAllByCategoryId(id);
     }
 
-    public void deleteAllProvidersByCategoryGuildId(long id) {
+    public void deleteAllByCategoryGuildId(long id) {
         repository.deleteAllByCategoryGuildId(id);
     }
 
-    public void deleteAllProvidersByCategoryGuildDiscordId(long id) {
+    public void deleteAllByCategoryGuildDiscordId(long id) {
         repository.deleteAllByCategoryGuildDiscordId(id);
     }
 

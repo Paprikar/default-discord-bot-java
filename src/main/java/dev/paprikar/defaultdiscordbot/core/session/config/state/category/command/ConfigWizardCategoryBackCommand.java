@@ -26,9 +26,9 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCommand {
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      @Nullable String argsString) {
-        logger.trace("onExitCommand(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
+        logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        session.setEntityId(categoryService.getCategoryById(session.getEntityId()).getGuild().getId());
+        session.setEntityId(categoryService.getById(session.getEntityId()).getGuild().getId());
         return ConfigWizardState.CATEGORIES;
     }
 }

@@ -16,8 +16,6 @@ public class DiscordGuild implements Serializable {
 
     private static final long serialVersionUID = 9149541181598340425L;
 
-    private final transient Logger logger = LoggerFactory.getLogger(DiscordCategory.class);
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "discord_guild_id_generator")
