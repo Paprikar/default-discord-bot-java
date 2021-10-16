@@ -1,12 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.categories;
 
+import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesAddCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesBackCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesOpenCommand;
@@ -32,16 +31,27 @@ public class ConfigWizardCategoriesService extends ConfigWizard {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesService.class);
 
-    private final DiscordGuildService guildService;
-
     private final DiscordCategoryService categoryService;
 
+    private final ConfigWizardCategoriesBackCommand backCommand;
+
+    private final ConfigWizardCategoriesAddCommand addCommand;
+
+    private final ConfigWizardCategoriesOpenCommand openCommand;
+
     @Autowired
-    public ConfigWizardCategoriesService(DiscordGuildService guildService,
-                                         DiscordCategoryService categoryService) {
+    public ConfigWizardCategoriesService(DiscordCategoryService categoryService,
+                                         ConfigWizardCategoriesBackCommand backCommand,
+                                         ConfigWizardCategoriesAddCommand addCommand,
+                                         ConfigWizardCategoriesOpenCommand openCommand) {
         super();
-        this.guildService = guildService;
+
         this.categoryService = categoryService;
+
+        this.backCommand = backCommand;
+        this.addCommand = addCommand;
+        this.openCommand = openCommand;
+
         setupCommands();
     }
 
@@ -63,7 +73,7 @@ public class ConfigWizardCategoriesService extends ConfigWizard {
         }
 
         builder.appendDescription("Available commands:\n");
-        builder.appendDescription("`open` `<category>`\n");
+        builder.appendDescription("`open` `<name>`\n");
         builder.appendDescription("`add` `<name>`\n");
         builder.appendDescription("`back`\n");
         builder.appendDescription("`exit`");
@@ -110,8 +120,8 @@ public class ConfigWizardCategoriesService extends ConfigWizard {
     }
 
     private void setupCommands() {
-        commands.put("back", new ConfigWizardCategoriesBackCommand());
-        commands.put("add", new ConfigWizardCategoriesAddCommand(guildService, categoryService));
-        commands.put("open", new ConfigWizardCategoriesOpenCommand(categoryService));
+        commands.put("back", backCommand);
+        commands.put("add", addCommand);
+        commands.put("open", openCommand);
     }
 }

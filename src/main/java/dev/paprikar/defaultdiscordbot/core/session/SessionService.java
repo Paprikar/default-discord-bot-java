@@ -32,6 +32,7 @@ public class SessionService {
     public SessionService(DiscordGuildService guildService,
                           List<IConfigWizard> configWizards) {
         this.guildService = guildService;
+
         for (IConfigWizard s : configWizards) {
             this.configWizardServices.put(s.getState(), s);
         }
@@ -62,6 +63,8 @@ public class SessionService {
     }
 
     public void startConfigWizardSession(GuildMessageReceivedEvent event) {
+        // todo only one session in the same time
+        // todo only administrator access
         long userId = event.getAuthor().getIdLong();
         // Ignore if any session is already started
         if (activePrivateSessions.containsKey(userId)) {

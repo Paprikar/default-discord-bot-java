@@ -9,18 +9,22 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 
+@Component
 public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardCommand {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderRemoveCommand.class);
 
     private final DiscordProviderFromVkService vkProviderService;
 
+    @Autowired
     public ConfigWizardVkProviderRemoveCommand(DiscordProviderFromVkService vkProviderService) {
         this.vkProviderService = vkProviderService;
     }
@@ -43,8 +47,10 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardCommand 
             );
             return null;
         }
+
         session.setEntityId(provider.getCategory().getId());
         vkProviderService.delete(provider);
+
         session.getResponses().add(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
@@ -54,6 +60,7 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardCommand 
         );
 
         logger.debug("The vkProvider={id={}} was deleted", provider.getId());
+
         return ConfigWizardState.VK_PROVIDERS;
     }
 }

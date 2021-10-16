@@ -24,6 +24,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConfigWizardRootService extends ConfigWizard {
@@ -32,10 +33,21 @@ public class ConfigWizardRootService extends ConfigWizard {
 
     private final DiscordGuildService guildService;
 
+    private final ConfigWizardRootSetCommand setCommand;
+
+    private final ConfigWizardRootOpenCommand openCommand;
+
     @Autowired
-    public ConfigWizardRootService(DiscordGuildService guildService) {
+    public ConfigWizardRootService(DiscordGuildService guildService,
+                                   ConfigWizardRootSetCommand setCommand,
+                                   ConfigWizardRootOpenCommand openCommand) {
         super();
+
         this.guildService = guildService;
+
+        this.setCommand = setCommand;
+        this.openCommand = openCommand;
+
         setupCommands();
     }
 
@@ -84,9 +96,19 @@ public class ConfigWizardRootService extends ConfigWizard {
     @Override
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
+
         if (addStateEmbed) {
-            responses.add(getStateEmbed(guildService.getById(session.getEntityId())));
+            Optional<DiscordGuild> guildOptional = guildService.findById(session.getEntityId());
+            MessageEmbed embed;
+            if (guildOptional.isPresent()) {
+                embed = getStateEmbed(guildOptional.get());
+            } else {
+                embed = null; // todo error response
+                logger.error("print(): Unable to get guild={id={}}", session.getEntityId());
+            }
+            responses.add(embed);
         }
+
         if (!responses.isEmpty()) {
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
@@ -100,7 +122,7 @@ public class ConfigWizardRootService extends ConfigWizard {
     }
 
     private void setupCommands() {
-        commands.put("set", new ConfigWizardRootSetCommand(guildService));
-        commands.put("open", new ConfigWizardRootOpenCommand());
+        commands.put("set", setCommand);
+        commands.put("open", openCommand);
     }
 }

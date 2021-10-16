@@ -6,21 +6,29 @@ import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetterResp
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
 
+@Component
 public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderSetter {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderNameSetter.class);
 
+    private final DiscordProviderFromVkService vkProviderService;
+
+    @Autowired
+    public ConfigWizardVkProviderNameSetter(DiscordProviderFromVkService vkProviderService) {
+        this.vkProviderService = vkProviderService;
+    }
+
     @Nonnull
     @Override
-    public ConfigWizardSetterResponse set(@Nonnull String value,
-                                          @Nonnull DiscordProviderFromVk provider,
-                                          @Nonnull DiscordProviderFromVkService vkProviderService) {
+    public ConfigWizardSetterResponse set(@Nonnull String value, @Nonnull DiscordProviderFromVk provider) {
         if (value.isEmpty()) {
             return new ConfigWizardSetterResponse(false, new EmbedBuilder()
                     .setColor(Color.RED)
@@ -30,6 +38,7 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
                     .build()
             );
         }
+
         if (value.length() > 32) {
             return new ConfigWizardSetterResponse(false, new EmbedBuilder()
                     .setColor(Color.RED)
@@ -39,6 +48,7 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
                     .build()
             );
         }
+
         if (provider.getName().equals(value)) {
             return new ConfigWizardSetterResponse(false, new EmbedBuilder()
                     .setColor(Color.RED)
@@ -48,8 +58,10 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
                     .build()
             );
         }
+
         List<DiscordProviderFromVk> providers = vkProviderService
                 .findAllByCategoryId(provider.getCategory().getId());
+        // todo ? use name index
         for (DiscordProviderFromVk p : providers) {
             if (p.getName().equals(value)) {
                 return new ConfigWizardSetterResponse(false, new EmbedBuilder()
@@ -61,9 +73,12 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
                 );
             }
         }
+
         provider.setName(value);
         vkProviderService.save(provider);
+
         logger.debug("The vkProvider={id={}} name is set to '{}'", provider.getId(), value);
+
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")

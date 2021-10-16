@@ -12,23 +12,62 @@ import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+@Component
 public class ConfigWizardCategorySetCommand implements ConfigWizardCommand {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategorySetCommand.class);
 
     private final DiscordCategoryService categoryService;
 
+    private final ConfigWizardCategoryNameSetter nameSetter;
+
+    private final ConfigWizardCategorySendingChannelIdSetter sendingChannelIdSetter;
+
+    private final ConfigWizardCategoryApprovalChannelIdSetter approvalChannelIdSetter;
+
+    private final ConfigWizardCategoryStartTimeSetter startTimeSetter;
+
+    private final ConfigWizardCategoryEndTimeSetter endTimeSetter;
+
+    private final ConfigWizardCategoryReserveDaysSetter reserveDaysSetter;
+
+    private final ConfigWizardCategoryPositiveApprovalEmojiSetter positiveApprovalEmojiSetter;
+
+    private final ConfigWizardCategoryNegativeApprovalEmojiSetter negativeApprovalEmojiSetter;
+
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardCategorySetter> setters = new HashMap<>();
 
-    public ConfigWizardCategorySetCommand(DiscordCategoryService categoryService) {
+    @Autowired
+    public ConfigWizardCategorySetCommand(DiscordCategoryService categoryService,
+                                          ConfigWizardCategoryNameSetter nameSetter,
+                                          ConfigWizardCategorySendingChannelIdSetter sendingChannelIdSetter,
+                                          ConfigWizardCategoryApprovalChannelIdSetter approvalChannelIdSetter,
+                                          ConfigWizardCategoryStartTimeSetter startTimeSetter,
+                                          ConfigWizardCategoryEndTimeSetter endTimeSetter,
+                                          ConfigWizardCategoryReserveDaysSetter reserveDaysSetter,
+                                          ConfigWizardCategoryPositiveApprovalEmojiSetter positiveApprovalEmojiSetter,
+                                          ConfigWizardCategoryNegativeApprovalEmojiSetter negativeApprovalEmojiSetter) {
         this.categoryService = categoryService;
+
+        this.nameSetter = nameSetter;
+        this.sendingChannelIdSetter = sendingChannelIdSetter;
+        this.approvalChannelIdSetter = approvalChannelIdSetter;
+        this.startTimeSetter = startTimeSetter;
+        this.endTimeSetter = endTimeSetter;
+        this.reserveDaysSetter = reserveDaysSetter;
+        this.positiveApprovalEmojiSetter = positiveApprovalEmojiSetter;
+        this.negativeApprovalEmojiSetter = negativeApprovalEmojiSetter;
+
         setupSetters();
     }
 
@@ -53,10 +92,20 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCommand {
             // todo illegal var name response
             return null;
         }
-        String value = parts.getOther();
-        DiscordCategory category = categoryService.getById(session.getEntityId());
 
-        ConfigWizardSetterResponse response = setter.set(value, category, categoryService);
+        Optional<DiscordCategory> categoryOptional = categoryService.findById(session.getEntityId());
+        if (!categoryOptional.isPresent()) {
+            // todo error response
+
+            logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());
+
+            return ConfigWizardState.END;
+        }
+        DiscordCategory category = categoryOptional.get();
+
+        String value = parts.getOther();
+
+        ConfigWizardSetterResponse response = setter.set(value, category);
 
         session.getResponses().add(response.getEmbed());
         session.getResponses().add(ConfigWizardCategoryService.getStateEmbed(category));
@@ -65,13 +114,13 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCommand {
     }
 
     private void setupSetters() {
-        setters.put("name", new ConfigWizardCategoryNameSetter());
-        setters.put("sendingChannelId", new ConfigWizardCategorySendingChannelIdSetter());
-        setters.put("approvalChannelId", new ConfigWizardCategoryApprovalChannelIdSetter());
-        setters.put("startTime", new ConfigWizardCategoryStartTimeSetter());
-        setters.put("endTime", new ConfigWizardCategoryEndTimeSetter());
-        setters.put("reserveDays", new ConfigWizardCategoryReserveDaysSetter());
-        setters.put("positiveApprovalEmoji", new ConfigWizardCategoryPositiveApprovalEmojiSetter());
-        setters.put("negativeApprovalEmoji", new ConfigWizardCategoryNegativeApprovalEmojiSetter());
+        setters.put("name", nameSetter);
+        setters.put("sendingChannelId", sendingChannelIdSetter);
+        setters.put("approvalChannelId", approvalChannelIdSetter);
+        setters.put("startTime", startTimeSetter);
+        setters.put("endTime", endTimeSetter);
+        setters.put("reserveDays", reserveDaysSetter);
+        setters.put("positiveApprovalEmoji", positiveApprovalEmojiSetter);
+        setters.put("negativeApprovalEmoji", negativeApprovalEmojiSetter);
     }
 }

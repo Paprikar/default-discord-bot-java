@@ -27,6 +27,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConfigWizardDiscordProvidersService extends ConfigWizard {
@@ -37,16 +38,32 @@ public class ConfigWizardDiscordProvidersService extends ConfigWizard {
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
+    private final ConfigWizardDiscordProvidersBackCommand backCommand;
+
+    private final ConfigWizardDiscordProvidersAddCommand addCommand;
+
+    private final ConfigWizardDiscordProvidersOpenCommand openCommand;
+
     @Autowired
     public ConfigWizardDiscordProvidersService(DiscordCategoryService categoryService,
-                                               DiscordProviderFromDiscordService discordProviderService) {
+                                               DiscordProviderFromDiscordService discordProviderService,
+                                               ConfigWizardDiscordProvidersBackCommand backCommand,
+                                               ConfigWizardDiscordProvidersAddCommand addCommand,
+                                               ConfigWizardDiscordProvidersOpenCommand openCommand) {
         super();
+
         this.categoryService = categoryService;
         this.discordProviderService = discordProviderService;
+
+        this.backCommand = backCommand;
+        this.addCommand = addCommand;
+        this.openCommand = openCommand;
+
         setupCommands();
     }
 
-    public static MessageEmbed getStateEmbed(DiscordCategory category, List<DiscordProviderFromDiscord> providers) {
+    public static MessageEmbed getStateEmbed(@Nonnull DiscordCategory category,
+                                             @Nonnull List<DiscordProviderFromDiscord> providers) {
         EmbedBuilder builder = new EmbedBuilder();
         builder
                 .setColor(Color.GRAY)
@@ -64,7 +81,7 @@ public class ConfigWizardDiscordProvidersService extends ConfigWizard {
         }
 
         builder.appendDescription("Available commands:\n");
-        builder.appendDescription("`open` `<discord provider>`\n");
+        builder.appendDescription("`open` `<name>`\n");
         builder.appendDescription("`add` `<name>`\n");
         builder.appendDescription("`back`\n");
         builder.appendDescription("`exit`");
@@ -81,13 +98,14 @@ public class ConfigWizardDiscordProvidersService extends ConfigWizard {
         String message = event.getMessage().getContentRaw();
         FirstWordAndOther parts = new FirstWordAndOther(message);
         String commandName = parts.getFirstWord().toLowerCase();
-        String argsString = parts.getOther();
 
         ConfigWizardCommand command = commands.get(commandName);
         if (command == null) {
             // todo illegal command response ?
             return null;
         }
+
+        String argsString = parts.getOther();
         return command.execute(event, session, argsString);
     }
 
@@ -95,13 +113,20 @@ public class ConfigWizardDiscordProvidersService extends ConfigWizard {
     @Override
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
+
         if (addStateEmbed) {
             Long categoryId = session.getEntityId();
-            responses.add(getStateEmbed(
-                    categoryService.getById(categoryId),
-                    discordProviderService.findAllByCategoryId(categoryId)
-            ));
+            Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
+            MessageEmbed embed;
+            if (categoryOptional.isPresent()) {
+                embed = getStateEmbed(categoryOptional.get(), discordProviderService.findAllByCategoryId(categoryId));
+            } else {
+                embed = null; // todo error response
+                logger.error("print(): Unable to get category={id={}}", session.getEntityId());
+            }
+            responses.add(embed);
         }
+
         if (!responses.isEmpty()) {
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
@@ -115,8 +140,8 @@ public class ConfigWizardDiscordProvidersService extends ConfigWizard {
     }
 
     private void setupCommands() {
-        commands.put("back", new ConfigWizardDiscordProvidersBackCommand());
-        commands.put("add", new ConfigWizardDiscordProvidersAddCommand(categoryService, discordProviderService));
-        commands.put("open", new ConfigWizardDiscordProvidersOpenCommand(discordProviderService));
+        commands.put("back", backCommand);
+        commands.put("add", addCommand);
+        commands.put("open", openCommand);
     }
 }

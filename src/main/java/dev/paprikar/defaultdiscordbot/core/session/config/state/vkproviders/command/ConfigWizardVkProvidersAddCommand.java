@@ -4,19 +4,22 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 
+@Component
 public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersAddCommand.class);
@@ -25,6 +28,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
 
     private final DiscordProviderFromVkService vkProviderService;
 
+    @Autowired
     public ConfigWizardVkProvidersAddCommand(DiscordCategoryService categoryService,
                                              DiscordProviderFromVkService vkProviderService) {
         this.categoryService = categoryService;
@@ -41,6 +45,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
             // todo internal error response
             return null;
         }
+
         if (argsString.isEmpty()) {
             session.getResponses().add(new EmbedBuilder()
                     .setColor(Color.RED)
@@ -51,6 +56,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
             );
             return null;
         }
+
         if (argsString.length() > 32) {
             session.getResponses().add(new EmbedBuilder()
                     .setColor(Color.RED)
@@ -61,7 +67,9 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
             );
             return null;
         }
+
         long categoryId = session.getEntityId();
+        // todo ? use name index
         for (DiscordProviderFromVk p : vkProviderService.findAllByCategoryId(categoryId)) {
             if (p.getName().equals(argsString)) {
                 session.getResponses().add(new EmbedBuilder()
@@ -74,6 +82,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
                 return null;
             }
         }
+
         DiscordProviderFromVk provider = new DiscordProviderFromVk();
         provider.setName(argsString);
         DiscordCategory category = categoryService.getById(categoryId);
@@ -82,6 +91,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
         session.setEntityId(provider.getId());
 
         logger.debug("Add at VK_PROVIDERS: name={}, session={}", argsString, session);
+
         return ConfigWizardState.VK_PROVIDER;
     }
 }

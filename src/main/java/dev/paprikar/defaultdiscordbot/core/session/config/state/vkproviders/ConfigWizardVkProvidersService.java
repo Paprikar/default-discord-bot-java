@@ -4,13 +4,13 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command.ConfigWizardVkProvidersAddCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command.ConfigWizardVkProvidersBackCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command.ConfigWizardVkProvidersOpenCommand;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -37,12 +37,27 @@ public class ConfigWizardVkProvidersService extends ConfigWizard {
 
     private final DiscordProviderFromVkService vkProviderService;
 
+    private final ConfigWizardVkProvidersBackCommand backCommand;
+
+    private final ConfigWizardVkProvidersAddCommand addCommand;
+
+    private final ConfigWizardVkProvidersOpenCommand openCommand;
+
     @Autowired
     public ConfigWizardVkProvidersService(DiscordCategoryService categoryService,
-                                          DiscordProviderFromVkService vkProviderService) {
+                                          DiscordProviderFromVkService vkProviderService,
+                                          ConfigWizardVkProvidersBackCommand backCommand,
+                                          ConfigWizardVkProvidersAddCommand addCommand,
+                                          ConfigWizardVkProvidersOpenCommand openCommand) {
         super();
+
         this.categoryService = categoryService;
         this.vkProviderService = vkProviderService;
+
+        this.backCommand = backCommand;
+        this.addCommand = addCommand;
+        this.openCommand = openCommand;
+
         setupCommands();
     }
 
@@ -64,7 +79,7 @@ public class ConfigWizardVkProvidersService extends ConfigWizard {
         }
 
         builder.appendDescription("Available commands:\n");
-        builder.appendDescription("`open` `<vk provider>`\n");
+        builder.appendDescription("`open` `<name>`\n");
         builder.appendDescription("`add` `<name>`\n");
         builder.appendDescription("`back`\n");
         builder.appendDescription("`exit`");
@@ -81,13 +96,14 @@ public class ConfigWizardVkProvidersService extends ConfigWizard {
         String message = event.getMessage().getContentRaw();
         FirstWordAndOther parts = new FirstWordAndOther(message);
         String commandName = parts.getFirstWord().toLowerCase();
-        String argsString = parts.getOther();
-
         ConfigWizardCommand command = commands.get(commandName);
+
         if (command == null) {
             // todo illegal command response ?
             return null;
         }
+
+        String argsString = parts.getOther();
         return command.execute(event, session, argsString);
     }
 
@@ -95,6 +111,7 @@ public class ConfigWizardVkProvidersService extends ConfigWizard {
     @Override
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
+
         if (addStateEmbed) {
             Long entityId = session.getEntityId();
             responses.add(getStateEmbed(
@@ -102,6 +119,7 @@ public class ConfigWizardVkProvidersService extends ConfigWizard {
                     vkProviderService.findAllByCategoryId(entityId)
             ));
         }
+
         if (!responses.isEmpty()) {
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
@@ -115,8 +133,8 @@ public class ConfigWizardVkProvidersService extends ConfigWizard {
     }
 
     private void setupCommands() {
-        commands.put("back", new ConfigWizardVkProvidersBackCommand());
-        commands.put("add", new ConfigWizardVkProvidersAddCommand(categoryService, vkProviderService));
-        commands.put("open", new ConfigWizardVkProvidersOpenCommand(vkProviderService));
+        commands.put("back", backCommand);
+        commands.put("add", addCommand);
+        commands.put("open", openCommand);
     }
 }

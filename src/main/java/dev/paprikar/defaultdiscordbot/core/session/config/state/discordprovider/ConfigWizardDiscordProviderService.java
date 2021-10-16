@@ -1,6 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider;
 
-import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
@@ -25,6 +24,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConfigWizardDiscordProviderService extends ConfigWizard {
@@ -33,14 +33,33 @@ public class ConfigWizardDiscordProviderService extends ConfigWizard {
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
-    private final DiscordSuggestionService discordSuggestionService;
+    private final ConfigWizardDiscordProviderBackCommand backCommand;
+
+    private final ConfigWizardDiscordProviderSetCommand setCommand;
+
+    private final ConfigWizardDiscordProviderEnableCommand enableCommand;
+
+    private final ConfigWizardDiscordProviderDisableCommand disableCommand;
+
+    private final ConfigWizardDiscordProviderRemoveCommand removeCommand;
 
     @Autowired
     public ConfigWizardDiscordProviderService(DiscordProviderFromDiscordService discordProviderService,
-                                              DiscordSuggestionService discordSuggestionService) {
+                                              ConfigWizardDiscordProviderBackCommand backCommand,
+                                              ConfigWizardDiscordProviderSetCommand setCommand,
+                                              ConfigWizardDiscordProviderEnableCommand enableCommand,
+                                              ConfigWizardDiscordProviderDisableCommand disableCommand,
+                                              ConfigWizardDiscordProviderRemoveCommand removeCommand) {
         super();
+
         this.discordProviderService = discordProviderService;
-        this.discordSuggestionService = discordSuggestionService;
+
+        this.backCommand = backCommand;
+        this.setCommand = setCommand;
+        this.enableCommand = enableCommand;
+        this.disableCommand = disableCommand;
+        this.removeCommand = removeCommand;
+
         setupCommands();
     }
 
@@ -79,13 +98,15 @@ public class ConfigWizardDiscordProviderService extends ConfigWizard {
         String message = event.getMessage().getContentRaw();
         FirstWordAndOther parts = new FirstWordAndOther(message);
         String commandName = parts.getFirstWord().toLowerCase();
-        String argsString = parts.getOther();
-
         ConfigWizardCommand command = commands.get(commandName);
+
         if (command == null) {
             // todo illegal command response ?
             return null;
         }
+
+        String argsString = parts.getOther();
+
         return command.execute(event, session, argsString);
     }
 
@@ -93,9 +114,20 @@ public class ConfigWizardDiscordProviderService extends ConfigWizard {
     @Override
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
+
         if (addStateEmbed) {
-            responses.add(getStateEmbed(discordProviderService.getById(session.getEntityId())));
+            Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService
+                    .findById(session.getEntityId());
+            MessageEmbed embed;
+            if (discordProviderOptional.isPresent()) {
+                embed = getStateEmbed(discordProviderOptional.get());
+            } else {
+                embed = null; // todo error response
+                logger.error("print(): Unable to get discordProvider={id={}}", session.getEntityId());
+            }
+            responses.add(embed);
         }
+
         if (!responses.isEmpty()) {
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
@@ -109,12 +141,10 @@ public class ConfigWizardDiscordProviderService extends ConfigWizard {
     }
 
     private void setupCommands() {
-        commands.put("back", new ConfigWizardDiscordProviderBackCommand(discordProviderService));
-        commands.put("set", new ConfigWizardDiscordProviderSetCommand(discordProviderService));
-        commands.put("enable", new ConfigWizardDiscordProviderEnableCommand(
-                discordProviderService, discordSuggestionService));
-        commands.put("disable", new ConfigWizardDiscordProviderDisableCommand(discordProviderService,
-                discordSuggestionService));
-        commands.put("remove", new ConfigWizardDiscordProviderRemoveCommand(discordProviderService));
+        commands.put("back", backCommand);
+        commands.put("set", setCommand);
+        commands.put("enable", enableCommand);
+        commands.put("disable", disableCommand);
+        commands.put("remove", removeCommand);
     }
 }

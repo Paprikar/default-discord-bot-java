@@ -11,12 +11,16 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
+import java.util.Optional;
 
+@Component
 public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesAddCommand.class);
@@ -25,8 +29,8 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
 
     private final DiscordCategoryService categoryService;
 
-    public ConfigWizardCategoriesAddCommand(DiscordGuildService guildService,
-                                            DiscordCategoryService categoryService) {
+    @Autowired
+    public ConfigWizardCategoriesAddCommand(DiscordGuildService guildService, DiscordCategoryService categoryService) {
         this.guildService = guildService;
         this.categoryService = categoryService;
     }
@@ -41,10 +45,12 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
             // todo internal error response
             return null;
         }
+
         if (argsString.isEmpty()) {
             // todo invalid input response
             return null;
         }
+
         if (argsString.length() > 32) {
             session.getResponses().add(new EmbedBuilder()
                     .setColor(Color.RED)
@@ -55,6 +61,7 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
             );
             return null;
         }
+
         long guildId = session.getEntityId();
         for (DiscordCategory c : categoryService.findAllByGuildId(guildId)) {
             if (c.getName().equals(argsString)) {
@@ -69,14 +76,23 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
             }
         }
 
+        Optional<DiscordGuild> guildOptional = guildService.findById(guildId);
+        if (!guildOptional.isPresent()) {
+            // todo error response
+
+            logger.error("execute(): Unable to get guild={id={}}, ending session", session.getEntityId());
+
+            return ConfigWizardState.END;
+        }
+
         DiscordCategory category = new DiscordCategory();
         category.setName(argsString);
-        DiscordGuild guild = guildService.getById(guildId);
-        category = categoryService.attach(category, guild);
+        category = categoryService.attach(category, guildOptional.get());
 
         session.setEntityId(category.getId());
 
         logger.debug("Add at CATEGORIES: name={}, session={}", argsString, session);
+
         return ConfigWizardState.CATEGORY;
     }
 }

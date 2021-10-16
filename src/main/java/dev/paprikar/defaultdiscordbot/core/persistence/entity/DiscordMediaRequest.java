@@ -2,6 +2,7 @@ package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -34,6 +35,12 @@ public class DiscordMediaRequest implements Serializable {
     private Date creationDateTime;
 
     public DiscordMediaRequest() {
+    }
+
+    public DiscordMediaRequest(DiscordCategory category, String content) {
+        this.category = category;
+        this.content = content;
+        this.creationDateTime = Date.from(Instant.now());
     }
 
     public Long getId() {

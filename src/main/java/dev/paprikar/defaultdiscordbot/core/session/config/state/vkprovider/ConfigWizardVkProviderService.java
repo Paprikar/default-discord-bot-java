@@ -24,6 +24,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConfigWizardVkProviderService extends ConfigWizard {
@@ -32,10 +33,33 @@ public class ConfigWizardVkProviderService extends ConfigWizard {
 
     private final DiscordProviderFromVkService vkProviderService;
 
+    private final ConfigWizardVkProviderBackCommand backCommand;
+
+    private final ConfigWizardVkProviderSetCommand setCommand;
+
+    private final ConfigWizardVkProviderEnableCommand enableCommand;
+
+    private final ConfigWizardVkProviderDisableCommand disableCommand;
+
+    private final ConfigWizardVkProviderRemoveCommand removeCommand;
+
     @Autowired
-    public ConfigWizardVkProviderService(DiscordProviderFromVkService vkProviderService) {
+    public ConfigWizardVkProviderService(DiscordProviderFromVkService vkProviderService,
+                                         ConfigWizardVkProviderBackCommand backCommand,
+                                         ConfigWizardVkProviderSetCommand setCommand,
+                                         ConfigWizardVkProviderEnableCommand enableCommand,
+                                         ConfigWizardVkProviderDisableCommand disableCommand,
+                                         ConfigWizardVkProviderRemoveCommand removeCommand) {
         super();
+
         this.vkProviderService = vkProviderService;
+
+        this.backCommand = backCommand;
+        this.setCommand = setCommand;
+        this.enableCommand = enableCommand;
+        this.disableCommand = disableCommand;
+        this.removeCommand = removeCommand;
+
         setupCommands();
     }
 
@@ -75,13 +99,14 @@ public class ConfigWizardVkProviderService extends ConfigWizard {
         String message = event.getMessage().getContentRaw();
         FirstWordAndOther parts = new FirstWordAndOther(message);
         String commandName = parts.getFirstWord().toLowerCase();
-        String argsString = parts.getOther();
-
         ConfigWizardCommand command = commands.get(commandName);
+
         if (command == null) {
             // todo illegal command response ?
             return null;
         }
+
+        String argsString = parts.getOther();
         return command.execute(event, session, argsString);
     }
 
@@ -89,9 +114,19 @@ public class ConfigWizardVkProviderService extends ConfigWizard {
     @Override
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
+
         if (addStateEmbed) {
-            responses.add(getStateEmbed(vkProviderService.getById(session.getEntityId())));
+            Optional<DiscordProviderFromVk> categoryOptional = vkProviderService.findById(session.getEntityId());
+            MessageEmbed embed;
+            if (categoryOptional.isPresent()) {
+                embed = getStateEmbed(categoryOptional.get());
+            } else {
+                embed = null; // todo error response
+                logger.error("print(): Unable to get vkProvider={id={}}", session.getEntityId());
+            }
+            responses.add(embed);
         }
+
         if (!responses.isEmpty()) {
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
@@ -105,10 +140,10 @@ public class ConfigWizardVkProviderService extends ConfigWizard {
     }
 
     private void setupCommands() {
-        commands.put("back", new ConfigWizardVkProviderBackCommand(vkProviderService));
-        commands.put("set", new ConfigWizardVkProviderSetCommand(vkProviderService));
-        commands.put("enable", new ConfigWizardVkProviderEnableCommand());
-        commands.put("disable", new ConfigWizardVkProviderDisableCommand());
-        commands.put("remove", new ConfigWizardVkProviderRemoveCommand(vkProviderService));
+        commands.put("back", backCommand);
+        commands.put("set", setCommand);
+        commands.put("enable", enableCommand);
+        commands.put("disable", disableCommand);
+        commands.put("remove", removeCommand);
     }
 }

@@ -1,9 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category;
 
-import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
@@ -25,6 +23,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConfigWizardCategoryService extends ConfigWizard {
@@ -33,18 +32,37 @@ public class ConfigWizardCategoryService extends ConfigWizard {
 
     private final DiscordCategoryService categoryService;
 
-    private final DiscordProviderFromDiscordService discordProviderService;
+    private final ConfigWizardCategoryBackCommand backCommand;
 
-    private final DiscordSuggestionService discordSuggestionService;
+    private final ConfigWizardCategorySetCommand setCommand;
+
+    private final ConfigWizardCategoryOpenCommand openCommand;
+
+    private final ConfigWizardCategoryEnableCommand enableCommand;
+
+    private final ConfigWizardCategoryDisableCommand disableCommand;
+
+    private final ConfigWizardCategoryRemoveCommand removeCommand;
 
     @Autowired
     public ConfigWizardCategoryService(DiscordCategoryService categoryService,
-                                       DiscordProviderFromDiscordService discordProviderService,
-                                       DiscordSuggestionService discordSuggestionService) {
+                                       ConfigWizardCategoryBackCommand backCommand,
+                                       ConfigWizardCategorySetCommand setCommand,
+                                       ConfigWizardCategoryOpenCommand openCommand,
+                                       ConfigWizardCategoryEnableCommand enableCommand,
+                                       ConfigWizardCategoryDisableCommand disableCommand,
+                                       ConfigWizardCategoryRemoveCommand removeCommand) {
         super();
+
         this.categoryService = categoryService;
-        this.discordProviderService = discordProviderService;
-        this.discordSuggestionService = discordSuggestionService;
+
+        this.backCommand = backCommand;
+        this.setCommand = setCommand;
+        this.openCommand = openCommand;
+        this.enableCommand = enableCommand;
+        this.disableCommand = disableCommand;
+        this.removeCommand = removeCommand;
+
         setupCommands();
     }
 
@@ -106,10 +124,21 @@ public class ConfigWizardCategoryService extends ConfigWizard {
     @Override
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
+
         if (addStateEmbed) {
-            responses.add(getStateEmbed(categoryService.getById(session.getEntityId())));
+            Optional<DiscordCategory> categoryOptional = categoryService.findById(session.getEntityId());
+            MessageEmbed embed;
+            if (categoryOptional.isPresent()) {
+                embed = getStateEmbed(categoryOptional.get());
+            } else {
+                embed = null; // todo error response
+                logger.error("print(): Unable to get category={id={}}", session.getEntityId());
+            }
+            responses.add(embed);
         }
+
         if (!responses.isEmpty()) {
+            // todo without flatMap
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
         }
@@ -122,13 +151,11 @@ public class ConfigWizardCategoryService extends ConfigWizard {
     }
 
     private void setupCommands() {
-        commands.put("back", new ConfigWizardCategoryBackCommand(categoryService));
-        commands.put("set", new ConfigWizardCategorySetCommand(categoryService));
-        commands.put("open", new ConfigWizardCategoryOpenCommand());
-        commands.put("enable", new ConfigWizardCategoryEnableCommand(categoryService,
-                discordProviderService, discordSuggestionService));
-        commands.put("disable", new ConfigWizardCategoryDisableCommand(categoryService, discordProviderService,
-                discordSuggestionService));
-        commands.put("remove", new ConfigWizardCategoryRemoveCommand(categoryService));
+        commands.put("back", backCommand);
+        commands.put("set", setCommand);
+        commands.put("open", openCommand);
+        commands.put("enable", enableCommand);
+        commands.put("disable", disableCommand);
+        commands.put("remove", removeCommand);
     }
 }

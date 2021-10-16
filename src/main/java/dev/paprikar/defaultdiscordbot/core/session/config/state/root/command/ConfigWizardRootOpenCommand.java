@@ -1,17 +1,20 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.root.command;
 
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class ConfigWizardRootOpenCommand implements ConfigWizardCommand {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardRootOpenCommand.class);
@@ -19,6 +22,7 @@ public class ConfigWizardRootOpenCommand implements ConfigWizardCommand {
     // Map<Directory, State>
     private final Map<String, ConfigWizardState> targets = new HashMap<>();
 
+    @Autowired
     public ConfigWizardRootOpenCommand() {
         setupTargets();
     }
@@ -33,12 +37,15 @@ public class ConfigWizardRootOpenCommand implements ConfigWizardCommand {
             // todo internal error response
             return null;
         }
+
         ConfigWizardState targetState = targets.get(argsString);
         if (targetState == null) {
             // todo illegal command response
             return null;
         }
+
         logger.debug("Open at ROOT: targetState='{}'", argsString);
+
         return targetState;
     }
 

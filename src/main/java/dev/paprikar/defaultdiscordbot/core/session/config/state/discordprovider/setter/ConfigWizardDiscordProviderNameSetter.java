@@ -6,21 +6,29 @@ import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetterResp
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
 
+@Component
 public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscordProviderSetter {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderNameSetter.class);
 
+    private final DiscordProviderFromDiscordService discordProviderService;
+
+    @Autowired
+    public ConfigWizardDiscordProviderNameSetter(DiscordProviderFromDiscordService discordProviderService) {
+        this.discordProviderService = discordProviderService;
+    }
+
     @Nonnull
     @Override
-    public ConfigWizardSetterResponse set(@Nonnull String value,
-                                          @Nonnull DiscordProviderFromDiscord provider,
-                                          @Nonnull DiscordProviderFromDiscordService discordProviderService) {
+    public ConfigWizardSetterResponse set(@Nonnull String value, @Nonnull DiscordProviderFromDiscord provider) {
         if (value.isEmpty()) {
             return new ConfigWizardSetterResponse(false, new EmbedBuilder()
                     .setColor(Color.RED)
@@ -30,6 +38,7 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
                     .build()
             );
         }
+
         if (value.length() > 32) {
             return new ConfigWizardSetterResponse(false, new EmbedBuilder()
                     .setColor(Color.RED)
@@ -39,6 +48,7 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
                     .build()
             );
         }
+
         if (provider.getName().equals(value)) {
             return new ConfigWizardSetterResponse(false, new EmbedBuilder()
                     .setColor(Color.RED)
@@ -48,8 +58,10 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
                     .build()
             );
         }
+
         List<DiscordProviderFromDiscord> providers = discordProviderService
                 .findAllByCategoryId(provider.getCategory().getId());
+        // todo ? use name index
         for (DiscordProviderFromDiscord p : providers) {
             if (p.getName().equals(value)) {
                 return new ConfigWizardSetterResponse(false, new EmbedBuilder()
@@ -61,9 +73,12 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
                 );
             }
         }
+
         provider.setName(value);
         discordProviderService.save(provider);
+
         logger.debug("The discordProvider={id={}} name is set to '{}'", provider.getId(), value);
+
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
