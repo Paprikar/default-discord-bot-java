@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class ConfigWizardVkProviderSetCommand implements ConfigWizardCommand {
@@ -72,8 +73,17 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardCommand {
             return null;
         }
 
+        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(session.getEntityId());
+        if (!vkProviderOptional.isPresent()) {
+            // todo error response
+
+            logger.error("execute(): Unable to get vkProvider={id={}}, ending session", session.getEntityId());
+
+            return ConfigWizardState.END;
+        }
+        DiscordProviderFromVk provider = vkProviderOptional.get();
+
         String value = parts.getOther();
-        DiscordProviderFromVk provider = vkProviderService.getById(session.getEntityId());
 
         ConfigWizardSetterResponse response = setter.set(value, provider);
 

@@ -70,6 +70,7 @@ public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardComma
         }
 
         long categoryId = session.getEntityId();
+        // todo use name index ?
         for (DiscordProviderFromDiscord p : discordProviderService.findAllByCategoryId(categoryId)) {
             if (p.getName().equals(argsString)) {
                 session.getResponses().add(new EmbedBuilder()

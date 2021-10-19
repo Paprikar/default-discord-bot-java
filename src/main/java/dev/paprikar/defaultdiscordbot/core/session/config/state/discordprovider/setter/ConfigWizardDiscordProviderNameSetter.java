@@ -61,7 +61,7 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
 
         List<DiscordProviderFromDiscord> providers = discordProviderService
                 .findAllByCategoryId(provider.getCategory().getId());
-        // todo ? use name index
+        // todo use name index ?
         for (DiscordProviderFromDiscord p : providers) {
             if (p.getName().equals(value)) {
                 return new ConfigWizardSetterResponse(false, new EmbedBuilder()

@@ -1,5 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.command;
 
+import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @Component
 public class ConfigWizardVkProviderBackCommand implements ConfigWizardCommand {
@@ -32,8 +34,16 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardCommand {
                                      @Nullable String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        session.setEntityId(vkProviderService.getById(session.getEntityId()).getCategory().getId());
+        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(session.getEntityId());
+        if (!vkProviderOptional.isPresent()) {
+            // todo error response
 
+            logger.error("execute(): Unable to get vkProvider={id={}}, ending session", session.getEntityId());
+
+            return ConfigWizardState.END;
+        }
+
+        session.setEntityId(vkProviderOptional.get().getCategory().getId());
         return ConfigWizardState.VK_PROVIDERS;
     }
 }

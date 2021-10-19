@@ -18,6 +18,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
+import java.util.Optional;
 
 @Component
 public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
@@ -69,7 +70,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
         }
 
         long categoryId = session.getEntityId();
-        // todo ? use name index
+        // todo use name index ?
         for (DiscordProviderFromVk p : vkProviderService.findAllByCategoryId(categoryId)) {
             if (p.getName().equals(argsString)) {
                 session.getResponses().add(new EmbedBuilder()
@@ -83,10 +84,18 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
             }
         }
 
+        Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
+        if (!categoryOptional.isPresent()) {
+            // todo error response
+
+            logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());
+
+            return ConfigWizardState.END;
+        }
+
         DiscordProviderFromVk provider = new DiscordProviderFromVk();
         provider.setName(argsString);
-        DiscordCategory category = categoryService.getById(categoryId);
-        provider = vkProviderService.attach(provider, category);
+        provider = vkProviderService.attach(provider, categoryOptional.get());
 
         session.setEntityId(provider.getId());
 

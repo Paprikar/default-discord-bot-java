@@ -34,7 +34,7 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardCommand {
                                      @Nullable String argsString) {
         List<DiscordProviderFromVk> providers = vkProviderService
                 .findAllByCategoryId(session.getEntityId());
-        // todo ? use name index
+        // todo use name index ?
         DiscordProviderFromVk targetProvider = null;
         for (DiscordProviderFromVk p : providers) {
             if (p.getName().equals(argsString)) {

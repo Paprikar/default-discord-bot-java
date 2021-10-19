@@ -10,21 +10,25 @@ import java.util.List;
 
 public class PrivateSession {
 
-    private List<MessageEmbed> responses = new ArrayList<>();
-
     private RestAction<PrivateChannel> channel;
 
     private IConfigWizard service;
 
     private Long entityId;
 
+    private Long discordGuildId;
+
+    private List<MessageEmbed> responses = new ArrayList<>();
+
     public PrivateSession() {
     }
 
-    public PrivateSession(RestAction<PrivateChannel> channel, IConfigWizard service, Long entityId) {
+    public PrivateSession(RestAction<PrivateChannel> channel, IConfigWizard service, Long entityId,
+                          Long discordGuildId) {
         this.channel = channel;
         this.service = service;
         this.entityId = entityId;
+        this.discordGuildId = discordGuildId;
     }
 
     public RestAction<PrivateChannel> getChannel() {
@@ -35,13 +39,6 @@ public class PrivateSession {
         this.channel = channel;
     }
 
-    public List<MessageEmbed> getResponses() {
-        return responses;
-    }
-
-    public void setResponses(List<MessageEmbed> responses) {
-        this.responses = responses;
-    }
 
     public IConfigWizard getService() {
         return service;
@@ -57,5 +54,21 @@ public class PrivateSession {
 
     public void setEntityId(Long entityId) {
         this.entityId = entityId;
+    }
+
+    public Long getDiscordGuildId() {
+        return discordGuildId;
+    }
+
+    public void setDiscordGuildId(Long discordGuildId) {
+        this.discordGuildId = discordGuildId;
+    }
+
+    public List<MessageEmbed> getResponses() {
+        return responses;
+    }
+
+    public void setResponses(List<MessageEmbed> responses) {
+        this.responses = responses;
     }
 }

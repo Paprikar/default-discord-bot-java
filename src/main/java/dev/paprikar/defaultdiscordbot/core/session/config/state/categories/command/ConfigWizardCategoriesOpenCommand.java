@@ -33,7 +33,7 @@ public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCommand {
                                      @Nonnull PrivateSession session,
                                      @Nullable String argsString) {
         List<DiscordCategory> categories = categoryService.findAllByGuildId(session.getEntityId());
-        // todo ? use name index
+        // todo use name index ?
         DiscordCategory targetCategory = null;
         for (DiscordCategory c : categories) {
             if (c.getName().equals(argsString)) {

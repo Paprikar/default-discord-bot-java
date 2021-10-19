@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class DiscordCommandHandler {
@@ -34,7 +35,12 @@ public class DiscordCommandHandler {
         long guildId = event.getGuild().getIdLong();
         String message = event.getMessage().getContentRaw();
 
-        DiscordGuild guild = guildService.getByDiscordId(guildId);
+        Optional<DiscordGuild> guildOptional = guildService.findByDiscordId(guildId);
+        if (!guildOptional.isPresent()) {
+            return;
+        }
+        DiscordGuild guild = guildOptional.get();
+
         String prefix = guild.getPrefix();
         if (!message.startsWith(prefix)) {
             return;

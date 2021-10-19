@@ -1,8 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.session;
 
+import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.IConfigWizard;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -11,9 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -27,6 +28,9 @@ public class SessionService {
 
     // Map<InitiatorUserId, Session>
     private final Map<Long, PrivateSession> activePrivateSessions = new ConcurrentHashMap<>();
+
+    // Set<DiscordGuildId>
+    private final Set<Long> activeGuilds = ConcurrentHashMap.newKeySet();
 
     @Autowired
     public SessionService(DiscordGuildService guildService,
@@ -44,11 +48,16 @@ public class SessionService {
         if (session == null) {
             return;
         }
+
         IConfigWizard service = session.getService();
         ConfigWizardState targetState = service.handle(event, session);
+
         if (targetState == ConfigWizardState.END) {
             service.print(session, false);
+
             activePrivateSessions.remove(userId);
+            activeGuilds.remove(session.getDiscordGuildId());
+
             session.getChannel().flatMap(PrivateChannel::close).queue();
             logger.debug("handle(): Configuration session is ended: userId={}", userId);
             return;
@@ -62,21 +71,35 @@ public class SessionService {
         }
     }
 
-    public void startConfigWizardSession(GuildMessageReceivedEvent event) {
-        // todo only one session in the same time
-        // todo only administrator access
+    public void handle(GuildMessageReceivedEvent event) {
+        Member member = event.getMember();
+        if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) {
+            return;
+        }
+
         long userId = event.getAuthor().getIdLong();
         // Ignore if any session is already started
         if (activePrivateSessions.containsKey(userId)) {
             // todo response ?
             return;
         }
+
+        long discordGuildId = event.getGuild().getIdLong();
+        if (!activeGuilds.add(discordGuildId)) {
+            // todo session is already active response
+            return;
+        }
+
+        Optional<DiscordGuild> guildOptional = guildService.findByDiscordId(discordGuildId);
+        if (!guildOptional.isPresent()) {
+            return;
+        }
+
         IConfigWizard initialService = configWizardServices.get(ConfigWizardState.ROOT);
 
-        PrivateSession session = new PrivateSession();
-        session.setChannel(event.getAuthor().openPrivateChannel());
-        session.setService(initialService);
-        session.setEntityId(guildService.getByDiscordId(event.getGuild().getIdLong()).getId());
+        PrivateSession session = new PrivateSession(event.getAuthor().openPrivateChannel(), initialService,
+                guildOptional.get().getId(), discordGuildId);
+
         activePrivateSessions.put(userId, session);
 
         initialService.print(session, true);

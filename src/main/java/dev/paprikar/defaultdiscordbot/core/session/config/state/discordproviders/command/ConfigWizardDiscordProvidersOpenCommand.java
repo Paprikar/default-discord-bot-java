@@ -34,7 +34,7 @@ public class ConfigWizardDiscordProvidersOpenCommand implements ConfigWizardComm
                                      @Nullable String argsString) {
         List<DiscordProviderFromDiscord> providers = discordProviderService
                 .findAllByCategoryId(session.getEntityId());
-        // todo ? use name index
+        // todo use name index ?
         DiscordProviderFromDiscord targetProvider = null;
         for (DiscordProviderFromDiscord p : providers) {
             if (p.getName().equals(argsString)) {

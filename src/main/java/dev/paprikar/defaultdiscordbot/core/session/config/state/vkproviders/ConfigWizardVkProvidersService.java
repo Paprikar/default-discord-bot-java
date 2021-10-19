@@ -27,6 +27,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConfigWizardVkProvidersService extends ConfigWizard {
@@ -113,11 +114,16 @@ public class ConfigWizardVkProvidersService extends ConfigWizard {
         List<MessageEmbed> responses = session.getResponses();
 
         if (addStateEmbed) {
-            Long entityId = session.getEntityId();
-            responses.add(getStateEmbed(
-                    categoryService.getById(entityId),
-                    vkProviderService.findAllByCategoryId(entityId)
-            ));
+            Long categoryId = session.getEntityId();
+            Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
+            MessageEmbed embed;
+            if (categoryOptional.isPresent()) {
+                embed = getStateEmbed(categoryOptional.get(), vkProviderService.findAllByCategoryId(categoryId));
+            } else {
+                embed = null; // todo error response
+                logger.error("print(): Unable to get category={id={}}", session.getEntityId());
+            }
+            responses.add(embed);
         }
 
         if (!responses.isEmpty()) {

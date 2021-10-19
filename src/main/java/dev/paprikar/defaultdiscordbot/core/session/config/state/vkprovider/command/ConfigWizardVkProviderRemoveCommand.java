@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
+import java.util.Optional;
 
 @Component
 public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardCommand {
@@ -36,7 +37,16 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardCommand 
                                      @Nullable String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        DiscordProviderFromVk provider = vkProviderService.getById(session.getEntityId());
+        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(session.getEntityId());
+        if (!vkProviderOptional.isPresent()) {
+            // todo error response
+
+            logger.error("execute(): Unable to get vkProvider={id={}, ending session", session.getEntityId());
+
+            return ConfigWizardState.END;
+        }
+        DiscordProviderFromVk provider = vkProviderOptional.get();
+
         if (provider.isEnabled()) {
             session.getResponses().add(new EmbedBuilder()
                     .setColor(Color.RED)
