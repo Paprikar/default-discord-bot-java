@@ -63,7 +63,7 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
         }
 
         category.setName(value);
-        categoryService.save(category);
+        category = categoryService.save(category);
 
         logger.debug("The category={id={}} name is set to '{}'", category.getId(), value);
 

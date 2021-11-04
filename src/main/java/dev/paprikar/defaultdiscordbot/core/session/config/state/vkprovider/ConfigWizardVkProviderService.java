@@ -4,7 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
+import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.command.*;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ConfigWizardVkProviderService extends ConfigWizard {
+public class ConfigWizardVkProviderService extends AbstractConfigWizard {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderService.class);
 

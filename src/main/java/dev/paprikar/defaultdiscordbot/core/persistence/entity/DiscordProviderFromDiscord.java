@@ -2,11 +2,11 @@ package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
 import dev.paprikar.defaultdiscordbot.core.DiscordProvider;
 import dev.paprikar.defaultdiscordbot.utils.DefaultObjectMapper;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.util.Objects;
 

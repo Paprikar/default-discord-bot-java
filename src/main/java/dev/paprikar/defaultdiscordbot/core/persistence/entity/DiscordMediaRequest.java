@@ -2,12 +2,12 @@ package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Date;
 
 @Entity
 @Table(name = "discord_media_request", indexes = {
-        @Index(name = "creation_date_time_idx", columnList = "creation_date_time")
+        @Index(name = "creation_timestamp_idx", columnList = "creation_timestamp")
 })
 public class DiscordMediaRequest implements Serializable {
 
@@ -30,9 +30,8 @@ public class DiscordMediaRequest implements Serializable {
     @Column(nullable = false)
     private String content;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "creation_date_time", nullable = false)
-    private Date creationDateTime;
+    @Column(name = "creation_timestamp", nullable = false)
+    private Timestamp creationTimestamp;
 
     public DiscordMediaRequest() {
     }
@@ -40,7 +39,7 @@ public class DiscordMediaRequest implements Serializable {
     public DiscordMediaRequest(DiscordCategory category, String content) {
         this.category = category;
         this.content = content;
-        this.creationDateTime = Date.from(Instant.now());
+        this.creationTimestamp = Timestamp.from(Instant.now());
     }
 
     public Long getId() {
@@ -67,11 +66,11 @@ public class DiscordMediaRequest implements Serializable {
         this.content = content;
     }
 
-    public Date getCreationDateTime() {
-        return creationDateTime;
+    public Timestamp getCreationTimestamp() {
+        return creationTimestamp;
     }
 
-    public void setCreationDateTime(Date creationDateTime) {
-        this.creationDateTime = creationDateTime;
+    public void setCreationTimestamp(Timestamp creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
     }
 }

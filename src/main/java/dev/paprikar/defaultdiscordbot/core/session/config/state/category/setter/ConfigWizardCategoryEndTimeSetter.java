@@ -1,7 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter;
 
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
@@ -18,8 +16,6 @@ import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 @Component
 public class ConfigWizardCategoryEndTimeSetter implements ConfigWizardCategorySetter {
@@ -30,15 +26,11 @@ public class ConfigWizardCategoryEndTimeSetter implements ConfigWizardCategorySe
 
     private final SendingService sendingService;
 
-    private final ReadWriteLockService readWriteLockService;
-
     @Autowired
     public ConfigWizardCategoryEndTimeSetter(DiscordCategoryService categoryService,
-                                             SendingService sendingService,
-                                             ReadWriteLockService readWriteLockService) {
+                                             SendingService sendingService) {
         this.categoryService = categoryService;
         this.sendingService = sendingService;
-        this.readWriteLockService = readWriteLockService;
     }
 
     @Nonnull
@@ -59,22 +51,10 @@ public class ConfigWizardCategoryEndTimeSetter implements ConfigWizardCategorySe
 
         // todo checks
 
-        ReadWriteLock lock = readWriteLockService.get(
-                ReadWriteLockScope.GUILD_CONFIGURATION, category.getGuild().getId());
-        if (lock == null) {
-            // todo error response
-            return null;
-        }
-
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
-
         category.setEndTime(time);
-        categoryService.save(category);
+        category = categoryService.save(category);
 
-        sendingService.updateSender(category);
-
-        writeLock.unlock();
+        sendingService.updateCategory(category);
 
         logger.debug("The category={id={}} endTime is set to '{}'", category.getId(), time);
 

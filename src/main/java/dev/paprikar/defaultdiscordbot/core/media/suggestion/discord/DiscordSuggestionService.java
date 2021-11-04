@@ -1,18 +1,18 @@
 package dev.paprikar.defaultdiscordbot.core.media.suggestion.discord;
 
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockService;
+import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
+import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
+import dev.paprikar.defaultdiscordbot.core.concurrency.LockService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.FileExtension;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -21,156 +21,169 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class DiscordSuggestionService {
 
     private final Logger logger = LoggerFactory.getLogger(DiscordSuggestionService.class);
 
-    private final DiscordGuildService guildService;
-
     private final DiscordCategoryService categoryService;
 
-    private final ReadWriteLockService readWriteLockService;
+    private final LockService lockService;
 
     // Map<SuggestionChannelId, CategoryId>
     private final Map<Long, Long> categories = new ConcurrentHashMap<>();
 
-    public DiscordSuggestionService(
-            DiscordGuildService guildService,
-            DiscordCategoryService categoryService,
-            ReadWriteLockService readWriteLockService) {
-        this.guildService = guildService;
+    @Autowired
+    public DiscordSuggestionService(DiscordCategoryService categoryService, LockService lockService) {
         this.categoryService = categoryService;
-        this.readWriteLockService = readWriteLockService;
+        this.lockService = lockService;
     }
 
     public void handle(@Nonnull TextChannelDeleteEvent event) {
-        Optional<DiscordGuild> guildOptional = guildService.findByDiscordId(event.getGuild().getIdLong());
-        if (!guildOptional.isPresent()) {
+        Long channelId = event.getChannel().getIdLong();
+        Long categoryId = categories.get(channelId);
+        if (categoryId == null) {
             return;
         }
 
-        ReadWriteLock lock = readWriteLockService.get(
-                ReadWriteLockScope.GUILD_CONFIGURATION, guildOptional.get().getId());
+        ConcurrencyKey lockKey = ConcurrencyKey
+                .from(ConcurrencyScope.CATEGORY_DISCORD_PROVIDER_CONFIGURATION, categoryId);
+        Lock lock = lockService.get(lockKey);
         if (lock == null) {
             return;
         }
 
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
+        lock.lock();
 
-        categories.remove(event.getChannel().getIdLong());
+        categories.remove(channelId);
 
-        writeLock.unlock();
+        lockService.remove(lockKey);
+
+        lock.unlock();
     }
 
     public void handle(@Nonnull GuildMessageReceivedEvent event) {
-        Optional<DiscordGuild> guildOptional = guildService.findByDiscordId(event.getGuild().getIdLong());
-        if (!guildOptional.isPresent()) {
-            return;
-        }
-
-        ReadWriteLock lock = readWriteLockService.get(
-                ReadWriteLockScope.GUILD_CONFIGURATION, guildOptional.get().getId());
-        if (lock == null) {
-            return;
-        }
-
-        Lock readLock = lock.readLock();
-        readLock.lock();
-
         Long categoryId = categories.get(event.getChannel().getIdLong());
         if (categoryId == null) {
-            readLock.unlock();
             return;
         }
 
-        // todo get inside the lock
         Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
         if (!categoryOptional.isPresent()) {
-            readLock.unlock();
             return;
         }
         DiscordCategory category = categoryOptional.get();
 
         Message eventMessage = event.getMessage();
-        String link = eventMessage.getContentRaw();
-        if (link.isEmpty()) { // from attachments
-            List<Message.Attachment> attachments = eventMessage.getAttachments();
-            if (attachments.isEmpty()) {
-                // todo invalid input response
-                readLock.unlock();
-                return;
-            }
+        List<Message.Attachment> attachments = eventMessage.getAttachments();
+        String url;
+
+        if (!attachments.isEmpty()) { // from attachments
             if (attachments.size() != 1) {
                 // todo invalid input response
-                readLock.unlock();
                 return;
             }
             Message.Attachment attachment = attachments.get(0);
+
             if (!(attachment.isImage() || attachment.isVideo())) {
                 // todo invalid input response
-                readLock.unlock();
                 return;
             }
-            link = attachment.getUrl();
+
+            url = attachment.getUrl();
         } else { // from content
-            if (link.matches(".*?(\\R|\\s).*")) {
+            url = eventMessage.getContentRaw();
+            if (url.matches(".*?(\\R|\\s).*")) { // only one request
                 // todo invalid input response
-                readLock.unlock();
                 return;
             }
-//            if (!isValidExtension(link)) { // todo fix validation ?
+
+//            if (!isValidExtension(url)) { // todo fix validation ?
 //                // todo invalid input response
-//                readLock.unlock();
 //                return;
 //            }
         }
 
-        // todo thrust list | saving bypassing the approval with readLock
+        // todo thrust list
 
         TextChannel approvalChannel = event.getJDA().getTextChannelById(category.getApprovalChannelId());
         if (approvalChannel == null) {
             // todo failure callback (to suggestion channel)
-            readLock.unlock();
             return;
         }
 
         // todo add suggester info
-        approvalChannel.sendMessage(link)
+        approvalChannel.sendMessage(url)
                 .flatMap(message -> message
                         .addReaction(category.getPositiveApprovalEmoji().toString())
                         .and(message.addReaction(category.getNegativeApprovalEmoji().toString())))
                 .flatMap(unused -> eventMessage.delete())
-                .queue(unused -> onSuggestionSendingSuccess(readLock),
-                        throwable -> onSuggestionSendingFailure(throwable, readLock));
+                .queue(unused -> onSuggestionSendingSuccess(), this::onSuggestionSendingFailure);
     }
 
-    public void addSuggestionChannel(Long channelId, Long categoryId) {
-        categories.put(channelId, categoryId);
-    }
+    public void addCategory(Long categoryId, Long suggestionChannelId) {
+        Lock lock = new ReentrantLock();
+        lock.lock();
+        ConcurrencyKey lockKey = ConcurrencyKey
+                .from(ConcurrencyScope.CATEGORY_DISCORD_PROVIDER_CONFIGURATION, categoryId);
+        if (lockService.putIfAbsent(lockKey, lock) != null) {
+            lock.unlock();
+            return;
+        }
 
-    public void removeSuggestionChannel(Long channelId) {
-        categories.remove(channelId);
-    }
+        categories.put(suggestionChannelId, categoryId);
 
-    public void updateSuggestionChannel(Long oldChannelId, Long newChannelId) {
-        Long categoryId = categories.get(oldChannelId);
-        categories.put(newChannelId, categoryId);
-        categories.remove(oldChannelId);
-    }
-
-    private void onSuggestionSendingSuccess(Lock lock) {
-        // todo success callback (to suggestion channel)
         lock.unlock();
     }
 
-    private void onSuggestionSendingFailure(Throwable throwable, Lock lock) {
+    public void removeCategory(Long suggestionChannelId) {
+        Long categoryId = categories.get(suggestionChannelId);
+        if (categoryId == null) {
+            return;
+        }
+
+        ConcurrencyKey lockKey = ConcurrencyKey
+                .from(ConcurrencyScope.CATEGORY_DISCORD_PROVIDER_CONFIGURATION, categoryId);
+        Lock lock = lockService.get(lockKey);
+        if (lock == null) {
+            return;
+        }
+
+        lock.lock();
+
+        categories.remove(suggestionChannelId);
+
+        lockService.remove(lockKey);
+
+        lock.unlock();
+    }
+
+    public void updateCategory(Long oldSuggestionChannelId, Long newSuggestionChannelId) {
+        Long categoryId = categories.get(oldSuggestionChannelId);
+        Lock lock = lockService.get(ConcurrencyScope.CATEGORY_DISCORD_PROVIDER_CONFIGURATION, categoryId);
+        if (lock == null) {
+            return;
+        }
+
+        lock.lock();
+
+        categories.put(newSuggestionChannelId, categoryId);
+        if (!oldSuggestionChannelId.equals(newSuggestionChannelId)) {
+            categories.remove(oldSuggestionChannelId);
+        }
+
+        lock.unlock();
+    }
+
+    private void onSuggestionSendingSuccess() {
+        // todo success callback (to suggestion channel)
+    }
+
+    private void onSuggestionSendingFailure(Throwable throwable) {
         logger.error("An error occurred while sending the suggestion", throwable);
         // todo failure callback (to suggestion channel)
-        lock.unlock();
     }
 
     private boolean isValidExtension(String fileName) {

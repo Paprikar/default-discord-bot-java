@@ -1,7 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.command;
 
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockService;
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
@@ -17,8 +15,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 @Component
 public class ConfigWizardCategoryDisableCommand implements ConfigWizardCommand {
@@ -29,15 +25,11 @@ public class ConfigWizardCategoryDisableCommand implements ConfigWizardCommand {
 
     private final MediaActionService mediaActionService;
 
-    private final ReadWriteLockService readWriteLockService;
-
     @Autowired
     public ConfigWizardCategoryDisableCommand(DiscordCategoryService categoryService,
-                                              MediaActionService mediaActionService,
-                                              ReadWriteLockService readWriteLockService) {
+                                              MediaActionService mediaActionService) {
         this.categoryService = categoryService;
         this.mediaActionService = mediaActionService;
-        this.readWriteLockService = readWriteLockService;
     }
 
     @Nullable
@@ -62,23 +54,13 @@ public class ConfigWizardCategoryDisableCommand implements ConfigWizardCommand {
             return null;
         }
 
-        ReadWriteLock lock = readWriteLockService.get(
-                ReadWriteLockScope.GUILD_CONFIGURATION, category.getGuild().getId());
-        if (lock == null) {
-            return null;
-        }
-
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
-
         category.setEnabled(false);
-        categoryService.save(category);
+        category = categoryService.save(category);
 
         mediaActionService.disableCategory(category);
 
-        writeLock.unlock();
-
         // todo disabled response
+
         return null;
     }
 }

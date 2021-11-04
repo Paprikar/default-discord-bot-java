@@ -1,14 +1,12 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.command;
 
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockService;
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
-import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +15,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 @Component
 public class ConfigWizardCategoryEnableCommand implements ConfigWizardCommand {
@@ -30,15 +27,11 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCommand {
 
     private final MediaActionService mediaActionService;
 
-    private final ReadWriteLockService readWriteLockService;
-
     @Autowired
     public ConfigWizardCategoryEnableCommand(DiscordCategoryService categoryService,
-                                             MediaActionService mediaActionService,
-                                             ReadWriteLockService readWriteLockService) {
+                                             MediaActionService mediaActionService) {
         this.categoryService = categoryService;
         this.mediaActionService = mediaActionService;
-        this.readWriteLockService = readWriteLockService;
     }
 
     @Nullable
@@ -63,64 +56,14 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCommand {
             return null;
         }
 
-        JDA jda = event.getJDA();
-        Long sendingChannelId = category.getSendingChannelId();
-        if (sendingChannelId == null || jda.getTextChannelById(sendingChannelId) == null) {
-            // todo invalid param
-            return null;
-        }
-
-        Long approvalChannelId = category.getApprovalChannelId();
-        if (approvalChannelId == null || jda.getTextChannelById(approvalChannelId) == null) {
-            // todo invalid param
-            return null;
-        }
-
-        // todo time checks
-
-        if (category.getStartTime() == null) {
-            // todo invalid param
-            return null;
-        }
-
-        if (category.getEndTime() == null) {
-            // todo invalid param
-            return null;
-        }
-
-        Integer reserveDays = category.getReserveDays();
-        if (reserveDays == null || reserveDays < 1) {
-            // todo invalid param
-            return null;
-        }
-
-        if (category.getPositiveApprovalEmoji() == null) {
-            // todo invalid param
-            return null;
-        }
-
-        if (category.getNegativeApprovalEmoji() == null) {
-            // todo invalid param
-            return null;
-        }
-
-        ReadWriteLock lock = readWriteLockService.get(
-                ReadWriteLockScope.GUILD_CONFIGURATION, category.getGuild().getId());
-        if (lock == null) {
-            return null;
-        }
-
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
-
         category.setEnabled(true);
-        categoryService.save(category);
+        category = categoryService.save(category);
 
-        mediaActionService.enableCategory(category, jda);
-
-        writeLock.unlock();
+        List<MessageEmbed> errors = mediaActionService.enableCategory(category, event.getJDA());
+        session.getResponses().addAll(errors);
 
         // todo enabled response
+
         return null;
     }
 }

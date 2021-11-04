@@ -1,7 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core;
 
 import dev.paprikar.defaultdiscordbot.core.command.DiscordCommandHandler;
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
@@ -42,22 +41,18 @@ public class DiscordEventListener extends ListenerAdapter {
 
     private final SessionService sessionService;
 
-    private final ReadWriteLockService readWriteLockService;
-
     public DiscordEventListener(DiscordGuildService guildService,
                                 DiscordCommandHandler commandHandler,
                                 DiscordSuggestionService discordSuggestionService,
                                 ApproveService approveService,
                                 SendingService sendingService,
-                                SessionService sessionService,
-                                ReadWriteLockService readWriteLockService) {
+                                SessionService sessionService) {
         this.guildService = guildService;
         this.commandHandler = commandHandler;
         this.discordSuggestionService = discordSuggestionService;
         this.approveService = approveService;
         this.sendingService = sendingService;
         this.sessionService = sessionService;
-        this.readWriteLockService = readWriteLockService;
     }
 
     @Override
@@ -173,28 +168,24 @@ public class DiscordEventListener extends ListenerAdapter {
     @Override
     public void onGuildJoin(@Nonnull GuildJoinEvent event) {
         // todo media service
-        readWriteLockService.handle(event);
         setupDiscordGuild(event.getGuild().getIdLong());
     }
 
     @Override
     public void onGuildLeave(@Nonnull GuildLeaveEvent event) {
         // todo media service
-        readWriteLockService.handle(event);
         removeDiscordGuild(event.getGuild().getIdLong());
     }
 
     @Override
     public void onUnavailableGuildJoined(@Nonnull UnavailableGuildJoinedEvent event) {
         // todo media service
-        readWriteLockService.handle(event);
         setupDiscordGuild(event.getGuildIdLong());
     }
 
     @Override
     public void onUnavailableGuildLeave(@Nonnull UnavailableGuildLeaveEvent event) {
         // todo media service
-        readWriteLockService.handle(event);
         removeDiscordGuild(event.getGuildIdLong());
     }
 

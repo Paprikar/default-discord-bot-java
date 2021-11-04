@@ -2,11 +2,11 @@ package dev.paprikar.defaultdiscordbot.core.command;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.core.session.SessionService;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -21,13 +21,21 @@ public class DiscordCommandHandler {
 
     private final DiscordGuildService guildService;
 
-    private final SessionService sessionService;
+    private final DiscordPingCommand pingCommand;
+
+    private final DiscordConfigCommand configCommand;
 
     private final Map<String, DiscordCommand> commands = new HashMap<>();
 
-    public DiscordCommandHandler(DiscordGuildService guildService, SessionService sessionService) {
+    @Autowired
+    public DiscordCommandHandler(DiscordGuildService guildService,
+                                 DiscordPingCommand pingCommand,
+                                 DiscordConfigCommand configCommand) {
         this.guildService = guildService;
-        this.sessionService = sessionService;
+
+        this.pingCommand = pingCommand;
+        this.configCommand = configCommand;
+
         setupCommands();
     }
 
@@ -45,15 +53,18 @@ public class DiscordCommandHandler {
         if (!message.startsWith(prefix)) {
             return;
         }
+
         String argsString = message.substring(prefix.length());
         if (argsString.isEmpty()) {
             return;
         }
+
         FirstWordAndOther parts = new FirstWordAndOther(argsString);
         String commandName = parts.getFirstWord().toLowerCase();
         argsString = parts.getOther();
 
         logger.debug("handle(): command='{}' args='{}'", commandName, argsString);
+
         DiscordCommand command = commands.get(commandName);
         if (command != null) {
             command.execute(argsString, event);
@@ -61,7 +72,7 @@ public class DiscordCommandHandler {
     }
 
     private void setupCommands() {
-        commands.put("ping", new DiscordPingCommand());
-        commands.put("config", new DiscordConfigCommand(sessionService));
+        commands.put("ping", pingCommand);
+        commands.put("config", configCommand);
     }
 }

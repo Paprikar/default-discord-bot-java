@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session;
 
-import dev.paprikar.defaultdiscordbot.core.session.config.IConfigWizard;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -12,7 +12,7 @@ public class PrivateSession {
 
     private RestAction<PrivateChannel> channel;
 
-    private IConfigWizard service;
+    private ConfigWizard service;
 
     private Long entityId;
 
@@ -23,7 +23,7 @@ public class PrivateSession {
     public PrivateSession() {
     }
 
-    public PrivateSession(RestAction<PrivateChannel> channel, IConfigWizard service, Long entityId,
+    public PrivateSession(RestAction<PrivateChannel> channel, ConfigWizard service, Long entityId,
                           Long discordGuildId) {
         this.channel = channel;
         this.service = service;
@@ -40,11 +40,11 @@ public class PrivateSession {
     }
 
 
-    public IConfigWizard getService() {
+    public ConfigWizard getService() {
         return service;
     }
 
-    public void setService(IConfigWizard service) {
+    public void setService(ConfigWizard service) {
         this.service = service;
     }
 

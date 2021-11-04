@@ -1,21 +1,18 @@
 package dev.paprikar.defaultdiscordbot.core.session.config;
 
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardExitCommand;
+import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-public abstract class ConfigWizard implements IConfigWizard {
+public interface ConfigWizard {
 
-    // Map<CommandName, Command>
-    protected final Map<String, ConfigWizardCommand> commands = new HashMap<>();
+    @Nullable
+    ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session);
 
-    protected ConfigWizard() {
-        setupCommands();
-    }
+    void print(@Nonnull PrivateSession session, boolean addStateEmbed);
 
-    private void setupCommands() {
-        commands.put("exit", new ConfigWizardExitCommand());
-    }
+    @Nonnull
+    ConfigWizardState getState();
 }

@@ -3,7 +3,7 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.categories;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
+import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesAddCommand;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ConfigWizardCategoriesService extends ConfigWizard {
+public class ConfigWizardCategoriesService extends AbstractConfigWizard {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesService.class);
 

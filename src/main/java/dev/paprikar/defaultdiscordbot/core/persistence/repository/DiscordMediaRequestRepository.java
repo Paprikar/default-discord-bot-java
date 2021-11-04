@@ -12,9 +12,9 @@ public interface DiscordMediaRequestRepository extends JpaRepository<DiscordMedi
 
     List<DiscordMediaRequest> findAllByCategoryId(Long id);
 
-    Optional<DiscordMediaRequest> findFirstByCategoryIdOrderByCreationDateTimeAsc(Long id);
+    Optional<DiscordMediaRequest> findFirstByCategoryIdOrderByCreationTimestampAsc(Long id);
 
-    DiscordMediaRequest getFirstByCategoryIdOrderByCreationDateTimeAsc(Long id);
+    DiscordMediaRequest getFirstByCategoryIdOrderByCreationTimestampAsc(Long id);
 
     long countByCategoryId(Long id);
 }

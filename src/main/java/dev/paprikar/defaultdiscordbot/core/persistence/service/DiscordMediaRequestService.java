@@ -59,15 +59,14 @@ public class DiscordMediaRequestService {
 
     @Nonnull
     public Optional<DiscordMediaRequest> findFirstByCategoryId(long id) {
-        return repository.findFirstByCategoryIdOrderByCreationDateTimeAsc(id);
+        return repository.findFirstByCategoryIdOrderByCreationTimestampAsc(id);
     }
 
     @Nonnull
     public DiscordMediaRequest getFirstByCategoryId(long id) throws EntityNotFoundException {
-        return repository.getFirstByCategoryIdOrderByCreationDateTimeAsc(id);
+        return repository.getFirstByCategoryIdOrderByCreationTimestampAsc(id);
     }
 
-    @Nonnull
     public long countByCategoryId(long id) {
         return repository.countByCategoryId(id);
     }

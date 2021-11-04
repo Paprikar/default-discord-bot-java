@@ -3,7 +3,7 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.root;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
+import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.command.ConfigWizardRootOpenCommand;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ConfigWizardRootService extends ConfigWizard {
+public class ConfigWizardRootService extends AbstractConfigWizard {
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardRootService.class);
 

@@ -75,7 +75,7 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
         }
 
         provider.setName(value);
-        vkProviderService.save(provider);
+        provider = vkProviderService.save(provider);
 
         logger.debug("The vkProvider={id={}} name is set to '{}'", provider.getId(), value);
 

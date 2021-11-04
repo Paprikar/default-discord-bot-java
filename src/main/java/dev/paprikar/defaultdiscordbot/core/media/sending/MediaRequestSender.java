@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.sql.Timestamp;
 import java.time.*;
-import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.*;
 
@@ -62,11 +62,11 @@ public class MediaRequestSender {
                 logger.error(message);
                 throw new IllegalStateException(message);
             }
-            Date dt = category.getLastSendDateTime();
+            Timestamp dt = category.getLastSendTimestamp();
             if (dt == null) {
                 lastSendDateTime = null;
             } else {
-                lastSendDateTime = LocalDateTime.from(dt.toInstant());
+                lastSendDateTime = dt.toLocalDateTime();
             }
             toTerminate = false;
             taskFuture = executor.schedule(new SenderTask(category, false), 0, TimeUnit.NANOSECONDS);
@@ -80,7 +80,7 @@ public class MediaRequestSender {
                 taskFuture.cancel(false);
                 if (!taskFuture.isDone()) {
                     try {
-                        taskFuture.get();
+                        taskFuture.get(); // todo fix deadlock with SenderTask.run()
                     } catch (InterruptedException | ExecutionException e) {
                         logger.error(e.toString());
                     }
@@ -128,7 +128,7 @@ public class MediaRequestSender {
             if (!requestOptional.isPresent()) {
                 // normally should not happen
                 toTerminate = true;
-                lastSendDateTime = LocalDateTime.from(category.getLastSendDateTime().toInstant());
+                lastSendDateTime = LocalDateTime.from(category.getLastSendTimestamp().toInstant());
                 logger.error("No requests were found to be sent");
                 return;
             }
@@ -146,7 +146,7 @@ public class MediaRequestSender {
                 channel
                         .sendMessage(request.getContent())
                         .submit()
-                        .whenComplete((message, throwable) -> onRequestSendingComplete(throwable))
+                        .whenComplete((message, throwable) -> onRequestSendingComplete(throwable, request))
                         .get();
             } catch (InterruptedException | ExecutionException e) {
                 toTerminate = true;
@@ -154,10 +154,12 @@ public class MediaRequestSender {
             }
         }
 
-        private void onRequestSendingComplete(Throwable throwable) {
+        private void onRequestSendingComplete(Throwable throwable, DiscordMediaRequest request) {
             if (throwable == null) {
+                mediaRequestService.delete(request);
                 // save lastSendDateTime changes
-                category.setLastSendDateTime(Date.from(lastSendDateTime.atZone(ZoneId.systemDefault()).toInstant()));
+                category.setLastSendTimestamp(
+                        Timestamp.from(lastSendDateTime.atZone(ZoneId.systemDefault()).toInstant()));
                 MediaRequestSender.this.category = categoryService.save(category);
                 return;
             }
@@ -166,7 +168,7 @@ public class MediaRequestSender {
             // which in both cases causes the sender to stop working externally via events.
             toTerminate = true;
             // revert lastSendDateTime changes
-            lastSendDateTime = LocalDateTime.from(category.getLastSendDateTime().toInstant());
+            lastSendDateTime = LocalDateTime.from(category.getLastSendTimestamp().toInstant());
             String message = "Failed to send request";
             if (throwable instanceof ErrorResponseException) {
                 ErrorResponseException ere = (ErrorResponseException) throwable;
@@ -190,8 +192,8 @@ public class MediaRequestSender {
                 return;
             }
 
-            LocalTime startTime = LocalTime.from(category.getStartTime().toInstant());
-            LocalTime endTime = LocalTime.from(category.getEndTime().toInstant());
+            LocalTime startTime = category.getStartTime().toLocalTime();
+            LocalTime endTime = category.getEndTime().toLocalTime();
             int reserveDays = category.getReserveDays();
 
             LocalDateTime currentDateTime = LocalDateTime.now();
@@ -272,7 +274,7 @@ public class MediaRequestSender {
             }
 
             // skipping the end point of the day
-            if (currentDateTime.isAfter(endDateTime.plus(periodDuration))) {
+            if (currentDateTime.isAfter(endDateTime.minus(periodDuration))) {
                 // wait for the next day
                 LocalDateTime target = startDateTime.plusDays(1);
                 long cooldown = deltaMillis(currentDateTime, target);

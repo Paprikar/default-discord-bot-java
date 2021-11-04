@@ -1,7 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.command;
 
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockService;
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
@@ -17,8 +15,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 @Component
 public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardCommand {
@@ -29,15 +25,11 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardCo
 
     private final MediaActionService mediaActionService;
 
-    private final ReadWriteLockService readWriteLockService;
-
     @Autowired
     public ConfigWizardDiscordProviderDisableCommand(DiscordProviderFromDiscordService discordProviderService,
-                                                     MediaActionService mediaActionService,
-                                                     ReadWriteLockService readWriteLockService) {
+                                                     MediaActionService mediaActionService) {
         this.discordProviderService = discordProviderService;
         this.mediaActionService = mediaActionService;
-        this.readWriteLockService = readWriteLockService;
     }
 
     @Nullable
@@ -63,22 +55,10 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardCo
             return null;
         }
 
-        ReadWriteLock lock = readWriteLockService.get(
-                ReadWriteLockScope.GUILD_CONFIGURATION, provider.getCategory().getGuild().getId());
-        if (lock == null) {
-            // todo error response
-            return null;
-        }
-
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
-
         provider.setEnabled(false);
-        discordProviderService.save(provider);
+        provider = discordProviderService.save(provider);
 
         mediaActionService.disableDiscordProvider(provider);
-
-        writeLock.unlock();
 
         // todo disabled response
 

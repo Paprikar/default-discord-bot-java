@@ -1,7 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.setter;
 
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
@@ -15,8 +13,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 @Component
 public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements ConfigWizardDiscordProviderSetter {
@@ -27,16 +23,12 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
 
     private final DiscordSuggestionService discordSuggestionService;
 
-    private final ReadWriteLockService readWriteLockService;
-
     @Autowired
     public ConfigWizardDiscordProviderSuggestionChannelIdSetter(
             DiscordProviderFromDiscordService discordProviderService,
-            DiscordSuggestionService discordSuggestionService,
-            ReadWriteLockService readWriteLockService) {
+            DiscordSuggestionService discordSuggestionService) {
         this.discordProviderService = discordProviderService;
         this.discordSuggestionService = discordSuggestionService;
-        this.readWriteLockService = readWriteLockService;
     }
 
     @Nonnull
@@ -55,23 +47,11 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
             );
         }
 
-        ReadWriteLock lock = readWriteLockService.get(
-                ReadWriteLockScope.GUILD_CONFIGURATION, provider.getCategory().getGuild().getId());
-        if (lock == null) {
-            // todo error response
-            return null;
-        }
-
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
-
         long oldChannelId = provider.getSuggestionChannelId();
         provider.setSuggestionChannelId(newChannelId);
-        discordProviderService.save(provider);
+        provider = discordProviderService.save(provider);
 
-        discordSuggestionService.updateSuggestionChannel(oldChannelId, newChannelId);
-
-        writeLock.unlock();
+        discordSuggestionService.updateCategory(oldChannelId, newChannelId);
 
         logger.debug("The discordProvider={id={}} suggestionChannelId is set to '{}'", provider.getId(), value);
 

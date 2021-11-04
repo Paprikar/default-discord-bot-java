@@ -1,7 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter;
 
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
@@ -15,8 +13,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 @Component
 public class ConfigWizardCategoryApprovalChannelIdSetter implements ConfigWizardCategorySetter {
@@ -27,15 +23,11 @@ public class ConfigWizardCategoryApprovalChannelIdSetter implements ConfigWizard
 
     private final ApproveService approveService;
 
-    private final ReadWriteLockService readWriteLockService;
-
     @Autowired
     public ConfigWizardCategoryApprovalChannelIdSetter(DiscordCategoryService categoryService,
-                                                       ApproveService approveService,
-                                                       ReadWriteLockService readWriteLockService) {
+                                                       ApproveService approveService) {
         this.categoryService = categoryService;
         this.approveService = approveService;
-        this.readWriteLockService = readWriteLockService;
     }
 
     @Nonnull
@@ -56,22 +48,10 @@ public class ConfigWizardCategoryApprovalChannelIdSetter implements ConfigWizard
 
         // todo checks
 
-        ReadWriteLock lock = readWriteLockService.get(
-                ReadWriteLockScope.GUILD_CONFIGURATION, category.getGuild().getId());
-        if (lock == null) {
-            // todo error response
-            return null;
-        }
-
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
-
         category.setApprovalChannelId(id);
-        categoryService.save(category);
+        category = categoryService.save(category);
 
         approveService.updateCategory(category);
-
-        writeLock.unlock();
 
         logger.debug("The category={id={}} approvalChannelId is set to '{}'", category.getId(), value);
 

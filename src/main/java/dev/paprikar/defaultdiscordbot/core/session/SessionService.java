@@ -3,7 +3,7 @@ package dev.paprikar.defaultdiscordbot.core.session;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.IConfigWizard;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
@@ -24,7 +24,7 @@ public class SessionService {
 
     private final DiscordGuildService guildService;
 
-    private final Map<ConfigWizardState, IConfigWizard> configWizardServices = new HashMap<>();
+    private final Map<ConfigWizardState, ConfigWizard> configWizardServices = new HashMap<>();
 
     // Map<InitiatorUserId, Session>
     private final Map<Long, PrivateSession> activePrivateSessions = new ConcurrentHashMap<>();
@@ -34,10 +34,10 @@ public class SessionService {
 
     @Autowired
     public SessionService(DiscordGuildService guildService,
-                          List<IConfigWizard> configWizards) {
+                          List<ConfigWizard> configWizards) {
         this.guildService = guildService;
 
-        for (IConfigWizard s : configWizards) {
+        for (ConfigWizard s : configWizards) {
             this.configWizardServices.put(s.getState(), s);
         }
     }
@@ -49,7 +49,7 @@ public class SessionService {
             return;
         }
 
-        IConfigWizard service = session.getService();
+        ConfigWizard service = session.getService();
         ConfigWizardState targetState = service.handle(event, session);
 
         if (targetState == ConfigWizardState.END) {
@@ -95,7 +95,7 @@ public class SessionService {
             return;
         }
 
-        IConfigWizard initialService = configWizardServices.get(ConfigWizardState.ROOT);
+        ConfigWizard initialService = configWizardServices.get(ConfigWizardState.ROOT);
 
         PrivateSession session = new PrivateSession(event.getAuthor().openPrivateChannel(), initialService,
                 guildOptional.get().getId(), discordGuildId);

@@ -75,7 +75,7 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
         }
 
         provider.setName(value);
-        discordProviderService.save(provider);
+        provider = discordProviderService.save(provider);
 
         logger.debug("The discordProvider={id={}} name is set to '{}'", provider.getId(), value);
 

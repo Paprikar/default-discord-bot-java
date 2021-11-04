@@ -1,7 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter;
 
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.lock.ReadWriteLockService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
@@ -15,8 +13,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 @Component
 public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCategorySetter {
@@ -27,15 +23,11 @@ public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCatego
 
     private final SendingService sendingService;
 
-    private final ReadWriteLockService readWriteLockService;
-
     @Autowired
     public ConfigWizardCategoryReserveDaysSetter(DiscordCategoryService categoryService,
-                                                 SendingService sendingService,
-                                                 ReadWriteLockService readWriteLockService) {
+                                                 SendingService sendingService) {
         this.categoryService = categoryService;
         this.sendingService = sendingService;
-        this.readWriteLockService = readWriteLockService;
     }
 
     @Nonnull
@@ -64,22 +56,10 @@ public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCatego
             );
         }
 
-        ReadWriteLock lock = readWriteLockService.get(
-                ReadWriteLockScope.GUILD_CONFIGURATION, category.getGuild().getId());
-        if (lock == null) {
-            // todo error response
-            return null;
-        }
-
-        Lock writeLock = lock.writeLock();
-        writeLock.lock();
-
         category.setReserveDays(reserveDays);
-        categoryService.save(category);
+        category = categoryService.save(category);
 
-        sendingService.updateSender(category);
-
-        writeLock.unlock();
+        sendingService.updateCategory(category);
 
         logger.debug("The category={id={}} reserveDays is set to '{}'", category.getId(), value);
 

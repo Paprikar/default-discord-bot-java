@@ -29,7 +29,7 @@ public class ConfigWizardVkProviderTokenSetter implements ConfigWizardVkProvider
     @Override
     public ConfigWizardSetterResponse set(@Nonnull String value, @Nonnull DiscordProviderFromVk provider) {
         provider.setName(value);
-        vkProviderService.save(provider);
+        provider = vkProviderService.save(provider);
 
         logger.debug("The vkProvider={id={}} token is set to '{}'", provider.getId(), value);
 

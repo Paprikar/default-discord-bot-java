@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -43,13 +44,11 @@ public class DiscordCategory implements Serializable {
     @Column(name = "approval_channel_id")
     private Long approvalChannelId;
 
-    @Temporal(TemporalType.TIME)
     @Column(name = "start_time")
-    private Date startTime;
+    private Time startTime;
 
-    @Temporal(TemporalType.TIME)
     @Column(name = "end_time")
-    private Date endTime;
+    private Time endTime;
 
     @Column(name = "reserve_days")
     private Integer reserveDays;
@@ -63,9 +62,8 @@ public class DiscordCategory implements Serializable {
     @Column(nullable = false)
     private Boolean enabled = false;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "last_send_date_time")
-    private Date lastSendDateTime;
+    @Column(name = "last_send_timestamp")
+    private Timestamp lastSendTimestamp;
 
     public DiscordCategory() {
     }
@@ -110,19 +108,19 @@ public class DiscordCategory implements Serializable {
         this.approvalChannelId = approvalChannelId;
     }
 
-    public Date getStartTime() {
+    public Time getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(Time startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public Time getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(Time endTime) {
         this.endTime = endTime;
     }
 
@@ -158,12 +156,12 @@ public class DiscordCategory implements Serializable {
         this.enabled = enabled;
     }
 
-    public Date getLastSendDateTime() {
-        return lastSendDateTime;
+    public Timestamp getLastSendTimestamp() {
+        return lastSendTimestamp;
     }
 
-    public void setLastSendDateTime(Date lastSendDateTime) {
-        this.lastSendDateTime = lastSendDateTime;
+    public void setLastSendTimestamp(Timestamp lastSendTimestamp) {
+        this.lastSendTimestamp = lastSendTimestamp;
     }
 
     public void attach(@Nonnull DiscordGuild guild) {
