@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -27,14 +28,15 @@ public class DiscordBot {
 
     private final DdbConfig config;
 
+    @Autowired
     public DiscordBot(DiscordCategoryService categoryService,
                       MediaActionService mediaActionService,
                       DiscordEventListener eventListener,
                       DdbConfig config) {
         this.categoryService = categoryService;
         this.mediaActionService = mediaActionService;
-        this.config = config;
         this.eventListener = eventListener;
+        this.config = config;
     }
 
     @EventListener(ApplicationReadyEvent.class)

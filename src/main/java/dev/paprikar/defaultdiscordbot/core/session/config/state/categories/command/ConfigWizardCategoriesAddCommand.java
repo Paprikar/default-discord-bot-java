@@ -1,5 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command;
 
+import dev.paprikar.defaultdiscordbot.config.DdbConfig;
+import dev.paprikar.defaultdiscordbot.config.DdbDefaults;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
@@ -29,10 +31,15 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
 
     private final DiscordCategoryService categoryService;
 
+    private final DdbConfig config;
+
     @Autowired
-    public ConfigWizardCategoriesAddCommand(DiscordGuildService guildService, DiscordCategoryService categoryService) {
+    public ConfigWizardCategoriesAddCommand(DiscordGuildService guildService,
+                                            DiscordCategoryService categoryService,
+                                            DdbConfig config) {
         this.guildService = guildService;
         this.categoryService = categoryService;
+        this.config = config;
     }
 
     @Nullable
@@ -86,7 +93,12 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
         }
 
         DiscordCategory category = new DiscordCategory();
+        DdbDefaults defaults = config.getDefaults();
+
         category.setName(argsString);
+        category.setPositiveApprovalEmoji(defaults.getPositiveApprovalEmoji());
+        category.setNegativeApprovalEmoji(defaults.getNegativeApprovalEmoji());
+
         category = categoryService.attach(category, guildOptional.get());
 
         session.setEntityId(category.getId());

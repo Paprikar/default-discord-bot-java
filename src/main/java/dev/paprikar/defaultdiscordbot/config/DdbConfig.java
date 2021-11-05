@@ -4,25 +4,26 @@ package dev.paprikar.defaultdiscordbot.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nonnull;
 import javax.validation.constraints.NotBlank;
-import java.util.Map;
 
 @Component
 @ConfigurationProperties("ddb")
 @Validated
-public class DdbConfig {
+public class DdbConfig implements Validator {
 
     @NotBlank
     private String token;
 
-    private String commandPrefix = "!";
-
-    private int botChannelId;
-
     @NestedConfigurationProperty
-    private Map<String, PicsCategory> picsCategories;
+    private DdbDefaults defaults;
+
+    public DdbConfig() {
+    }
 
     public String getToken() {
         return token;
@@ -32,37 +33,31 @@ public class DdbConfig {
         this.token = token;
     }
 
-    public String getCommandPrefix() {
-        return commandPrefix;
+    public DdbDefaults getDefaults() {
+        return defaults;
     }
 
-    public void setCommandPrefix(String commandPrefix) {
-        this.commandPrefix = commandPrefix;
-    }
-
-    public int getBotChannelId() {
-        return botChannelId;
-    }
-
-    public void setBotChannelId(int botChannelId) {
-        this.botChannelId = botChannelId;
-    }
-
-    public Map<String, PicsCategory> getPicsCategories() {
-        return picsCategories;
-    }
-
-    public void setPicsCategories(Map<String, PicsCategory> picsCategories) {
-        this.picsCategories = picsCategories;
+    public void setDefaults(DdbDefaults defaults) {
+        this.defaults = defaults;
     }
 
     @Override
     public String toString() {
         return "DdbConfig{" +
                 "token='" + token + '\'' +
-                ", commandPrefix='" + commandPrefix + '\'' +
-                ", botChannelId=" + botChannelId +
-                ", picsCategories=" + picsCategories +
+                ", defaults=" + defaults +
                 '}';
+    }
+
+    @Override
+    public boolean supports(@Nonnull Class<?> clazz) {
+        return DdbConfig.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public void validate(@Nonnull Object target, @Nonnull Errors errors) {
+        DdbConfig config = (DdbConfig) target;
+
+        config.defaults.validate(errors);
     }
 }

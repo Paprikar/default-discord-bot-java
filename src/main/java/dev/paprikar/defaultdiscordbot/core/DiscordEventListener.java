@@ -1,11 +1,18 @@
 package dev.paprikar.defaultdiscordbot.core;
 
+import dev.paprikar.defaultdiscordbot.config.DdbConfig;
+import dev.paprikar.defaultdiscordbot.config.DdbDefaults;
 import dev.paprikar.defaultdiscordbot.core.command.DiscordCommandHandler;
+import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
+import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
+import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordMediaRequestService;
+import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.SessionService;
 import net.dv8tion.jda.api.events.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -20,6 +27,7 @@ import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
@@ -31,6 +39,12 @@ public class DiscordEventListener extends ListenerAdapter {
 
     private final DiscordGuildService guildService;
 
+    private final DiscordCategoryService categoryService;
+
+    private final DiscordMediaRequestService mediaRequestService;
+
+    private final DiscordProviderFromDiscordService discordProviderService;
+
     private final DiscordCommandHandler commandHandler;
 
     private final DiscordSuggestionService discordSuggestionService;
@@ -39,20 +53,35 @@ public class DiscordEventListener extends ListenerAdapter {
 
     private final SendingService sendingService;
 
+    private final MediaActionService mediaActionService;
+
     private final SessionService sessionService;
 
+    private final DdbConfig config;
+
+    @Autowired
     public DiscordEventListener(DiscordGuildService guildService,
+                                DiscordCategoryService categoryService,
+                                DiscordMediaRequestService mediaRequestService,
+                                DiscordProviderFromDiscordService discordProviderService,
                                 DiscordCommandHandler commandHandler,
                                 DiscordSuggestionService discordSuggestionService,
                                 ApproveService approveService,
                                 SendingService sendingService,
-                                SessionService sessionService) {
+                                MediaActionService mediaActionService,
+                                SessionService sessionService,
+                                DdbConfig config) {
         this.guildService = guildService;
+        this.categoryService = categoryService;
+        this.mediaRequestService = mediaRequestService;
+        this.discordProviderService = discordProviderService;
         this.commandHandler = commandHandler;
         this.discordSuggestionService = discordSuggestionService;
         this.approveService = approveService;
         this.sendingService = sendingService;
+        this.mediaActionService = mediaActionService;
         this.sessionService = sessionService;
+        this.config = config;
     }
 
     @Override
@@ -167,37 +196,46 @@ public class DiscordEventListener extends ListenerAdapter {
 
     @Override
     public void onGuildJoin(@Nonnull GuildJoinEvent event) {
-        // todo media service
         setupDiscordGuild(event.getGuild().getIdLong());
     }
 
     @Override
     public void onGuildLeave(@Nonnull GuildLeaveEvent event) {
-        // todo media service
         removeDiscordGuild(event.getGuild().getIdLong());
     }
 
     @Override
     public void onUnavailableGuildJoined(@Nonnull UnavailableGuildJoinedEvent event) {
-        // todo media service
         setupDiscordGuild(event.getGuildIdLong());
     }
 
     @Override
     public void onUnavailableGuildLeave(@Nonnull UnavailableGuildLeaveEvent event) {
-        // todo media service
         removeDiscordGuild(event.getGuildIdLong());
     }
 
-    private void setupDiscordGuild(long discordGuildId) {
-        // todo default fields
+    private void setupDiscordGuild(long guildDiscordId) {
         DiscordGuild guild = new DiscordGuild();
-        guild.setDiscordId(discordGuildId);
+        DdbDefaults defaults = config.getDefaults();
+
+        guild.setDiscordId(guildDiscordId);
+        guild.setPrefix(defaults.getPrefix());
+
         guildService.save(guild);
     }
 
-    private void removeDiscordGuild(long discordGuildId) {
+    private void removeDiscordGuild(long guildDiscordId) {
         // todo delete timeout
-        guildService.deleteByDiscordId(discordGuildId);
+
+        for (DiscordCategory c : categoryService.findAllByGuildDiscordId(guildDiscordId)) {
+            mediaActionService.disableCategory(c);
+
+            Long categoryId = c.getId();
+            categoryService.deleteById(categoryId);
+            mediaRequestService.deleteByCategoryId(categoryId);
+            discordProviderService.deleteAllByCategoryId(categoryId);
+        }
+
+        guildService.deleteByDiscordId(guildDiscordId);
     }
 }

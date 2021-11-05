@@ -11,11 +11,4 @@ public class DdbApplication {
     public static void main(String[] args) {
         SpringApplication.run(DdbApplication.class, args);
     }
-
-    //@Bean
-    public ApplicationRunner applicationRunner() {
-        return args -> {
-
-        };
-    }
 }

@@ -26,12 +26,6 @@
             <name>m2-dv8tion</name>
             <url>https://m2.dv8tion.net/releases</url>
         </repository>
-
-        <!--        <repository>-->
-        <!--            <id>jcenter</id>-->
-        <!--            <name>jcenter-bintray</name>-->
-        <!--            <url>https://jcenter.bintray.com</url>-->
-        <!--        </repository>-->
     </repositories>
 
     <dependencies>
@@ -102,14 +96,6 @@
             <artifactId>emoji-java</artifactId>
             <version>5.1.1</version>
         </dependency>
-
-        <!--        <dependency>-->
-        <!--            <groupId>com.jagrosh</groupId>-->
-        <!--            <artifactId>jda-utilities</artifactId>-->
-        <!--            <version>3.0.5</version>-->
-        <!--            <scope>compile</scope>-->
-        <!--            <type>pom</type>-->
-        <!--        </dependency>-->
     </dependencies>
 
     <build>

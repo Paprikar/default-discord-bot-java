@@ -16,5 +16,7 @@ public interface DiscordMediaRequestRepository extends JpaRepository<DiscordMedi
 
     DiscordMediaRequest getFirstByCategoryIdOrderByCreationTimestampAsc(Long id);
 
+    void deleteByCategoryId(Long id);
+
     long countByCategoryId(Long id);
 }

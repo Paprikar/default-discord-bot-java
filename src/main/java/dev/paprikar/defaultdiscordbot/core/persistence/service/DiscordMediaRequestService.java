@@ -53,6 +53,10 @@ public class DiscordMediaRequestService {
         repository.deleteById(id);
     }
 
+    public void deleteByCategoryId(long id) {
+        repository.deleteByCategoryId(id);
+    }
+
     public boolean existsById(long id) {
         return repository.existsById(id);
     }
