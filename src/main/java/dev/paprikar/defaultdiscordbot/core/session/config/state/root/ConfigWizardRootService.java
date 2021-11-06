@@ -5,10 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildServi
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.root.command.ConfigWizardRootOpenCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.root.command.ConfigWizardRootSetCommand;
-import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.root.command.ConfigWizardRootCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -33,22 +30,16 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
 
     private final DiscordGuildService guildService;
 
-    private final ConfigWizardRootSetCommand setCommand;
-
-    private final ConfigWizardRootOpenCommand openCommand;
-
     @Autowired
     public ConfigWizardRootService(DiscordGuildService guildService,
-                                   ConfigWizardRootSetCommand setCommand,
-                                   ConfigWizardRootOpenCommand openCommand) {
+                                   List<ConfigWizardRootCommand> commands) {
         super();
 
         this.guildService = guildService;
 
-        this.setCommand = setCommand;
-        this.openCommand = openCommand;
-
-        setupCommands();
+        for (ConfigWizardRootCommand c : commands) {
+            this.commands.put(c.getName(), c);
+        }
     }
 
     public static MessageEmbed getStateEmbed(DiscordGuild guild) {
@@ -79,17 +70,7 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
     public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
         logger.trace("handle(): event={}, sessionInfo={}", event, session);
 
-        String message = event.getMessage().getContentRaw();
-        FirstWordAndOther parts = new FirstWordAndOther(message);
-        String commandName = parts.getFirstWord().toLowerCase();
-        String argsString = parts.getOther();
-
-        ConfigWizardCommand command = commands.get(commandName);
-        if (command == null) {
-            // todo illegal command response ?
-            return null;
-        }
-        return command.execute(event, session, argsString);
+        return super.handle(event, session);
     }
 
     @Transactional
@@ -119,10 +100,5 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.ROOT;
-    }
-
-    private void setupCommands() {
-        commands.put("set", setCommand);
-        commands.put("open", openCommand);
     }
 }

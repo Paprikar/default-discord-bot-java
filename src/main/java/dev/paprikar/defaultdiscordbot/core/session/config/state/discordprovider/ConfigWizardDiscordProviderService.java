@@ -6,9 +6,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFr
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.command.*;
-import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.command.ConfigWizardDiscordProviderCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -33,34 +31,16 @@ public class ConfigWizardDiscordProviderService extends AbstractConfigWizard {
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
-    private final ConfigWizardDiscordProviderBackCommand backCommand;
-
-    private final ConfigWizardDiscordProviderSetCommand setCommand;
-
-    private final ConfigWizardDiscordProviderEnableCommand enableCommand;
-
-    private final ConfigWizardDiscordProviderDisableCommand disableCommand;
-
-    private final ConfigWizardDiscordProviderRemoveCommand removeCommand;
-
     @Autowired
     public ConfigWizardDiscordProviderService(DiscordProviderFromDiscordService discordProviderService,
-                                              ConfigWizardDiscordProviderBackCommand backCommand,
-                                              ConfigWizardDiscordProviderSetCommand setCommand,
-                                              ConfigWizardDiscordProviderEnableCommand enableCommand,
-                                              ConfigWizardDiscordProviderDisableCommand disableCommand,
-                                              ConfigWizardDiscordProviderRemoveCommand removeCommand) {
+                                              List<ConfigWizardDiscordProviderCommand> commands) {
         super();
 
         this.discordProviderService = discordProviderService;
 
-        this.backCommand = backCommand;
-        this.setCommand = setCommand;
-        this.enableCommand = enableCommand;
-        this.disableCommand = disableCommand;
-        this.removeCommand = removeCommand;
-
-        setupCommands();
+        for (ConfigWizardDiscordProviderCommand c : commands) {
+            this.commands.put(c.getName(), c);
+        }
     }
 
     public static MessageEmbed getStateEmbed(DiscordProviderFromDiscord provider) {
@@ -95,19 +75,7 @@ public class ConfigWizardDiscordProviderService extends AbstractConfigWizard {
     public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
         logger.trace("handle(): event={}, sessionInfo={}", event, session);
 
-        String message = event.getMessage().getContentRaw();
-        FirstWordAndOther parts = new FirstWordAndOther(message);
-        String commandName = parts.getFirstWord().toLowerCase();
-        ConfigWizardCommand command = commands.get(commandName);
-
-        if (command == null) {
-            // todo illegal command response ?
-            return null;
-        }
-
-        String argsString = parts.getOther();
-
-        return command.execute(event, session, argsString);
+        return super.handle(event, session);
     }
 
     @Transactional
@@ -138,13 +106,5 @@ public class ConfigWizardDiscordProviderService extends AbstractConfigWizard {
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.DISCORD_PROVIDER;
-    }
-
-    private void setupCommands() {
-        commands.put("back", backCommand);
-        commands.put("set", setCommand);
-        commands.put("enable", enableCommand);
-        commands.put("disable", disableCommand);
-        commands.put("remove", removeCommand);
     }
 }

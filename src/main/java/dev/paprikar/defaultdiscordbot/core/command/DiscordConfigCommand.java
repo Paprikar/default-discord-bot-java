@@ -10,6 +10,8 @@ import javax.annotation.Nonnull;
 @Component
 public class DiscordConfigCommand implements DiscordCommand {
 
+    private static final String NAME = "config";
+
     private final SessionService sessionService;
 
     @Autowired
@@ -20,5 +22,11 @@ public class DiscordConfigCommand implements DiscordCommand {
     @Override
     public void execute(@Nonnull String argsString, @Nonnull GuildMessageReceivedEvent event) {
         sessionService.handle(event);
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

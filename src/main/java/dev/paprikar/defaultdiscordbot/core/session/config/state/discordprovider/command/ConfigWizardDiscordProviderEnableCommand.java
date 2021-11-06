@@ -5,7 +5,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -19,7 +18,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardCommand {
+public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDiscordProviderCommand {
+
+    private static final String NAME = "enable";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderEnableCommand.class);
 
@@ -66,5 +67,11 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardCom
         // todo enabled response
 
         return null;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

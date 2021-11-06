@@ -5,11 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategorySe
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesAddCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesBackCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesOpenCommand;
-import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -33,26 +29,16 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
 
     private final DiscordCategoryService categoryService;
 
-    private final ConfigWizardCategoriesBackCommand backCommand;
-
-    private final ConfigWizardCategoriesAddCommand addCommand;
-
-    private final ConfigWizardCategoriesOpenCommand openCommand;
-
     @Autowired
     public ConfigWizardCategoriesService(DiscordCategoryService categoryService,
-                                         ConfigWizardCategoriesBackCommand backCommand,
-                                         ConfigWizardCategoriesAddCommand addCommand,
-                                         ConfigWizardCategoriesOpenCommand openCommand) {
+                                         List<ConfigWizardCategoriesCommand> commands) {
         super();
 
         this.categoryService = categoryService;
 
-        this.backCommand = backCommand;
-        this.addCommand = addCommand;
-        this.openCommand = openCommand;
-
-        setupCommands();
+        for (ConfigWizardCategoriesCommand c : commands) {
+            this.commands.put(c.getName(), c);
+        }
     }
 
     public static MessageEmbed getStateEmbed(List<DiscordCategory> categories) {
@@ -87,26 +73,18 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
     public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
         logger.trace("handle(): event={}, sessionInfo={}", event, session);
 
-        String message = event.getMessage().getContentRaw();
-        FirstWordAndOther parts = new FirstWordAndOther(message);
-        String commandName = parts.getFirstWord().toLowerCase();
-        String argsString = parts.getOther();
-
-        ConfigWizardCommand command = commands.get(commandName);
-        if (command == null) {
-            // todo illegal command response ?
-            return null;
-        }
-        return command.execute(event, session, argsString);
+        return super.handle(event, session);
     }
 
     @Transactional
     @Override
     public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
+
         if (addStateEmbed) {
             responses.add(getStateEmbed(categoryService.findAllByGuildId(session.getEntityId())));
         }
+
         if (!responses.isEmpty()) {
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
@@ -117,11 +95,5 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.CATEGORIES;
-    }
-
-    private void setupCommands() {
-        commands.put("back", backCommand);
-        commands.put("add", addCommand);
-        commands.put("open", openCommand);
     }
 }

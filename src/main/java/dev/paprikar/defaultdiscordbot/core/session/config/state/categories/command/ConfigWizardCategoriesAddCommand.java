@@ -8,7 +8,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategorySe
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -23,7 +22,9 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Component
-public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
+public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesCommand {
+
+    private final static String NAME = "add";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesAddCommand.class);
 
@@ -106,5 +107,11 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCommand {
         logger.debug("Add at CATEGORIES: name={}, session={}", argsString, session);
 
         return ConfigWizardState.CATEGORY;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

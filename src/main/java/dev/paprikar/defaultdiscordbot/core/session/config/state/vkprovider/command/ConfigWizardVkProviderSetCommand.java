@@ -5,11 +5,8 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFr
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetterResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.ConfigWizardVkProviderService;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.setter.ConfigWizardVkProviderNameSetter;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.setter.ConfigWizardVkProviderSetter;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.setter.ConfigWizardVkProviderTokenSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -20,33 +17,30 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class ConfigWizardVkProviderSetCommand implements ConfigWizardCommand {
+public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderCommand {
+
+    private static final String NAME = "set";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderSetCommand.class);
 
     private final DiscordProviderFromVkService vkProviderService;
-
-    private final ConfigWizardVkProviderNameSetter nameSetter;
-
-    private final ConfigWizardVkProviderTokenSetter tokenSetter;
 
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardVkProviderSetter> setters = new HashMap<>();
 
     @Autowired
     public ConfigWizardVkProviderSetCommand(DiscordProviderFromVkService vkProviderService,
-                                            ConfigWizardVkProviderNameSetter nameSetter,
-                                            ConfigWizardVkProviderTokenSetter tokenSetter) {
+                                            List<ConfigWizardVkProviderSetter> setters) {
         this.vkProviderService = vkProviderService;
 
-        this.nameSetter = nameSetter;
-        this.tokenSetter = tokenSetter;
-
-        setupSetters();
+        for (ConfigWizardVkProviderSetter s : setters) {
+            this.setters.put(s.getVariableName(), s);
+        }
     }
 
     @Nullable
@@ -93,8 +87,9 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardCommand {
         return null;
     }
 
-    private void setupSetters() {
-        setters.put("name", nameSetter);
-        setters.put("token", tokenSetter);
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

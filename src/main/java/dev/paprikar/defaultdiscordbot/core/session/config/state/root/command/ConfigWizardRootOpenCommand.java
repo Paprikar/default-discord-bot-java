@@ -2,7 +2,6 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.root.command;
 
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class ConfigWizardRootOpenCommand implements ConfigWizardCommand {
+public class ConfigWizardRootOpenCommand implements ConfigWizardRootCommand {
+
+    private static final String NAME = "open";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardRootOpenCommand.class);
 
@@ -47,6 +48,12 @@ public class ConfigWizardRootOpenCommand implements ConfigWizardCommand {
         logger.debug("Open at ROOT: targetState='{}'", argsString);
 
         return targetState;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     private void setupTargets() {

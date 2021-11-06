@@ -6,7 +6,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategorySe
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -21,7 +20,9 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Component
-public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
+public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvidersCommand {
+
+    private static final String NAME = "add";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersAddCommand.class);
 
@@ -102,5 +103,11 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardCommand {
         logger.debug("Add at VK_PROVIDERS: name={}, session={}", argsString, session);
 
         return ConfigWizardState.VK_PROVIDER;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

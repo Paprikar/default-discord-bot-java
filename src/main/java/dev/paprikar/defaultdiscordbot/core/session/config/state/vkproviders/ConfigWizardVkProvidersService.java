@@ -7,11 +7,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFr
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command.ConfigWizardVkProvidersAddCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command.ConfigWizardVkProvidersBackCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command.ConfigWizardVkProvidersOpenCommand;
-import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command.ConfigWizardVkProvidersCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -38,28 +34,18 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
 
     private final DiscordProviderFromVkService vkProviderService;
 
-    private final ConfigWizardVkProvidersBackCommand backCommand;
-
-    private final ConfigWizardVkProvidersAddCommand addCommand;
-
-    private final ConfigWizardVkProvidersOpenCommand openCommand;
-
     @Autowired
     public ConfigWizardVkProvidersService(DiscordCategoryService categoryService,
                                           DiscordProviderFromVkService vkProviderService,
-                                          ConfigWizardVkProvidersBackCommand backCommand,
-                                          ConfigWizardVkProvidersAddCommand addCommand,
-                                          ConfigWizardVkProvidersOpenCommand openCommand) {
+                                          List<ConfigWizardVkProvidersCommand> commands) {
         super();
 
         this.categoryService = categoryService;
         this.vkProviderService = vkProviderService;
 
-        this.backCommand = backCommand;
-        this.addCommand = addCommand;
-        this.openCommand = openCommand;
-
-        setupCommands();
+        for (ConfigWizardVkProvidersCommand c : commands) {
+            this.commands.put(c.getName(), c);
+        }
     }
 
     public static MessageEmbed getStateEmbed(DiscordCategory category, List<DiscordProviderFromVk> providers) {
@@ -94,18 +80,7 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
     public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
         logger.trace("handle(): event={}, sessionInfo={}", event, session);
 
-        String message = event.getMessage().getContentRaw();
-        FirstWordAndOther parts = new FirstWordAndOther(message);
-        String commandName = parts.getFirstWord().toLowerCase();
-        ConfigWizardCommand command = commands.get(commandName);
-
-        if (command == null) {
-            // todo illegal command response ?
-            return null;
-        }
-
-        String argsString = parts.getOther();
-        return command.execute(event, session, argsString);
+        return super.handle(event, session);
     }
 
     @Transactional
@@ -136,11 +111,5 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.VK_PROVIDERS;
-    }
-
-    private void setupCommands() {
-        commands.put("back", backCommand);
-        commands.put("add", addCommand);
-        commands.put("open", openCommand);
     }
 }

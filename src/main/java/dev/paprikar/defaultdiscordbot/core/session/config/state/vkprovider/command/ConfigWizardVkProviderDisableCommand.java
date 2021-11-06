@@ -2,7 +2,6 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.comm
 
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Component
-public class ConfigWizardVkProviderDisableCommand implements ConfigWizardCommand {
+public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProviderCommand {
+
+    private static final String NAME = "disable";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderDisableCommand.class);
 
@@ -31,5 +32,11 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardCommand
         // todo
 
         return null;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

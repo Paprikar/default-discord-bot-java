@@ -20,6 +20,8 @@ import java.time.format.DateTimeParseException;
 @Component
 public class ConfigWizardCategoryEndTimeSetter implements ConfigWizardCategorySetter {
 
+    private static final String VARIABLE_NAME = "endTime";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryEndTimeSetter.class);
 
     private final DiscordCategoryService categoryService;
@@ -65,5 +67,11 @@ public class ConfigWizardCategoryEndTimeSetter implements ConfigWizardCategorySe
                 .appendDescription("EndTime value has been set to `" + time + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

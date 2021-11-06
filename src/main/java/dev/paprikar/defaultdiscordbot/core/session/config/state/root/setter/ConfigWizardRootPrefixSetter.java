@@ -16,6 +16,8 @@ import java.time.Instant;
 @Component
 public class ConfigWizardRootPrefixSetter implements ConfigWizardRootSetter {
 
+    private static final String VARIABLE_NAME = "prefix";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardRootPrefixSetter.class);
 
     private final DiscordGuildService guildService;
@@ -50,5 +52,11 @@ public class ConfigWizardRootPrefixSetter implements ConfigWizardRootSetter {
                 .appendDescription("Prefix value has been set to `" + value + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

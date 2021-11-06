@@ -20,6 +20,7 @@ public class FileExtension {
     public static final Set<String> VIDEO_EXTENSIONS = new HashSet<>(videoExtensions);
 
     public static final Set<String> EXTENSIONS = new HashSet<>(imageExtensions.size() + videoExtensions.size());
+
     static {
         EXTENSIONS.addAll(imageExtensions);
         EXTENSIONS.addAll(videoExtensions);

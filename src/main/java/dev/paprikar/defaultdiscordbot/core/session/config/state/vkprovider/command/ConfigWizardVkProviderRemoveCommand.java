@@ -4,7 +4,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -19,7 +18,9 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Component
-public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardCommand {
+public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProviderCommand {
+
+    private static final String NAME = "remove";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderRemoveCommand.class);
 
@@ -72,5 +73,11 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardCommand 
         logger.debug("The vkProvider={id={}} was deleted", provider.getId());
 
         return ConfigWizardState.VK_PROVIDERS;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

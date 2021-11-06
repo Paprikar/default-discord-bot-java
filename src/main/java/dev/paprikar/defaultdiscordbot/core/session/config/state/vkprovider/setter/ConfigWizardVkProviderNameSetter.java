@@ -17,6 +17,8 @@ import java.util.List;
 @Component
 public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderSetter {
 
+    private static final String VARIABLE_NAME = "name";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderNameSetter.class);
 
     private final DiscordProviderFromVkService vkProviderService;
@@ -86,5 +88,11 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
                 .appendDescription("Name value has been set to `" + value + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

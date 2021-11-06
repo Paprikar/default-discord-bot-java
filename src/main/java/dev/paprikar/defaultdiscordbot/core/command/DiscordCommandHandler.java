@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,22 +22,15 @@ public class DiscordCommandHandler {
 
     private final DiscordGuildService guildService;
 
-    private final DiscordPingCommand pingCommand;
-
-    private final DiscordConfigCommand configCommand;
-
     private final Map<String, DiscordCommand> commands = new HashMap<>();
 
     @Autowired
-    public DiscordCommandHandler(DiscordGuildService guildService,
-                                 DiscordPingCommand pingCommand,
-                                 DiscordConfigCommand configCommand) {
+    public DiscordCommandHandler(DiscordGuildService guildService, List<DiscordCommand> commands) {
         this.guildService = guildService;
 
-        this.pingCommand = pingCommand;
-        this.configCommand = configCommand;
-
-        setupCommands();
+        for (DiscordCommand c : commands) {
+            this.commands.put(c.getName(), c);
+        }
     }
 
     public void handle(@Nonnull GuildMessageReceivedEvent event) {
@@ -69,10 +63,5 @@ public class DiscordCommandHandler {
         if (command != null) {
             command.execute(argsString, event);
         }
-    }
-
-    private void setupCommands() {
-        commands.put("ping", pingCommand);
-        commands.put("config", configCommand);
     }
 }

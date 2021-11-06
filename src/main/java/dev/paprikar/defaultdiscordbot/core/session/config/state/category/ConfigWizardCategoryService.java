@@ -5,9 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategorySe
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.category.command.*;
-import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.category.command.ConfigWizardCategoryCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -32,38 +30,16 @@ public class ConfigWizardCategoryService extends AbstractConfigWizard {
 
     private final DiscordCategoryService categoryService;
 
-    private final ConfigWizardCategoryBackCommand backCommand;
-
-    private final ConfigWizardCategorySetCommand setCommand;
-
-    private final ConfigWizardCategoryOpenCommand openCommand;
-
-    private final ConfigWizardCategoryEnableCommand enableCommand;
-
-    private final ConfigWizardCategoryDisableCommand disableCommand;
-
-    private final ConfigWizardCategoryRemoveCommand removeCommand;
-
     @Autowired
     public ConfigWizardCategoryService(DiscordCategoryService categoryService,
-                                       ConfigWizardCategoryBackCommand backCommand,
-                                       ConfigWizardCategorySetCommand setCommand,
-                                       ConfigWizardCategoryOpenCommand openCommand,
-                                       ConfigWizardCategoryEnableCommand enableCommand,
-                                       ConfigWizardCategoryDisableCommand disableCommand,
-                                       ConfigWizardCategoryRemoveCommand removeCommand) {
+                                       List<ConfigWizardCategoryCommand> commands) {
         super();
 
         this.categoryService = categoryService;
 
-        this.backCommand = backCommand;
-        this.setCommand = setCommand;
-        this.openCommand = openCommand;
-        this.enableCommand = enableCommand;
-        this.disableCommand = disableCommand;
-        this.removeCommand = removeCommand;
-
-        setupCommands();
+        for (ConfigWizardCategoryCommand c : commands) {
+            this.commands.put(c.getName(), c);
+        }
     }
 
     public static MessageEmbed getStateEmbed(DiscordCategory category) {
@@ -107,17 +83,7 @@ public class ConfigWizardCategoryService extends AbstractConfigWizard {
     public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
         logger.trace("handle(): event={}, sessionInfo={}", event, session);
 
-        String message = event.getMessage().getContentRaw();
-        FirstWordAndOther parts = new FirstWordAndOther(message);
-        String commandName = parts.getFirstWord().toLowerCase();
-        String argsString = parts.getOther();
-
-        ConfigWizardCommand command = commands.get(commandName);
-        if (command == null) {
-            // todo illegal command response ?
-            return null;
-        }
-        return command.execute(event, session, argsString);
+        return super.handle(event, session);
     }
 
     @Transactional
@@ -138,7 +104,6 @@ public class ConfigWizardCategoryService extends AbstractConfigWizard {
         }
 
         if (!responses.isEmpty()) {
-            // todo without flatMap
             session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
         }
@@ -148,14 +113,5 @@ public class ConfigWizardCategoryService extends AbstractConfigWizard {
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.CATEGORY;
-    }
-
-    private void setupCommands() {
-        commands.put("back", backCommand);
-        commands.put("set", setCommand);
-        commands.put("open", openCommand);
-        commands.put("enable", enableCommand);
-        commands.put("disable", disableCommand);
-        commands.put("remove", removeCommand);
     }
 }

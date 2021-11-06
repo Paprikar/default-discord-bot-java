@@ -4,7 +4,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,9 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 @Component
-public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCommand {
+public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategoriesCommand {
+
+    private static final String NAME = "open";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesOpenCommand.class);
 
@@ -51,5 +52,11 @@ public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCommand {
         logger.debug("Open at CATEGORIES: target='{}', session={}", argsString, session);
 
         return ConfigWizardState.CATEGORY;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

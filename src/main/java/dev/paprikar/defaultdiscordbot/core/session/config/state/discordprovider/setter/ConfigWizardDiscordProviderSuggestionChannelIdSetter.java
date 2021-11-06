@@ -17,6 +17,8 @@ import java.time.Instant;
 @Component
 public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements ConfigWizardDiscordProviderSetter {
 
+    private static final String VARIABLE_NAME = "suggestionChannelId";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderSuggestionChannelIdSetter.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
@@ -62,5 +64,11 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
                 .appendDescription("SuggestionChannelId value has been set to `" + value + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

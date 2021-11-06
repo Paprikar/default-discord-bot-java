@@ -4,7 +4,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,9 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 @Component
-public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardCommand {
+public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvidersCommand {
+
+    private static final String NAME = "open";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersOpenCommand.class);
 
@@ -52,5 +53,11 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardCommand {
         logger.debug("Open at VK_PROVIDERS: target='{}', session={}", argsString, session);
 
         return ConfigWizardState.VK_PROVIDER;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

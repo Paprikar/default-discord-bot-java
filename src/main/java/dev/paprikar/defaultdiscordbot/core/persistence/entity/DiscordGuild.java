@@ -1,8 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
 import dev.paprikar.defaultdiscordbot.utils.DefaultObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.io.Serializable;

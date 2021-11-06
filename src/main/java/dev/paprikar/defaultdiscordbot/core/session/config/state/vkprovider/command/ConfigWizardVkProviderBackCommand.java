@@ -4,7 +4,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,9 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 @Component
-public class ConfigWizardVkProviderBackCommand implements ConfigWizardCommand {
+public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProviderCommand {
+
+    private static final String NAME = "back";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderBackCommand.class);
 
@@ -45,5 +46,11 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardCommand {
 
         session.setEntityId(vkProviderOptional.get().getCategory().getId());
         return ConfigWizardState.VK_PROVIDERS;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

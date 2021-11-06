@@ -19,6 +19,8 @@ import java.util.List;
 @Component
 public class ConfigWizardCategoryPositiveApprovalEmojiSetter implements ConfigWizardCategorySetter {
 
+    private static final String VARIABLE_NAME = "positiveApprovalEmoji";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryPositiveApprovalEmojiSetter.class);
 
     private final DiscordCategoryService categoryService;
@@ -70,5 +72,11 @@ public class ConfigWizardCategoryPositiveApprovalEmojiSetter implements ConfigWi
                 .appendDescription("PositiveApprovalEmoji value has been set to `" + value + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

@@ -8,8 +8,16 @@ import javax.annotation.Nonnull;
 @Component
 public class DiscordPingCommand implements DiscordCommand {
 
+    private static final String NAME = "ping";
+
     @Override
     public void execute(@Nonnull String argsString, @Nonnull GuildMessageReceivedEvent event) {
         event.getChannel().sendMessage("...pong").queue();
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

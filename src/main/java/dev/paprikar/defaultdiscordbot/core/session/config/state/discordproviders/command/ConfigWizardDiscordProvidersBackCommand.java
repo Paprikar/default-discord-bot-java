@@ -2,7 +2,6 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider
 
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Component
-public class ConfigWizardDiscordProvidersBackCommand implements ConfigWizardCommand {
+public class ConfigWizardDiscordProvidersBackCommand implements ConfigWizardDiscordProvidersCommand {
+
+    private static final String NAME = "back";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersBackCommand.class);
 
@@ -29,5 +30,11 @@ public class ConfigWizardDiscordProvidersBackCommand implements ConfigWizardComm
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         return ConfigWizardState.CATEGORY;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

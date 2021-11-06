@@ -17,6 +17,8 @@ import java.util.List;
 @Component
 public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySetter {
 
+    private static final String VARIABLE_NAME = "name";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryNameSetter.class);
 
     private final DiscordCategoryService categoryService;
@@ -74,5 +76,11 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
                 .appendDescription("Name value has been set to `" + value + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

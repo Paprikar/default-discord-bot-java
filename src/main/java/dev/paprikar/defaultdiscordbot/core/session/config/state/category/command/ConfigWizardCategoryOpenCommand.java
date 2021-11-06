@@ -2,7 +2,6 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.category.comman
 
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class ConfigWizardCategoryOpenCommand implements ConfigWizardCommand {
+public class ConfigWizardCategoryOpenCommand implements ConfigWizardCategoryCommand {
+
+    private static final String NAME = "open";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryOpenCommand.class);
 
@@ -49,5 +50,11 @@ public class ConfigWizardCategoryOpenCommand implements ConfigWizardCommand {
     private void setupTargets() {
         targets.put("discord providers", ConfigWizardState.DISCORD_PROVIDERS);
         targets.put("vk providers", ConfigWizardState.VK_PROVIDERS);
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

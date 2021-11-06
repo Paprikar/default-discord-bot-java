@@ -5,11 +5,8 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFr
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetterResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.ConfigWizardDiscordProviderService;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.setter.ConfigWizardDiscordProviderNameSetter;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.setter.ConfigWizardDiscordProviderSetter;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.setter.ConfigWizardDiscordProviderSuggestionChannelIdSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -20,19 +17,18 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardCommand {
+public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscordProviderCommand {
+
+    private static final String NAME = "set";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderSetCommand.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
-
-    private final ConfigWizardDiscordProviderNameSetter nameSetter;
-
-    private final ConfigWizardDiscordProviderSuggestionChannelIdSetter suggestionChannelIdSetter;
 
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardDiscordProviderSetter> setters = new HashMap<>();
@@ -40,14 +36,12 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardComman
     @Autowired
     public ConfigWizardDiscordProviderSetCommand(
             DiscordProviderFromDiscordService discordProviderService,
-            ConfigWizardDiscordProviderNameSetter nameSetter,
-            ConfigWizardDiscordProviderSuggestionChannelIdSetter suggestionChannelIdSetter) {
+            List<ConfigWizardDiscordProviderSetter> setters) {
         this.discordProviderService = discordProviderService;
 
-        this.nameSetter = nameSetter;
-        this.suggestionChannelIdSetter = suggestionChannelIdSetter;
-
-        setupSetters();
+        for (ConfigWizardDiscordProviderSetter s : setters) {
+            this.setters.put(s.getVariableName(), s);
+        }
     }
 
     @Nullable
@@ -95,8 +89,9 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardComman
         return null;
     }
 
-    private void setupSetters() {
-        setters.put("name", nameSetter);
-        setters.put("suggestionChannelId", suggestionChannelIdSetter);
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

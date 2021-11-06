@@ -16,6 +16,8 @@ import java.time.Instant;
 @Component
 public class ConfigWizardVkProviderTokenSetter implements ConfigWizardVkProviderSetter {
 
+    private static final String VARIABLE_NAME = "token";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderTokenSetter.class);
 
     private final DiscordProviderFromVkService vkProviderService;
@@ -40,5 +42,11 @@ public class ConfigWizardVkProviderTokenSetter implements ConfigWizardVkProvider
                 .appendDescription("Token value has been set to `" + value + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

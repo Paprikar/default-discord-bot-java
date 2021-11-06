@@ -7,11 +7,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFr
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command.ConfigWizardDiscordProvidersAddCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command.ConfigWizardDiscordProvidersBackCommand;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command.ConfigWizardDiscordProvidersOpenCommand;
-import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command.ConfigWizardDiscordProvidersCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -38,28 +34,18 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
-    private final ConfigWizardDiscordProvidersBackCommand backCommand;
-
-    private final ConfigWizardDiscordProvidersAddCommand addCommand;
-
-    private final ConfigWizardDiscordProvidersOpenCommand openCommand;
-
     @Autowired
     public ConfigWizardDiscordProvidersService(DiscordCategoryService categoryService,
                                                DiscordProviderFromDiscordService discordProviderService,
-                                               ConfigWizardDiscordProvidersBackCommand backCommand,
-                                               ConfigWizardDiscordProvidersAddCommand addCommand,
-                                               ConfigWizardDiscordProvidersOpenCommand openCommand) {
+                                               List<ConfigWizardDiscordProvidersCommand> commands) {
         super();
 
         this.categoryService = categoryService;
         this.discordProviderService = discordProviderService;
 
-        this.backCommand = backCommand;
-        this.addCommand = addCommand;
-        this.openCommand = openCommand;
-
-        setupCommands();
+        for (ConfigWizardDiscordProvidersCommand c : commands) {
+            this.commands.put(c.getName(), c);
+        }
     }
 
     public static MessageEmbed getStateEmbed(@Nonnull DiscordCategory category,
@@ -95,18 +81,7 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
     public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
         logger.trace("handle(): event={}, sessionInfo={}", event, session);
 
-        String message = event.getMessage().getContentRaw();
-        FirstWordAndOther parts = new FirstWordAndOther(message);
-        String commandName = parts.getFirstWord().toLowerCase();
-
-        ConfigWizardCommand command = commands.get(commandName);
-        if (command == null) {
-            // todo illegal command response ?
-            return null;
-        }
-
-        String argsString = parts.getOther();
-        return command.execute(event, session, argsString);
+        return super.handle(event, session);
     }
 
     @Transactional
@@ -137,11 +112,5 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.DISCORD_PROVIDERS;
-    }
-
-    private void setupCommands() {
-        commands.put("back", backCommand);
-        commands.put("add", addCommand);
-        commands.put("open", openCommand);
     }
 }

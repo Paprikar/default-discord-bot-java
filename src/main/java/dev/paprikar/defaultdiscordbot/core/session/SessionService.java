@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core.session;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
@@ -33,8 +33,7 @@ public class SessionService {
     private final Set<Long> activeGuilds = ConcurrentHashMap.newKeySet();
 
     @Autowired
-    public SessionService(DiscordGuildService guildService,
-                          List<ConfigWizard> configWizards) {
+    public SessionService(DiscordGuildService guildService, List<ConfigWizard> configWizards) {
         this.guildService = guildService;
 
         for (ConfigWizard s : configWizards) {

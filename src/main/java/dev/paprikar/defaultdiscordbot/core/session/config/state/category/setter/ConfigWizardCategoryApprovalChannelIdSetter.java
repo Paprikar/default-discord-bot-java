@@ -17,6 +17,8 @@ import java.time.Instant;
 @Component
 public class ConfigWizardCategoryApprovalChannelIdSetter implements ConfigWizardCategorySetter {
 
+    private static final String VARIABLE_NAME = "approvalChannelId";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryApprovalChannelIdSetter.class);
 
     private final DiscordCategoryService categoryService;
@@ -62,5 +64,11 @@ public class ConfigWizardCategoryApprovalChannelIdSetter implements ConfigWizard
                 .appendDescription("ApprovalChannelId value has been set to `" + value + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

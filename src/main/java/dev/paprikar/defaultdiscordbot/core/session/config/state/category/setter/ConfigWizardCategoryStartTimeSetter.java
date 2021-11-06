@@ -20,6 +20,8 @@ import java.time.format.DateTimeParseException;
 @Component
 public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategorySetter {
 
+    private static final String VARIABLE_NAME = "startTime";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryStartTimeSetter.class);
 
     private final DiscordCategoryService categoryService;
@@ -65,5 +67,11 @@ public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategory
                 .appendDescription("StartTime value has been set to `" + time + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

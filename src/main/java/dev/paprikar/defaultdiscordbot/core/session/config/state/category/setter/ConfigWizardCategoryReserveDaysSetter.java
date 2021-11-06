@@ -17,6 +17,8 @@ import java.time.Instant;
 @Component
 public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCategorySetter {
 
+    private static final String VARIABLE_NAME = "reserveDays";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryReserveDaysSetter.class);
 
     private final DiscordCategoryService categoryService;
@@ -70,5 +72,11 @@ public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCatego
                 .appendDescription("ReserveDays value has been set to `" + value + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

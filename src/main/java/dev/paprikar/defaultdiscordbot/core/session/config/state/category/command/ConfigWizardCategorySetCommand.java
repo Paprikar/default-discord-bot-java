@@ -5,9 +5,8 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategorySe
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetterResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.ConfigWizardCategoryService;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter.*;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter.ConfigWizardCategorySetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -18,57 +17,30 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class ConfigWizardCategorySetCommand implements ConfigWizardCommand {
+public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryCommand {
+
+    private static final String NAME = "set";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategorySetCommand.class);
 
     private final DiscordCategoryService categoryService;
-
-    private final ConfigWizardCategoryNameSetter nameSetter;
-
-    private final ConfigWizardCategorySendingChannelIdSetter sendingChannelIdSetter;
-
-    private final ConfigWizardCategoryApprovalChannelIdSetter approvalChannelIdSetter;
-
-    private final ConfigWizardCategoryStartTimeSetter startTimeSetter;
-
-    private final ConfigWizardCategoryEndTimeSetter endTimeSetter;
-
-    private final ConfigWizardCategoryReserveDaysSetter reserveDaysSetter;
-
-    private final ConfigWizardCategoryPositiveApprovalEmojiSetter positiveApprovalEmojiSetter;
-
-    private final ConfigWizardCategoryNegativeApprovalEmojiSetter negativeApprovalEmojiSetter;
 
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardCategorySetter> setters = new HashMap<>();
 
     @Autowired
     public ConfigWizardCategorySetCommand(DiscordCategoryService categoryService,
-                                          ConfigWizardCategoryNameSetter nameSetter,
-                                          ConfigWizardCategorySendingChannelIdSetter sendingChannelIdSetter,
-                                          ConfigWizardCategoryApprovalChannelIdSetter approvalChannelIdSetter,
-                                          ConfigWizardCategoryStartTimeSetter startTimeSetter,
-                                          ConfigWizardCategoryEndTimeSetter endTimeSetter,
-                                          ConfigWizardCategoryReserveDaysSetter reserveDaysSetter,
-                                          ConfigWizardCategoryPositiveApprovalEmojiSetter positiveApprovalEmojiSetter,
-                                          ConfigWizardCategoryNegativeApprovalEmojiSetter negativeApprovalEmojiSetter) {
+                                          List<ConfigWizardCategorySetter> setters) {
         this.categoryService = categoryService;
 
-        this.nameSetter = nameSetter;
-        this.sendingChannelIdSetter = sendingChannelIdSetter;
-        this.approvalChannelIdSetter = approvalChannelIdSetter;
-        this.startTimeSetter = startTimeSetter;
-        this.endTimeSetter = endTimeSetter;
-        this.reserveDaysSetter = reserveDaysSetter;
-        this.positiveApprovalEmojiSetter = positiveApprovalEmojiSetter;
-        this.negativeApprovalEmojiSetter = negativeApprovalEmojiSetter;
-
-        setupSetters();
+        for (ConfigWizardCategorySetter s : setters) {
+            this.setters.put(s.getVariableName(), s);
+        }
     }
 
     @Nullable
@@ -113,14 +85,9 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCommand {
         return null;
     }
 
-    private void setupSetters() {
-        setters.put("name", nameSetter);
-        setters.put("sendingChannelId", sendingChannelIdSetter);
-        setters.put("approvalChannelId", approvalChannelIdSetter);
-        setters.put("startTime", startTimeSetter);
-        setters.put("endTime", endTimeSetter);
-        setters.put("reserveDays", reserveDaysSetter);
-        setters.put("positiveApprovalEmoji", positiveApprovalEmojiSetter);
-        setters.put("negativeApprovalEmoji", negativeApprovalEmojiSetter);
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

@@ -14,6 +14,8 @@ import java.time.Instant;
 
 public class ConfigWizardExitCommand implements ConfigWizardCommand {
 
+    private static final String NAME = "exit";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardExitCommand.class);
 
     @Override
@@ -31,5 +33,11 @@ public class ConfigWizardExitCommand implements ConfigWizardCommand {
                 .build()
         );
         return ConfigWizardState.END;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

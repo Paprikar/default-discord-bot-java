@@ -4,7 +4,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -19,7 +18,9 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Component
-public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardCommand {
+public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDiscordProviderCommand {
+
+    private static final String NAME = "remove";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderRemoveCommand.class);
 
@@ -73,5 +74,11 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardCom
         logger.debug("The discordProvider={id={}} was deleted", provider.getId());
 
         return ConfigWizardState.DISCORD_PROVIDERS;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

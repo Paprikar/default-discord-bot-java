@@ -17,6 +17,8 @@ import java.time.Instant;
 @Component
 public class ConfigWizardCategorySendingChannelIdSetter implements ConfigWizardCategorySetter {
 
+    private static final String VARIABLE_NAME = "sendingChannelId";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategorySendingChannelIdSetter.class);
 
     private final DiscordCategoryService categoryService;
@@ -62,5 +64,11 @@ public class ConfigWizardCategorySendingChannelIdSetter implements ConfigWizardC
                 .appendDescription("SendingChannelId value has been set to `" + value + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }

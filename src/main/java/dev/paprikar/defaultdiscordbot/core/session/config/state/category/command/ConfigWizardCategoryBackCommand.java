@@ -4,7 +4,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,9 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 @Component
-public class ConfigWizardCategoryBackCommand implements ConfigWizardCommand {
+public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryCommand {
+
+    private static final String NAME = "back";
 
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryBackCommand.class);
 
@@ -45,5 +46,11 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCommand {
 
         session.setEntityId(categoryOptional.get().getGuild().getId());
         return ConfigWizardState.CATEGORIES;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

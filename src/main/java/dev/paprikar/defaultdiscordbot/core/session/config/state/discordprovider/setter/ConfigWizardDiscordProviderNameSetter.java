@@ -17,6 +17,8 @@ import java.util.List;
 @Component
 public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscordProviderSetter {
 
+    private static final String VARIABLE_NAME = "name";
+
     private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderNameSetter.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
@@ -86,5 +88,11 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
                 .appendDescription("Name value has been set to `" + value + "`")
                 .build()
         );
+    }
+
+    @Nonnull
+    @Override
+    public String getVariableName() {
+        return VARIABLE_NAME;
     }
 }
