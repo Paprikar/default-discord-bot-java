@@ -22,7 +22,7 @@ public class ConfigWizardCategoryEndTimeSetter implements ConfigWizardCategorySe
 
     private static final String VARIABLE_NAME = "endTime";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryEndTimeSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryEndTimeSetter.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -46,7 +46,7 @@ public class ConfigWizardCategoryEndTimeSetter implements ConfigWizardCategorySe
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Value has an invalid format")
+                    .appendDescription("The value has an invalid format")
                     .build()
             );
         }
@@ -56,15 +56,15 @@ public class ConfigWizardCategoryEndTimeSetter implements ConfigWizardCategorySe
         category.setEndTime(time);
         category = categoryService.save(category);
 
-        sendingService.updateCategory(category);
+        sendingService.update(category);
 
-        logger.debug("The category={id={}} endTime is set to '{}'", category.getId(), time);
+        logger.debug("The category={id={}} value 'endTime' is set to '{}'", category.getId(), time);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("EndTime value has been set to `" + time + "`")
+                .appendDescription("The value `endTime` has been set to `" + time + "`")
                 .build()
         );
     }

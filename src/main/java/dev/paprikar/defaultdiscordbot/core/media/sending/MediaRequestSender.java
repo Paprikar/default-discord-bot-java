@@ -20,7 +20,7 @@ import java.util.concurrent.*;
 
 public class MediaRequestSender {
 
-    private final Logger logger = LoggerFactory.getLogger(MediaRequestSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(MediaRequestSender.class);
 
     private final JDA jda;
 
@@ -80,7 +80,7 @@ public class MediaRequestSender {
                 taskFuture.cancel(false);
                 if (!taskFuture.isDone()) {
                     try {
-                        taskFuture.get(); // todo fix deadlock with SenderTask.run()
+                        taskFuture.get(); // todo fix deadlock with SenderTask#run()
                     } catch (InterruptedException | ExecutionException e) {
                         logger.error(e.toString());
                     }
@@ -92,7 +92,7 @@ public class MediaRequestSender {
         }
     }
 
-    public void refresh(@Nonnull DiscordCategory category) {
+    public void update(@Nonnull DiscordCategory category) {
         stop();
         start(category);
     }
@@ -125,7 +125,7 @@ public class MediaRequestSender {
 
         private void sendRequest() {
             Optional<DiscordMediaRequest> requestOptional = mediaRequestService.findFirstByCategoryId(category.getId());
-            if (!requestOptional.isPresent()) {
+            if (requestOptional.isEmpty()) {
                 // normally should not happen
                 toTerminate = true;
                 lastSendDateTime = LocalDateTime.from(category.getLastSendTimestamp().toInstant());
@@ -202,7 +202,7 @@ public class MediaRequestSender {
             boolean inTime = timeInRange(currentDateTime.toLocalTime(), startTime, endTime);
 
             StringBuilder debugMsgBuilder = new StringBuilder();
-            debugMsgBuilder.append("SenderTask.schedule(): ")
+            debugMsgBuilder.append("SenderTask#schedule(): ")
                     .append("category={id=").append(category.getId()).append("}, ")
                     .append("currentDateTime=").append(currentDateTime);
 

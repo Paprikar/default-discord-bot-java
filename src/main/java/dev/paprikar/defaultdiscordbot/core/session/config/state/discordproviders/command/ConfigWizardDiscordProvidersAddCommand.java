@@ -24,7 +24,7 @@ public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardDisco
 
     private static final String NAME = "add";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersAddCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersAddCommand.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -78,7 +78,7 @@ public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardDisco
                         .setColor(Color.RED)
                         .setTitle("Configuration Wizard Error")
                         .setTimestamp(Instant.now())
-                        .appendDescription("Discord provider name must be unique")
+                        .appendDescription("The name of discord provider must be unique")
                         .build()
                 );
                 return null;
@@ -86,7 +86,7 @@ public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardDisco
         }
 
         Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
-        if (!categoryOptional.isPresent()) {
+        if (categoryOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());

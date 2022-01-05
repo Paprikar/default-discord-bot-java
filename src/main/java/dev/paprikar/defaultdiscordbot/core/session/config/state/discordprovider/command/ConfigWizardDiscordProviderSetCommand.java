@@ -26,7 +26,7 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
 
     private static final String NAME = "set";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderSetCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderSetCommand.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
@@ -70,7 +70,7 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
 
         Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService
                 .findById(session.getEntityId());
-        if (!discordProviderOptional.isPresent()) {
+        if (discordProviderOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get discordProvider={id={}}, ending session", session.getEntityId());
@@ -80,10 +80,9 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
         DiscordProviderFromDiscord provider = discordProviderOptional.get();
 
         String value = parts.getOther();
-
         ConfigWizardSetterResponse response = setter.set(value, provider);
-
         session.getResponses().add(response.getEmbed());
+
         session.getResponses().add(ConfigWizardDiscordProviderService.getStateEmbed(provider));
 
         return null;

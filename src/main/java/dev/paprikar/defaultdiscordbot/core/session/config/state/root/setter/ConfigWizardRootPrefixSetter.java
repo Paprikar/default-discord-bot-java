@@ -18,7 +18,7 @@ public class ConfigWizardRootPrefixSetter implements ConfigWizardRootSetter {
 
     private static final String VARIABLE_NAME = "prefix";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardRootPrefixSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardRootPrefixSetter.class);
 
     private final DiscordGuildService guildService;
 
@@ -43,13 +43,13 @@ public class ConfigWizardRootPrefixSetter implements ConfigWizardRootSetter {
         guild.setPrefix(value);
         guild = guildService.save(guild);
 
-        logger.debug("The guild={id={}} prefix is set to '{}'", guild.getId(), value);
+        logger.debug("The guild={id={}} value 'prefix' is set to '{}'", guild.getId(), value);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("Prefix value has been set to `" + value + "`")
+                .appendDescription("The value `prefix` has been set to `" + value + "`")
                 .build()
         );
     }

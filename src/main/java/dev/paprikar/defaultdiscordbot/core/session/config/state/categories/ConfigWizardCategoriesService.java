@@ -25,7 +25,7 @@ import java.util.List;
 @Service
 public class ConfigWizardCategoriesService extends AbstractConfigWizard {
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesService.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -53,7 +53,7 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
         if (!categories.isEmpty()) {
             builder.appendDescription("Categories:\n");
             for (DiscordCategory c : categories) {
-                builder.appendDescription(String.format("`%s`\n", c.getName()));
+                builder.appendDescription("`" + c.getName() + "`\n");
             }
             builder.appendDescription("\n");
         }
@@ -86,7 +86,7 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
         }
 
         if (!responses.isEmpty()) {
-            session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
+            session.getChannel().flatMap(channel -> channel.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
         }
     }

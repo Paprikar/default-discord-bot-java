@@ -14,32 +14,45 @@ import java.awt.*;
 import java.time.Instant;
 
 @Component
-public class ConfigWizardVkProviderTokenSetter implements ConfigWizardVkProviderSetter {
+public class ConfigWizardVkProviderGroupIdSetter implements ConfigWizardVkProviderSetter {
 
-    private static final String VARIABLE_NAME = "token";
+    private static final String VARIABLE_NAME = "groupId";
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderTokenSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderGroupIdSetter.class);
 
     private final DiscordProviderFromVkService vkProviderService;
 
     @Autowired
-    public ConfigWizardVkProviderTokenSetter(DiscordProviderFromVkService vkProviderService) {
+    public ConfigWizardVkProviderGroupIdSetter(DiscordProviderFromVkService vkProviderService) {
         this.vkProviderService = vkProviderService;
     }
 
     @Nonnull
     @Override
     public ConfigWizardSetterResponse set(@Nonnull String value, @Nonnull DiscordProviderFromVk provider) {
-        provider.setToken(value);
+        int groupId;
+        try {
+            groupId = Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return new ConfigWizardSetterResponse(false, new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value has an invalid format")
+                    .build()
+            );
+        }
+
+        provider.setGroupId(groupId);
         provider = vkProviderService.save(provider);
 
-        logger.debug("The vkProvider={id={}} value 'token' is set to '{}'", provider.getId(), value);
+        logger.debug("The vkProvider={id={}} value 'groupId' is set to '{}'", provider.getId(), value);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The value `token` has been set to `" + value + "`")
+                .appendDescription("The value `groupId` has been set to `" + value + "`")
                 .build()
         );
     }

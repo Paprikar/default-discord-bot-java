@@ -18,7 +18,7 @@ public class ConfigWizardCategoryOpenCommand implements ConfigWizardCategoryComm
 
     private static final String NAME = "open";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryOpenCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryOpenCommand.class);
 
     // Map<Directory, State>
     private final Map<String, ConfigWizardState> targets = new HashMap<>();

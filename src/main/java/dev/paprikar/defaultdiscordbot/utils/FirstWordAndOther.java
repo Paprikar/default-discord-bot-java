@@ -1,12 +1,14 @@
 package dev.paprikar.defaultdiscordbot.utils;
 
+import javax.annotation.Nonnull;
+
 public class FirstWordAndOther {
 
     private final String firstWord;
 
     private final String other;
 
-    public FirstWordAndOther(String s) {
+    public FirstWordAndOther(@Nonnull String s) {
         int index = s.indexOf(' ');
         if (index == -1) {
             firstWord = s;
@@ -17,10 +19,12 @@ public class FirstWordAndOther {
         }
     }
 
+    @Nonnull
     public String getFirstWord() {
         return firstWord;
     }
 
+    @Nonnull
     public String getOther() {
         return other;
     }

@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 public class DiscordCommandHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(DiscordCommandHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(DiscordCommandHandler.class);
 
     private final DiscordGuildService guildService;
 
@@ -33,12 +33,12 @@ public class DiscordCommandHandler {
         }
     }
 
-    public void handle(@Nonnull GuildMessageReceivedEvent event) {
+    public void handleGuildMessageReceivedEvent(@Nonnull GuildMessageReceivedEvent event) {
         long guildId = event.getGuild().getIdLong();
         String message = event.getMessage().getContentRaw();
 
         Optional<DiscordGuild> guildOptional = guildService.findByDiscordId(guildId);
-        if (!guildOptional.isPresent()) {
+        if (guildOptional.isEmpty()) {
             return;
         }
         DiscordGuild guild = guildOptional.get();
@@ -57,7 +57,7 @@ public class DiscordCommandHandler {
         String commandName = parts.getFirstWord().toLowerCase();
         argsString = parts.getOther();
 
-        logger.debug("handle(): command='{}' args='{}'", commandName, argsString);
+        logger.debug("handleGuildMessageReceivedEvent(): command='{}' args='{}'", commandName, argsString);
 
         DiscordCommand command = commands.get(commandName);
         if (command != null) {

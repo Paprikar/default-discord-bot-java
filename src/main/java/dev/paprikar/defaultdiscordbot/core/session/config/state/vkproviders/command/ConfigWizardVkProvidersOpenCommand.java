@@ -19,7 +19,7 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvide
 
     private static final String NAME = "open";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersOpenCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersOpenCommand.class);
 
     private final DiscordProviderFromVkService vkProviderService;
 

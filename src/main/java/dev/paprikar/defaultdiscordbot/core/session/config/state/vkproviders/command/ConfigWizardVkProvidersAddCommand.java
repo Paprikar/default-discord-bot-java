@@ -24,7 +24,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvider
 
     private static final String NAME = "add";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersAddCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersAddCommand.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -78,7 +78,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvider
                         .setColor(Color.RED)
                         .setTitle("Configuration Wizard Error")
                         .setTimestamp(Instant.now())
-                        .appendDescription("Vk provider name must be unique")
+                        .appendDescription("The name of vk provider must be unique")
                         .build()
                 );
                 return null;
@@ -86,7 +86,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvider
         }
 
         Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
-        if (!categoryOptional.isPresent()) {
+        if (categoryOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());

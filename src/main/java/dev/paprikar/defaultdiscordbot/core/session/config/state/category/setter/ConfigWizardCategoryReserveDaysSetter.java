@@ -19,7 +19,7 @@ public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCatego
 
     private static final String VARIABLE_NAME = "reserveDays";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryReserveDaysSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryReserveDaysSetter.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -43,7 +43,7 @@ public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCatego
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Value has an invalid format")
+                    .appendDescription("The value has an invalid format")
                     .build()
             );
         }
@@ -53,7 +53,7 @@ public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCatego
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("ReserveDays value can only be positive")
+                    .appendDescription("The value `reserveDays` can only be positive")
                     .build()
             );
         }
@@ -61,15 +61,15 @@ public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCatego
         category.setReserveDays(reserveDays);
         category = categoryService.save(category);
 
-        sendingService.updateCategory(category);
+        sendingService.update(category);
 
-        logger.debug("The category={id={}} reserveDays is set to '{}'", category.getId(), value);
+        logger.debug("The category={id={}} value 'reserveDays' is set to '{}'", category.getId(), value);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("ReserveDays value has been set to `" + value + "`")
+                .appendDescription("The value `reserveDays` has been set to `" + value + "`")
                 .build()
         );
     }

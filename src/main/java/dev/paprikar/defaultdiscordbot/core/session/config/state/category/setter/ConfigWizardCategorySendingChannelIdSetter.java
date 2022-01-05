@@ -19,7 +19,7 @@ public class ConfigWizardCategorySendingChannelIdSetter implements ConfigWizardC
 
     private static final String VARIABLE_NAME = "sendingChannelId";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategorySendingChannelIdSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategorySendingChannelIdSetter.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -43,7 +43,7 @@ public class ConfigWizardCategorySendingChannelIdSetter implements ConfigWizardC
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Value has an invalid format")
+                    .appendDescription("The value has an invalid format")
                     .build()
             );
         }
@@ -53,15 +53,15 @@ public class ConfigWizardCategorySendingChannelIdSetter implements ConfigWizardC
         category.setSendingChannelId(id);
         category = categoryService.save(category);
 
-        sendingService.updateCategory(category);
+        sendingService.update(category);
 
-        logger.debug("The category={id={}} sendingChannelId is set to '{}'", category.getId(), value);
+        logger.debug("The category={id={}} value 'sendingChannelId' is set to '{}'", category.getId(), value);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("SendingChannelId value has been set to `" + value + "`")
+                .appendDescription("The value `sendingChannelId` has been set to `" + value + "`")
                 .build()
         );
     }

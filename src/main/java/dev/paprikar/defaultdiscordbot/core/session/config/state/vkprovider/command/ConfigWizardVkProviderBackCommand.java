@@ -19,7 +19,7 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProvider
 
     private static final String NAME = "back";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderBackCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderBackCommand.class);
 
     private final DiscordProviderFromVkService vkProviderService;
 
@@ -36,7 +36,7 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProvider
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(session.getEntityId());
-        if (!vkProviderOptional.isPresent()) {
+        if (vkProviderOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get vkProvider={id={}}, ending session", session.getEntityId());

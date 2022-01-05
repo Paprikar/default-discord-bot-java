@@ -26,7 +26,7 @@ import java.util.Optional;
 @Service
 public class ConfigWizardRootService extends AbstractConfigWizard {
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardRootService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardRootService.class);
 
     private final DiscordGuildService guildService;
 
@@ -91,7 +91,7 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
         }
 
         if (!responses.isEmpty()) {
-            session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
+            session.getChannel().flatMap(channel -> channel.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
         }
     }

@@ -19,7 +19,7 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryComm
 
     private static final String NAME = "back";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryBackCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryBackCommand.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -36,7 +36,7 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryComm
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         Optional<DiscordCategory> categoryOptional = categoryService.findById(session.getEntityId());
-        if (!categoryOptional.isPresent()) {
+        if (categoryOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());

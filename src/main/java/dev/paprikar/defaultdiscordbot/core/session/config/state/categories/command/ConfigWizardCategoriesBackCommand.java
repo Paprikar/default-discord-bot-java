@@ -16,7 +16,7 @@ public class ConfigWizardCategoriesBackCommand implements ConfigWizardCategories
 
     private static final String NAME = "back";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesBackCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesBackCommand.class);
 
     @Autowired
     public ConfigWizardCategoriesBackCommand() {

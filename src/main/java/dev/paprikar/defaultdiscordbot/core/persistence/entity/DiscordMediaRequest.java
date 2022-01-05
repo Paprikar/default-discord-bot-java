@@ -1,7 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
+import dev.paprikar.defaultdiscordbot.utils.DefaultObjectMapper;
+
 import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
 
@@ -9,9 +10,7 @@ import java.time.Instant;
 @Table(name = "discord_media_request", indexes = {
         @Index(name = "creation_timestamp_idx", columnList = "creation_timestamp")
 })
-public class DiscordMediaRequest implements Serializable {
-
-    private static final long serialVersionUID = 7730732395610934894L;
+public class DiscordMediaRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
@@ -72,5 +71,29 @@ public class DiscordMediaRequest implements Serializable {
 
     public void setCreationTimestamp(Timestamp creationTimestamp) {
         this.creationTimestamp = creationTimestamp;
+    }
+
+    @Override
+    public String toString() {
+        return DefaultObjectMapper.serializeAsString(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DiscordMediaRequest that = (DiscordMediaRequest) o;
+
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

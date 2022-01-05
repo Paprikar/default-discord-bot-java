@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FileExtension {
+public class FileExtensions {
 
     private static final List<String> imageExtensions = Arrays.asList(
             "jpg", "jpeg", "png", "gif", "webp", "tiff", "svg", "apng"

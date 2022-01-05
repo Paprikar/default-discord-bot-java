@@ -22,7 +22,7 @@ public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategory
 
     private static final String VARIABLE_NAME = "startTime";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryStartTimeSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryStartTimeSetter.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -46,7 +46,7 @@ public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategory
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Value has an invalid format")
+                    .appendDescription("The value has an invalid format")
                     .build()
             );
         }
@@ -56,15 +56,15 @@ public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategory
         category.setStartTime(time);
         category = categoryService.save(category);
 
-        sendingService.updateCategory(category);
+        sendingService.update(category);
 
-        logger.debug("The category={id={}} startTime is set to '{}'", category.getId(), time);
+        logger.debug("The category={id={}} value 'startTime' is set to '{}'", category.getId(), time);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("StartTime value has been set to `" + time + "`")
+                .appendDescription("The value `startTime` has been set to `" + time + "`")
                 .build()
         );
     }

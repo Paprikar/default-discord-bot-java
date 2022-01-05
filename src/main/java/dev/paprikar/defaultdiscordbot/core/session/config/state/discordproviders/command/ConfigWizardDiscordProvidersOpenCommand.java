@@ -19,7 +19,7 @@ public class ConfigWizardDiscordProvidersOpenCommand implements ConfigWizardDisc
 
     private static final String NAME = "open";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersOpenCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersOpenCommand.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
 

@@ -26,7 +26,7 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
 
     private static final String NAME = "set";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardRootSetCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardRootSetCommand.class);
 
     private final DiscordGuildService guildService;
 
@@ -67,7 +67,7 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
         }
 
         Optional<DiscordGuild> guildOptional = guildService.findById(session.getEntityId());
-        if (!guildOptional.isPresent()) {
+        if (guildOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get guild={id={}}, ending session", session.getEntityId());
@@ -77,13 +77,10 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
         DiscordGuild guild = guildOptional.get();
 
         String value = parts.getOther();
-
         ConfigWizardSetterResponse response = setter.set(value, guild);
-
         session.getResponses().add(response.getEmbed());
-        session.getResponses().add(ConfigWizardRootService.getStateEmbed(guild));
 
-        logger.debug("The guild={id={}} prefix is set to '{}'", session.getEntityId(), value);
+        session.getResponses().add(ConfigWizardRootService.getStateEmbed(guild));
 
         return null;
     }

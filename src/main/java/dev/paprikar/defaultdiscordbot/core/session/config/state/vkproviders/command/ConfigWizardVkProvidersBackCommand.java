@@ -16,7 +16,7 @@ public class ConfigWizardVkProvidersBackCommand implements ConfigWizardVkProvide
 
     private static final String NAME = "back";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersBackCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersBackCommand.class);
 
     @Autowired
     public ConfigWizardVkProvidersBackCommand() {

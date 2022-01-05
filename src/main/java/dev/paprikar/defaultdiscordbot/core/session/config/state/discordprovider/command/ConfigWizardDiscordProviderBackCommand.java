@@ -19,7 +19,7 @@ public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDisco
 
     private static final String NAME = "back";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderBackCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderBackCommand.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
@@ -37,7 +37,7 @@ public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDisco
 
         Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService
                 .findById(session.getEntityId());
-        if (!discordProviderOptional.isPresent()) {
+        if (discordProviderOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get discordProvider={id={}}, ending session", session.getEntityId());

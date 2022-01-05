@@ -19,7 +19,7 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
 
     private static final String VARIABLE_NAME = "name";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderNameSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderNameSetter.class);
 
     private final DiscordProviderFromVkService vkProviderService;
 
@@ -70,7 +70,7 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
                         .setColor(Color.RED)
                         .setTitle("Configuration Wizard Error")
                         .setTimestamp(Instant.now())
-                        .appendDescription("Vk provider name must be unique")
+                        .appendDescription("The name of vk provider must be unique")
                         .build()
                 );
             }
@@ -79,13 +79,13 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
         provider.setName(value);
         provider = vkProviderService.save(provider);
 
-        logger.debug("The vkProvider={id={}} name is set to '{}'", provider.getId(), value);
+        logger.debug("The vkProvider={id={}} value 'name' is set to '{}'", provider.getId(), value);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("Name value has been set to `" + value + "`")
+                .appendDescription("The value `name` has been set to `" + value + "`")
                 .build()
         );
     }

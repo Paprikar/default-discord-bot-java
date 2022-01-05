@@ -5,6 +5,9 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.ConfigWizardDiscordProviderService;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +16,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.awt.*;
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -20,7 +26,7 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDi
 
     private static final String NAME = "disable";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderDisableCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderDisableCommand.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
@@ -40,28 +46,47 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDi
                                      @Nullable String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService
-                .findById(session.getEntityId());
-        if (!discordProviderOptional.isPresent()) {
+        Long entityId = session.getEntityId();
+
+        Optional<DiscordProviderFromDiscord> providerOptional = discordProviderService.findById(entityId);
+        if (providerOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get discordProvider={id={}}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get discordProvider={id={}}, ending session", entityId);
 
             return ConfigWizardState.END;
         }
-        DiscordProviderFromDiscord provider = discordProviderOptional.get();
+        DiscordProviderFromDiscord provider = providerOptional.get();
+
+        List<MessageEmbed> responses = session.getResponses();
 
         if (!provider.isEnabled()) {
             // todo already disabled response
+
+            responses.add(ConfigWizardDiscordProviderService.getStateEmbed(provider));
+
             return null;
         }
 
         provider.setEnabled(false);
         provider = discordProviderService.save(provider);
 
-        mediaActionService.disableDiscordProvider(provider);
+        String message;
+        if (provider.getCategory().isEnabled()) {
+            mediaActionService.disableDiscordProvider(provider);
 
-        // todo disabled response
+            message = "The provider has been disabled";
+        } else {
+            message = "The flag `enabled` has been unset";
+        }
+        responses.add(new EmbedBuilder()
+                .setColor(Color.GRAY)
+                .setTitle("Configuration Wizard")
+                .setTimestamp(Instant.now())
+                .appendDescription(message)
+                .build());
+
+        responses.add(ConfigWizardDiscordProviderService.getStateEmbed(provider));
 
         return null;
     }

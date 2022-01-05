@@ -22,7 +22,7 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
 
     private static final String NAME = "remove";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryRemoveCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryRemoveCommand.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -39,7 +39,7 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         Optional<DiscordCategory> categoryOptional = categoryService.findById(session.getEntityId());
-        if (!categoryOptional.isPresent()) {
+        if (categoryOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());
@@ -53,7 +53,7 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Category that is enabled cannot be deleted")
+                    .appendDescription("The category that is enabled cannot be deleted")
                     .build()
             );
             return null;
@@ -66,7 +66,7 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("Category `" + category.getName() + "` has been successfully deleted")
+                .appendDescription("The category `" + category.getName() + "` has been successfully deleted")
                 .build()
         );
 

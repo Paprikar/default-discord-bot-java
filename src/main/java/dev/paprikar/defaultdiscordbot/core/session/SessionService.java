@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class SessionService {
 
-    private final Logger logger = LoggerFactory.getLogger(SessionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
 
     private final DiscordGuildService guildService;
 
@@ -41,7 +41,7 @@ public class SessionService {
         }
     }
 
-    public void handle(PrivateMessageReceivedEvent event) {
+    public void handlePrivateMessageReceivedEvent(PrivateMessageReceivedEvent event) {
         long userId = event.getAuthor().getIdLong();
         PrivateSession session = activePrivateSessions.get(userId);
         if (session == null) {
@@ -58,7 +58,7 @@ public class SessionService {
             activeGuilds.remove(session.getDiscordGuildId());
 
             session.getChannel().flatMap(PrivateChannel::close).queue();
-            logger.debug("handle(): Configuration session is ended: userId={}", userId);
+            logger.debug("handlePrivateMessageReceivedEvent(): Configuration session is ended: userId={}", userId);
             return;
         }
         if (targetState == null) {
@@ -70,7 +70,7 @@ public class SessionService {
         }
     }
 
-    public void handle(GuildMessageReceivedEvent event) {
+    public void handleGuildMessageReceivedEvent(GuildMessageReceivedEvent event) {
         Member member = event.getMember();
         if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) {
             return;
@@ -90,7 +90,7 @@ public class SessionService {
         }
 
         Optional<DiscordGuild> guildOptional = guildService.findByDiscordId(discordGuildId);
-        if (!guildOptional.isPresent()) {
+        if (guildOptional.isEmpty()) {
             return;
         }
 

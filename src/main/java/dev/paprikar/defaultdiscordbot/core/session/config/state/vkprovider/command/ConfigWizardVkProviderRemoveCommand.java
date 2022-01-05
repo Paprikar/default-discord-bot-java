@@ -22,7 +22,7 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
 
     private static final String NAME = "remove";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderRemoveCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderRemoveCommand.class);
 
     private final DiscordProviderFromVkService vkProviderService;
 
@@ -39,7 +39,7 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(session.getEntityId());
-        if (!vkProviderOptional.isPresent()) {
+        if (vkProviderOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get vkProvider={id={}, ending session", session.getEntityId());
@@ -53,7 +53,7 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Vk provider that is enabled cannot be deleted")
+                    .appendDescription("The vk provider that is enabled cannot be deleted")
                     .build()
             );
             return null;
@@ -66,7 +66,7 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("Vk provider `" + provider.getName() + "` has been successfully deleted")
+                .appendDescription("The vk provider `" + provider.getName() + "` has been successfully deleted")
                 .build()
         );
 

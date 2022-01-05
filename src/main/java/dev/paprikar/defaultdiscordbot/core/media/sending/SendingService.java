@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 public class SendingService {
 
-    private final Logger logger = LoggerFactory.getLogger(SendingService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SendingService.class);
 
     private final LockService lockService;
 
@@ -34,7 +34,7 @@ public class SendingService {
         this.lockService = lockService;
     }
 
-    public void handle(@Nonnull TextChannelDeleteEvent event) {
+    public void handleTextChannelDeleteEvent(@Nonnull TextChannelDeleteEvent event) {
         Long channelId = event.getChannel().getIdLong();
         Long categoryId = categories.get(channelId);
         if (categoryId == null) {
@@ -61,7 +61,7 @@ public class SendingService {
         lock.unlock();
     }
 
-    public void addCategory(@Nonnull DiscordCategory category, @Nonnull MediaRequestSender sender) {
+    public void add(@Nonnull DiscordCategory category, @Nonnull MediaRequestSender sender) {
         Long categoryId = category.getId();
         Lock lock = new ReentrantLock();
         lock.lock();
@@ -80,7 +80,7 @@ public class SendingService {
         lock.unlock();
     }
 
-    public void removeCategory(long categoryId) {
+    public void remove(long categoryId) {
         ConcurrencyKey lockKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
         Lock lock = lockService.get(lockKey);
         if (lock == null) {
@@ -107,7 +107,7 @@ public class SendingService {
         lock.unlock();
     }
 
-    public void updateCategory(@Nonnull DiscordCategory category) {
+    public void update(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
         Lock lock = lockService.get(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
         if (lock == null) {
@@ -135,7 +135,7 @@ public class SendingService {
             }
         }
 
-        sender.refresh(category);
+        sender.update(category);
 
         lock.unlock();
     }

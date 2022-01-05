@@ -18,7 +18,7 @@ public class ConfigWizardRootOpenCommand implements ConfigWizardRootCommand {
 
     private static final String NAME = "open";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardRootOpenCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardRootOpenCommand.class);
 
     // Map<Directory, State>
     private final Map<String, ConfigWizardState> targets = new HashMap<>();

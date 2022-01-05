@@ -27,7 +27,7 @@ import java.util.Optional;
 @Service
 public class ConfigWizardVkProviderService extends AbstractConfigWizard {
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderService.class);
 
     private final DiscordProviderFromVkService vkProviderService;
 
@@ -54,8 +54,15 @@ public class ConfigWizardVkProviderService extends AbstractConfigWizard {
         builder.appendDescription("Current directory: `/categories/" + category.getName() +
                 "/vk providers/" + provider.getName() + "`\n\n");
 
+        String currentState = provider.isEnabled() && provider.getCategory().isEnabled() ? "enabled" : "disabled";
+        builder.appendDescription("Current state: `" + currentState + "`\n\n");
+
+        String savedState = provider.isEnabled() ? "enabled" : "disabled";
+        builder.appendDescription("Saved state: `" + savedState + "`\n\n");
+
         builder.appendDescription("Variables:\n");
         builder.appendDescription("`name` = `" + provider.getName() + "`\n");
+        builder.appendDescription("`groupId` = `" + provider.getGroupId() + "`\n");
         builder.appendDescription("`token` = `" + provider.getToken() + "`\n\n");
 
         builder.appendDescription("Available commands:\n");
@@ -96,7 +103,7 @@ public class ConfigWizardVkProviderService extends AbstractConfigWizard {
         }
 
         if (!responses.isEmpty()) {
-            session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
+            session.getChannel().flatMap(channel -> channel.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
         }
     }

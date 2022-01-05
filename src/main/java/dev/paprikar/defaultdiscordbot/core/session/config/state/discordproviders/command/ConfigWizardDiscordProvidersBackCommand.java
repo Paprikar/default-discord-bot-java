@@ -16,7 +16,7 @@ public class ConfigWizardDiscordProvidersBackCommand implements ConfigWizardDisc
 
     private static final String NAME = "back";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersBackCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersBackCommand.class);
 
     @Autowired
     public ConfigWizardDiscordProvidersBackCommand() {

@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
 @Component
 public class DiscordEventListener extends ListenerAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(DiscordEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(DiscordEventListener.class);
 
     private final DiscordGuildService guildService;
 
@@ -135,8 +135,8 @@ public class DiscordEventListener extends ListenerAdapter {
             return;
         }
 
-        commandHandler.handle(event);
-        discordSuggestionService.handle(event);
+        commandHandler.handleGuildMessageReceivedEvent(event);
+        discordSuggestionService.handleGuildMessageReceivedEvent(event);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class DiscordEventListener extends ListenerAdapter {
             return;
         }
 
-        approveService.handle(event);
+        approveService.handleGuildMessageReactionAddEvent(event);
     }
 
     @Override
@@ -168,7 +168,7 @@ public class DiscordEventListener extends ListenerAdapter {
             return;
         }
 
-        sessionService.handle(event);
+        sessionService.handlePrivateMessageReceivedEvent(event);
     }
 
     @Override
@@ -178,10 +178,6 @@ public class DiscordEventListener extends ListenerAdapter {
                 event.getChannel().getIdLong(),
                 event.getMessage().getContentRaw()
         );
-
-        if (event.getAuthor().equals(event.getJDA().getSelfUser())) {
-            return;
-        }
     }
 
     @Override
@@ -189,9 +185,9 @@ public class DiscordEventListener extends ListenerAdapter {
         logger.debug("onTextChannelDelete(): event={channel={id={}}",
                 event.getChannel().getIdLong());
 
-        discordSuggestionService.handle(event);
-        approveService.handle(event);
-        sendingService.handle(event);
+        discordSuggestionService.handleTextChannelDeleteEvent(event);
+        approveService.handleTextChannelDeleteEvent(event);
+        sendingService.handleTextChannelDeleteEvent(event);
     }
 
     @Override

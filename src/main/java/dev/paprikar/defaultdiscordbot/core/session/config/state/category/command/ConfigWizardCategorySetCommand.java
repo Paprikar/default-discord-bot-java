@@ -26,7 +26,7 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
 
     private static final String NAME = "set";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategorySetCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategorySetCommand.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -66,7 +66,7 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
         }
 
         Optional<DiscordCategory> categoryOptional = categoryService.findById(session.getEntityId());
-        if (!categoryOptional.isPresent()) {
+        if (categoryOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());
@@ -76,10 +76,9 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
         DiscordCategory category = categoryOptional.get();
 
         String value = parts.getOther();
-
         ConfigWizardSetterResponse response = setter.set(value, category);
-
         session.getResponses().add(response.getEmbed());
+
         session.getResponses().add(ConfigWizardCategoryService.getStateEmbed(category));
 
         return null;

@@ -26,7 +26,7 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
 
     private static final String NAME = "set";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderSetCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderSetCommand.class);
 
     private final DiscordProviderFromVkService vkProviderService;
 
@@ -68,7 +68,7 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
         }
 
         Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(session.getEntityId());
-        if (!vkProviderOptional.isPresent()) {
+        if (vkProviderOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get vkProvider={id={}}, ending session", session.getEntityId());
@@ -78,10 +78,9 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
         DiscordProviderFromVk provider = vkProviderOptional.get();
 
         String value = parts.getOther();
-
         ConfigWizardSetterResponse response = setter.set(value, provider);
-
         session.getResponses().add(response.getEmbed());
+
         session.getResponses().add(ConfigWizardVkProviderService.getStateEmbed(provider));
 
         return null;

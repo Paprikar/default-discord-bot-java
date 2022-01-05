@@ -28,7 +28,7 @@ import java.util.Optional;
 @Service
 public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersService.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -102,7 +102,7 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
         }
 
         if (!responses.isEmpty()) {
-            session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
+            session.getChannel().flatMap(channel -> channel.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
         }
     }

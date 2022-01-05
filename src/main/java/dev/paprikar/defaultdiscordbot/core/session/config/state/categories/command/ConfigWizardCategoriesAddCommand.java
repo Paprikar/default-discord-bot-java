@@ -26,7 +26,7 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
 
     private final static String NAME = "add";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesAddCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesAddCommand.class);
 
     private final DiscordGuildService guildService;
 
@@ -77,7 +77,7 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
                         .setColor(Color.RED)
                         .setTitle("Configuration Wizard Error")
                         .setTimestamp(Instant.now())
-                        .appendDescription("Category name must be unique")
+                        .appendDescription("The name of category must be unique")
                         .build()
                 );
                 return null;
@@ -85,7 +85,7 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
         }
 
         Optional<DiscordGuild> guildOptional = guildService.findById(guildId);
-        if (!guildOptional.isPresent()) {
+        if (guildOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get guild={id={}}, ending session", session.getEntityId());

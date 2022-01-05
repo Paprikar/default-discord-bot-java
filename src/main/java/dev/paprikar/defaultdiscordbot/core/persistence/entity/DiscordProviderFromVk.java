@@ -1,22 +1,17 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
-import dev.paprikar.defaultdiscordbot.core.DiscordProvider;
 import dev.paprikar.defaultdiscordbot.utils.DefaultObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Table(name = "discord_provider_from_vk")
-public class DiscordProviderFromVk implements DiscordProvider {
+public class DiscordProviderFromVk {
 
-    private static final long serialVersionUID = 2072062532854250411L;
-
-    private final transient Logger logger = LoggerFactory.getLogger(DiscordProviderFromVk.class);
+    private static final Logger logger = LoggerFactory.getLogger(DiscordProviderFromVk.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
@@ -36,6 +31,9 @@ public class DiscordProviderFromVk implements DiscordProvider {
     private String name;
 
     @Column
+    private Integer groupId;
+
+    @Column
     private String token;
 
     @Column(nullable = false)
@@ -46,22 +44,18 @@ public class DiscordProviderFromVk implements DiscordProvider {
     public DiscordProviderFromVk() {
     }
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
     public void setId(Long id) {
         this.id = id;
     }
 
-    @Override
     public DiscordCategory getCategory() {
         return category;
     }
 
-    @Override
     public void setCategory(DiscordCategory category) {
         this.category = category;
     }
@@ -72,6 +66,14 @@ public class DiscordProviderFromVk implements DiscordProvider {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Integer groupId) {
+        this.groupId = groupId;
     }
 
     public String getToken() {
@@ -101,7 +103,7 @@ public class DiscordProviderFromVk implements DiscordProvider {
 
     public void detach() {
         if (category == null) {
-            String message = "The provider not attached to the category cannot be detached from the category";
+            String message = "The provider not attached to the category cannot be detached from it";
             logger.error(message);
             throw new IllegalArgumentException(message);
         }
@@ -114,7 +116,7 @@ public class DiscordProviderFromVk implements DiscordProvider {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -122,13 +124,13 @@ public class DiscordProviderFromVk implements DiscordProvider {
             return false;
         }
 
-        DiscordProviderFromVk category = (DiscordProviderFromVk) o;
+        DiscordProviderFromVk that = (DiscordProviderFromVk) o;
 
-        return Objects.equals(id, category.id);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id.hashCode();
     }
 }

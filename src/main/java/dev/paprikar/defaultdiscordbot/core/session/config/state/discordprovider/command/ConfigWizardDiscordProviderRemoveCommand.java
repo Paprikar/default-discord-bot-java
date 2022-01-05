@@ -22,7 +22,7 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
 
     private static final String NAME = "remove";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderRemoveCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderRemoveCommand.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
@@ -40,7 +40,7 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
 
         Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService
                 .findById(session.getEntityId());
-        if (!discordProviderOptional.isPresent()) {
+        if (discordProviderOptional.isEmpty()) {
             // todo error response
 
             logger.error("execute(): Unable to get discordProvider={id={}, ending session", session.getEntityId());
@@ -54,7 +54,7 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Discord provider that is enabled cannot be deleted")
+                    .appendDescription("The discord provider that is enabled cannot be deleted")
                     .build()
             );
             return null;
@@ -67,7 +67,7 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("Discord provider `" + provider.getName() + "` has been successfully deleted")
+                .appendDescription("The discord provider `" + provider.getName() + "` has been successfully deleted")
                 .build()
         );
 

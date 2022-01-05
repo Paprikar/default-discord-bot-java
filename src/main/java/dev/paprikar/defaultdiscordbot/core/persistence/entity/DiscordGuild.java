@@ -3,16 +3,12 @@ package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 import dev.paprikar.defaultdiscordbot.utils.DefaultObjectMapper;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Objects;
 
 @Entity
 @Table(name = "discord_guild", uniqueConstraints = {
         @UniqueConstraint(name = "discord_guild_discord_id_unique", columnNames = "discord_id")
 })
-public class DiscordGuild implements Serializable {
-
-    private static final long serialVersionUID = 9149541181598340425L;
+public class DiscordGuild {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
@@ -69,13 +65,13 @@ public class DiscordGuild implements Serializable {
             return false;
         }
 
-        DiscordGuild guild = (DiscordGuild) o;
+        DiscordGuild that = (DiscordGuild) o;
 
-        return Objects.equals(id, guild.id);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id.hashCode();
     }
 }

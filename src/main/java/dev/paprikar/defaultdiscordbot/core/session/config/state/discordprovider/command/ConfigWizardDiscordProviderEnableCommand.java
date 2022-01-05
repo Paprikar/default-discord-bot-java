@@ -5,6 +5,8 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.ConfigWizardDiscordProviderService;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.awt.*;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +26,7 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
 
     private static final String NAME = "enable";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderEnableCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderEnableCommand.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
@@ -42,29 +46,54 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
                                      @Nullable String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService
-                .findById(session.getEntityId());
-        if (!discordProviderOptional.isPresent()) {
+        Long entityId = session.getEntityId();
+
+        Optional<DiscordProviderFromDiscord> providerOptional = discordProviderService.findById(entityId);
+        if (providerOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get discordProvider={id={}}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get discordProvider={id={}}, ending session", entityId);
 
             return ConfigWizardState.END;
         }
-        DiscordProviderFromDiscord provider = discordProviderOptional.get();
+        DiscordProviderFromDiscord provider = providerOptional.get();
+
+        List<MessageEmbed> responses = session.getResponses();
 
         if (provider.isEnabled()) {
             // todo already enabled response
+
+            responses.add(ConfigWizardDiscordProviderService.getStateEmbed(provider));
+
             return null;
         }
 
         provider.setEnabled(true);
         provider = discordProviderService.save(provider);
 
-        List<MessageEmbed> providerErrors = mediaActionService.enableDiscordProvider(provider, event.getJDA());
-        session.getResponses().addAll(providerErrors);
+        if (provider.getCategory().isEnabled()) {
+            List<MessageEmbed> errors = mediaActionService.enableDiscordProvider(provider);
 
-        // todo enabled response
+            if (errors.isEmpty()) {
+                responses.add(new EmbedBuilder()
+                        .setColor(Color.GRAY)
+                        .setTitle("Configuration Wizard")
+                        .setTimestamp(Instant.now())
+                        .appendDescription("The provider has been enabled")
+                        .build());
+            } else {
+                responses.addAll(errors);
+            }
+        } else {
+            responses.add(new EmbedBuilder()
+                    .setColor(Color.GRAY)
+                    .setTitle("Configuration Wizard")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The flag `enabled` has been set")
+                    .build());
+        }
+
+        responses.add(ConfigWizardDiscordProviderService.getStateEmbed(provider));
 
         return null;
     }

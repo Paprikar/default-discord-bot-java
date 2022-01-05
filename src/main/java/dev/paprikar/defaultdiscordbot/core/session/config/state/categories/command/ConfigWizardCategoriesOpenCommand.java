@@ -19,7 +19,7 @@ public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategories
 
     private static final String NAME = "open";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesOpenCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesOpenCommand.class);
 
     private final DiscordCategoryService categoryService;
 

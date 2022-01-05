@@ -19,7 +19,8 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
 
     private static final String VARIABLE_NAME = "suggestionChannelId";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderSuggestionChannelIdSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(
+            ConfigWizardDiscordProviderSuggestionChannelIdSetter.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
@@ -44,7 +45,7 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Value has an invalid format")
+                    .appendDescription("The value has an invalid format")
                     .build()
             );
         }
@@ -53,15 +54,15 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
         provider.setSuggestionChannelId(newChannelId);
         provider = discordProviderService.save(provider);
 
-        discordSuggestionService.updateCategory(oldChannelId, newChannelId);
+        discordSuggestionService.update(oldChannelId, newChannelId);
 
-        logger.debug("The discordProvider={id={}} suggestionChannelId is set to '{}'", provider.getId(), value);
+        logger.debug("The discordProvider={id={}} value 'suggestionChannelId' is set to '{}'", provider.getId(), value);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("SuggestionChannelId value has been set to `" + value + "`")
+                .appendDescription("The value `suggestionChannelId` has been set to `" + value + "`")
                 .build()
         );
     }

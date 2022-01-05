@@ -19,7 +19,7 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
 
     private static final String VARIABLE_NAME = "name";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryNameSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryNameSetter.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -46,7 +46,7 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Changing category name to the same one does not make sense")
+                    .appendDescription("Changing the name to the same one does not make sense")
                     .build()
             );
         }
@@ -58,7 +58,7 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
                         .setColor(Color.RED)
                         .setTitle("Configuration Wizard Error")
                         .setTimestamp(Instant.now())
-                        .appendDescription("Category name must be unique")
+                        .appendDescription("The name must be unique")
                         .build()
                 );
             }
@@ -67,13 +67,13 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
         category.setName(value);
         category = categoryService.save(category);
 
-        logger.debug("The category={id={}} name is set to '{}'", category.getId(), value);
+        logger.debug("The category={id={}} value 'name' is set to '{}'", category.getId(), value);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("Name value has been set to `" + value + "`")
+                .appendDescription("The value `name` has been set to `" + value + "`")
                 .build()
         );
     }

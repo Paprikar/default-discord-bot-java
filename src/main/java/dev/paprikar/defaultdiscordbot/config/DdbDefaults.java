@@ -75,10 +75,10 @@ public class DdbDefaults {
 
     static class PropertyFieldName {
 
-        public static String PREFIX = "defaults.prefix";
+        public static final String PREFIX = "defaults.prefix";
 
-        public static String POSITIVE_APPROVAL_EMOJI = "defaults.positive-approval-emoji";
+        public static final String POSITIVE_APPROVAL_EMOJI = "defaults.positive-approval-emoji";
 
-        public static String NEGATIVE_APPROVAL_EMOJI = "defaults.negative-approval-emoji";
+        public static final String NEGATIVE_APPROVAL_EMOJI = "defaults.negative-approval-emoji";
     }
 }

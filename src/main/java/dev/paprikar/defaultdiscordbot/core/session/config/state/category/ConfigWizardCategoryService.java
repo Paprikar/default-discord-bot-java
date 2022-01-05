@@ -26,7 +26,7 @@ import java.util.Optional;
 @Service
 public class ConfigWizardCategoryService extends AbstractConfigWizard {
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryService.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -50,6 +50,9 @@ public class ConfigWizardCategoryService extends AbstractConfigWizard {
                 .setTimestamp(Instant.now());
 
         builder.appendDescription("Current directory: `/categories/" + category.getName() + "`\n\n");
+
+        String state = category.isEnabled() ? "enabled" : "disabled";
+        builder.appendDescription("Current state: `" + state + "`\n\n");
 
         builder.appendDescription("Variables:\n");
         builder.appendDescription("`name` = `" + category.getName() + "`\n");
@@ -104,7 +107,7 @@ public class ConfigWizardCategoryService extends AbstractConfigWizard {
         }
 
         if (!responses.isEmpty()) {
-            session.getChannel().flatMap(c -> c.sendMessageEmbeds(responses)).queue();
+            session.getChannel().flatMap(channel -> channel.sendMessageEmbeds(responses)).queue();
             session.setResponses(new ArrayList<>());
         }
     }

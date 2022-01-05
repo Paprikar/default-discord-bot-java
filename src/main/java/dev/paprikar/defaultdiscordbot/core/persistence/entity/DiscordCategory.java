@@ -6,20 +6,16 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Objects;
 
 @Entity
 @Table(name = "discord_category", indexes = {
         @Index(name = "discord_guild_id_idx", columnList = "discord_guild_id")
 })
-public class DiscordCategory implements Serializable {
+public class DiscordCategory {
 
-    private static final long serialVersionUID = 7792186337399345374L;
-
-    private final transient Logger logger = LoggerFactory.getLogger(DiscordCategory.class);
+    private static final Logger logger = LoggerFactory.getLogger(DiscordCategory.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
@@ -196,13 +192,13 @@ public class DiscordCategory implements Serializable {
             return false;
         }
 
-        DiscordCategory category = (DiscordCategory) o;
+        DiscordCategory that = (DiscordCategory) o;
 
-        return Objects.equals(id, category.id);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id.hashCode();
     }
 }

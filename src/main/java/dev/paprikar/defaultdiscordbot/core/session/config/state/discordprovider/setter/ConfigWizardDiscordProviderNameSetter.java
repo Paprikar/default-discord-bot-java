@@ -19,7 +19,7 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
 
     private static final String VARIABLE_NAME = "name";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderNameSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderNameSetter.class);
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
@@ -70,7 +70,7 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
                         .setColor(Color.RED)
                         .setTitle("Configuration Wizard Error")
                         .setTimestamp(Instant.now())
-                        .appendDescription("Discord provider name must be unique")
+                        .appendDescription("The name of discord provider must be unique")
                         .build()
                 );
             }
@@ -79,13 +79,13 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
         provider.setName(value);
         provider = discordProviderService.save(provider);
 
-        logger.debug("The discordProvider={id={}} name is set to '{}'", provider.getId(), value);
+        logger.debug("The discordProvider={id={}} value 'name' is set to '{}'", provider.getId(), value);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("Name value has been set to `" + value + "`")
+                .appendDescription("The value `name` has been set to `" + value + "`")
                 .build()
         );
     }

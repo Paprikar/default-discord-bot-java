@@ -21,7 +21,7 @@ public class DiscordConfigCommand implements DiscordCommand {
 
     @Override
     public void execute(@Nonnull String argsString, @Nonnull GuildMessageReceivedEvent event) {
-        sessionService.handle(event);
+        sessionService.handleGuildMessageReceivedEvent(event);
     }
 
     @Nonnull

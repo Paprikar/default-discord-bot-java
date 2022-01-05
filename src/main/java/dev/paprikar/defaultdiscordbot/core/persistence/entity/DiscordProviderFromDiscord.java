@@ -1,22 +1,17 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
-import dev.paprikar.defaultdiscordbot.core.DiscordProvider;
 import dev.paprikar.defaultdiscordbot.utils.DefaultObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Table(name = "discord_provider_from_discord")
-public class DiscordProviderFromDiscord implements DiscordProvider {
+public class DiscordProviderFromDiscord {
 
-    private static final long serialVersionUID = 8165088705252344004L;
-
-    private final transient Logger logger = LoggerFactory.getLogger(DiscordProviderFromDiscord.class);
+    private static final Logger logger = LoggerFactory.getLogger(DiscordProviderFromDiscord.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
@@ -46,22 +41,18 @@ public class DiscordProviderFromDiscord implements DiscordProvider {
     public DiscordProviderFromDiscord() {
     }
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
     public void setId(Long id) {
         this.id = id;
     }
 
-    @Override
     public DiscordCategory getCategory() {
         return category;
     }
 
-    @Override
     public void setCategory(DiscordCategory category) {
         this.category = category;
     }
@@ -114,7 +105,7 @@ public class DiscordProviderFromDiscord implements DiscordProvider {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -122,13 +113,13 @@ public class DiscordProviderFromDiscord implements DiscordProvider {
             return false;
         }
 
-        DiscordProviderFromDiscord category = (DiscordProviderFromDiscord) o;
+        DiscordProviderFromDiscord that = (DiscordProviderFromDiscord) o;
 
-        return Objects.equals(id, category.id);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id.hashCode();
     }
 }

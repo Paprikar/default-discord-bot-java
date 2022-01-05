@@ -16,7 +16,7 @@ public class ConfigWizardExitCommand implements ConfigWizardCommand {
 
     private static final String NAME = "exit";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardExitCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardExitCommand.class);
 
     @Override
     @Nullable

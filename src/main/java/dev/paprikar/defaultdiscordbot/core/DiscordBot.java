@@ -4,8 +4,6 @@ import dev.paprikar.defaultdiscordbot.config.DdbConfig;
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,7 @@ import javax.security.auth.login.LoginException;
 @Component
 public class DiscordBot {
 
-    private final Logger logger = LoggerFactory.getLogger(DiscordBot.class);
+    private static final Logger logger = LoggerFactory.getLogger(DiscordBot.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -26,41 +24,39 @@ public class DiscordBot {
 
     private final DiscordEventListener eventListener;
 
+    private final JDAService jdaService;
+
     private final DdbConfig config;
 
     @Autowired
     public DiscordBot(DiscordCategoryService categoryService,
                       MediaActionService mediaActionService,
                       DiscordEventListener eventListener,
+                      JDAService jdaService,
                       DdbConfig config) {
         this.categoryService = categoryService;
         this.mediaActionService = mediaActionService;
         this.eventListener = eventListener;
+        this.jdaService = jdaService;
         this.config = config;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
         try {
-            JDA jda = JDABuilder.createDefault(config.getToken())
-                    .addEventListeners(eventListener)
-                    .build()
+            jdaService
+                    .build(config.getToken(), config.getDiscordMaxReconnectDelay(), eventListener)
                     .awaitReady();
-            initBot(jda);
-            logger.info(jda.getGuilds().toString());
+            initBot();
         } catch (LoginException | InterruptedException e) {
             logger.error("An error occurred while starting the Discord bot", e);
             System.exit(1);
         }
     }
 
-    public DdbConfig getConfig() {
-        return config;
-    }
-
-    private void initBot(JDA jda) {
+    private void initBot() {
         categoryService.findAll().stream()
                 .filter(DiscordCategory::isEnabled)
-                .forEach(category -> mediaActionService.enableCategory(category, jda));
+                .forEach(mediaActionService::enableCategory);
     }
 }

@@ -21,7 +21,7 @@ public class ConfigWizardCategoryPositiveApprovalEmojiSetter implements ConfigWi
 
     private static final String VARIABLE_NAME = "positiveApprovalEmoji";
 
-    private final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryPositiveApprovalEmojiSetter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryPositiveApprovalEmojiSetter.class);
 
     private final DiscordCategoryService categoryService;
 
@@ -42,7 +42,7 @@ public class ConfigWizardCategoryPositiveApprovalEmojiSetter implements ConfigWi
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Emoji value can consist of only one character")
+                    .appendDescription("The value of emoji can consist of only one character")
                     .build()
             );
         }
@@ -53,7 +53,7 @@ public class ConfigWizardCategoryPositiveApprovalEmojiSetter implements ConfigWi
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("Value is not an emoji")
+                    .appendDescription("The value is not an emoji")
                     .build()
             );
         }
@@ -61,15 +61,15 @@ public class ConfigWizardCategoryPositiveApprovalEmojiSetter implements ConfigWi
         category.setPositiveApprovalEmoji(value.charAt(0));
         category = categoryService.save(category);
 
-        approveService.updateCategory(category);
+        approveService.update(category);
 
-        logger.debug("The category={id={}} positiveApprovalEmoji is set to '{}'", category.getId(), value);
+        logger.debug("The category={id={}} value 'positiveApprovalEmoji' is set to '{}'", category.getId(), value);
 
         return new ConfigWizardSetterResponse(true, new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("PositiveApprovalEmoji value has been set to `" + value + "`")
+                .appendDescription("The value `positiveApprovalEmoji` has been set to `" + value + "`")
                 .build()
         );
     }
