@@ -24,7 +24,6 @@ public class DiscordConfigCommand implements DiscordCommand {
         sessionService.handleGuildMessageReceivedEvent(event);
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

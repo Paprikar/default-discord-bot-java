@@ -24,12 +24,11 @@ import java.util.Optional;
 @Component
 public class ConfigWizardVkProviderEnableCommand implements ConfigWizardVkProviderCommand {
 
-    private static final String NAME = "enable";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderEnableCommand.class);
 
-    private final DiscordProviderFromVkService vkProviderService;
+    private static final String NAME = "enable";
 
+    private final DiscordProviderFromVkService vkProviderService;
     private final MediaActionService mediaActionService;
 
     @Autowired
@@ -43,10 +42,11 @@ public class ConfigWizardVkProviderEnableCommand implements ConfigWizardVkProvid
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
 
         Optional<DiscordProviderFromVk> providerOptional = vkProviderService.findById(entityId);
         if (providerOptional.isEmpty()) {
@@ -57,8 +57,6 @@ public class ConfigWizardVkProviderEnableCommand implements ConfigWizardVkProvid
             return ConfigWizardState.END;
         }
         DiscordProviderFromVk provider = providerOptional.get();
-
-        List<MessageEmbed> responses = session.getResponses();
 
         if (provider.isEnabled()) {
             // todo already enabled response
@@ -73,6 +71,7 @@ public class ConfigWizardVkProviderEnableCommand implements ConfigWizardVkProvid
 
         if (provider.getCategory().isEnabled()) {
             List<MessageEmbed> errors = mediaActionService.enableVkProvider(provider);
+            responses.addAll(errors);
 
             if (errors.isEmpty()) {
                 responses.add(new EmbedBuilder()
@@ -81,8 +80,6 @@ public class ConfigWizardVkProviderEnableCommand implements ConfigWizardVkProvid
                         .setTimestamp(Instant.now())
                         .appendDescription("The provider has been enabled")
                         .build());
-            } else {
-                responses.addAll(errors);
             }
         } else {
             responses.add(new EmbedBuilder()
@@ -98,7 +95,6 @@ public class ConfigWizardVkProviderEnableCommand implements ConfigWizardVkProvid
         return null;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

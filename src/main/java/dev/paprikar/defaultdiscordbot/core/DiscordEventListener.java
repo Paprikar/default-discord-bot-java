@@ -38,25 +38,15 @@ public class DiscordEventListener extends ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(DiscordEventListener.class);
 
     private final DiscordGuildService guildService;
-
     private final DiscordCategoryService categoryService;
-
     private final DiscordMediaRequestService mediaRequestService;
-
     private final DiscordProviderFromDiscordService discordProviderService;
-
     private final DiscordCommandHandler commandHandler;
-
     private final DiscordSuggestionService discordSuggestionService;
-
     private final ApproveService approveService;
-
     private final SendingService sendingService;
-
     private final MediaActionService mediaActionService;
-
     private final SessionService sessionService;
-
     private final DdbConfig config;
 
     @Autowired

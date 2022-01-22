@@ -31,8 +31,7 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
     private final DiscordGuildService guildService;
 
     @Autowired
-    public ConfigWizardRootService(DiscordGuildService guildService,
-                                   List<ConfigWizardRootCommand> commands) {
+    public ConfigWizardRootService(DiscordGuildService guildService, List<ConfigWizardRootCommand> commands) {
         super();
 
         this.guildService = guildService;
@@ -96,7 +95,6 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
         }
     }
 
-    @Nonnull
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.ROOT;

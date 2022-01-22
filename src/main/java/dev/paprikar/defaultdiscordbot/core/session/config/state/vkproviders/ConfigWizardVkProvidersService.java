@@ -31,7 +31,6 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersService.class);
 
     private final DiscordCategoryService categoryService;
-
     private final DiscordProviderFromVkService vkProviderService;
 
     @Autowired
@@ -107,7 +106,6 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
         }
     }
 
-    @Nonnull
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.VK_PROVIDERS;

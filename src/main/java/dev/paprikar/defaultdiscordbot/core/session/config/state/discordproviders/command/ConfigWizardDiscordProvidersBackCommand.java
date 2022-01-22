@@ -14,9 +14,9 @@ import javax.annotation.Nullable;
 @Component
 public class ConfigWizardDiscordProvidersBackCommand implements ConfigWizardDiscordProvidersCommand {
 
-    private static final String NAME = "back";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersBackCommand.class);
+
+    private static final String NAME = "back";
 
     @Autowired
     public ConfigWizardDiscordProvidersBackCommand() {
@@ -26,13 +26,12 @@ public class ConfigWizardDiscordProvidersBackCommand implements ConfigWizardDisc
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         return ConfigWizardState.CATEGORY;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

@@ -5,6 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFr
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,14 +16,15 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Component
 public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProviderCommand {
 
-    private static final String NAME = "remove";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderRemoveCommand.class);
+
+    private static final String NAME = "remove";
 
     private final DiscordProviderFromVkService vkProviderService;
 
@@ -35,21 +37,24 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(session.getEntityId());
+        Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
+
+        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(entityId);
         if (vkProviderOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get vkProvider={id={}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get vkProvider={id={}, ending session", entityId);
 
             return ConfigWizardState.END;
         }
         DiscordProviderFromVk provider = vkProviderOptional.get();
 
         if (provider.isEnabled()) {
-            session.getResponses().add(new EmbedBuilder()
+            responses.add(new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
@@ -62,7 +67,7 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
         session.setEntityId(provider.getCategory().getId());
         vkProviderService.delete(provider);
 
-        session.getResponses().add(new EmbedBuilder()
+        responses.add(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
@@ -75,7 +80,6 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
         return ConfigWizardState.VK_PROVIDERS;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

@@ -17,9 +17,9 @@ import java.util.Optional;
 @Component
 public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryCommand {
 
-    private static final String NAME = "back";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryBackCommand.class);
+
+    private static final String NAME = "back";
 
     private final DiscordCategoryService categoryService;
 
@@ -32,14 +32,16 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryComm
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        Optional<DiscordCategory> categoryOptional = categoryService.findById(session.getEntityId());
+        Long entityId = session.getEntityId();
+
+        Optional<DiscordCategory> categoryOptional = categoryService.findById(entityId);
         if (categoryOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get category={id={}}, ending session", entityId);
 
             return ConfigWizardState.END;
         }
@@ -48,7 +50,6 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryComm
         return ConfigWizardState.CATEGORIES;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

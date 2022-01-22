@@ -23,7 +23,9 @@ public class PrivateSession {
     public PrivateSession() {
     }
 
-    public PrivateSession(RestAction<PrivateChannel> channel, ConfigWizard service, Long entityId,
+    public PrivateSession(RestAction<PrivateChannel> channel,
+                          ConfigWizard service,
+                          Long entityId,
                           Long discordGuildId) {
         this.channel = channel;
         this.service = service;
@@ -38,7 +40,6 @@ public class PrivateSession {
     public void setChannel(RestAction<PrivateChannel> channel) {
         this.channel = channel;
     }
-
 
     public ConfigWizard getService() {
         return service;

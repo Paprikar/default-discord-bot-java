@@ -17,9 +17,9 @@ import java.util.List;
 @Component
 public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategoriesCommand {
 
-    private static final String NAME = "open";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesOpenCommand.class);
+
+    private static final String NAME = "open";
 
     private final DiscordCategoryService categoryService;
 
@@ -32,7 +32,7 @@ public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategories
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         List<DiscordCategory> categories = categoryService.findAllByGuildId(session.getEntityId());
         // todo use name index ?
         DiscordCategory targetCategory = null;
@@ -54,7 +54,6 @@ public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategories
         return ConfigWizardState.CATEGORY;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

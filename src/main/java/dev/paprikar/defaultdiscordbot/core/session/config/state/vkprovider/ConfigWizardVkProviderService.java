@@ -108,7 +108,6 @@ public class ConfigWizardVkProviderService extends AbstractConfigWizard {
         }
     }
 
-    @Nonnull
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.VK_PROVIDER;

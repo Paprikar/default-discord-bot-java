@@ -20,32 +20,26 @@ public class DiscordGuildService {
         this.repository = repository;
     }
 
-    @Nonnull
     public List<DiscordGuild> findAll() {
         return repository.findAll();
     }
 
-    @Nonnull
     public Optional<DiscordGuild> findById(long id) {
         return repository.findById(id);
     }
 
-    @Nonnull
     public DiscordGuild getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
     }
 
-    @Nonnull
     public Optional<DiscordGuild> findByDiscordId(long id) {
         return repository.findByDiscordId(id);
     }
 
-    @Nonnull
     public DiscordGuild getByDiscordId(long id) throws EntityNotFoundException {
         return repository.getByDiscordId(id);
     }
 
-    @Nonnull
     public DiscordGuild save(@Nonnull DiscordGuild guild) {
         return repository.save(guild);
     }

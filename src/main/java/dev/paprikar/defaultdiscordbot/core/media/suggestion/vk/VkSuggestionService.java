@@ -7,7 +7,6 @@ import dev.paprikar.defaultdiscordbot.config.DdbConfig;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.LockService;
-import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,28 +23,26 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 public class VkSuggestionService {
 
+    public static final VkApiClient CLIENT = new VkApiClient(HttpTransportClient.getInstance());
+
     private static final Logger logger = LoggerFactory.getLogger(VkSuggestionService.class);
 
     // Map<ProviderId, Handler>
     final Map<Long, GroupLongPollApi> handlers = new ConcurrentHashMap<>();
 
-    private final ApproveService approveService;
-
+    private final VkSuggestionHandler suggestionHandler;
     private final LockService lockService;
-
     private final DdbConfig config;
 
-    private final VkApiClient client = new VkApiClient(HttpTransportClient.getInstance());
-
     @Autowired
-    public VkSuggestionService(ApproveService approveService, LockService lockService, DdbConfig config) {
-        this.approveService = approveService;
+    public VkSuggestionService(VkSuggestionHandler suggestionHandler, LockService lockService, DdbConfig config) {
+        this.suggestionHandler = suggestionHandler;
         this.lockService = lockService;
         this.config = config;
     }
 
-    public VkApiClient getClient() {
-        return client;
+    public boolean contains(@Nonnull DiscordProviderFromVk provider) {
+        return handlers.containsKey(provider.getId());
     }
 
     public void add(@Nonnull DiscordProviderFromVk provider) {
@@ -62,7 +59,9 @@ public class VkSuggestionService {
             GroupLongPollApi handler = handlers.get(providerId);
 
             if (handler != null) { // there are only unstopped handlers in the map
-                handler.start(provider);
+                if (!handler.isToRun()) { // idempotency
+                    handler.start(provider);
+                }
 
                 oldLock.unlock();
                 return;
@@ -74,7 +73,7 @@ public class VkSuggestionService {
         // create a new handler when there was none or when the old one cannot be reused
         GroupActor actor = new GroupActor(provider.getGroupId(), provider.getToken());
         GroupLongPollApi handler = new GroupLongPollApiHandler(
-                client, actor, config.getVkMaxReconnectDelay(), this, approveService, lockService);
+                actor, config.getVkMaxReconnectDelay(), this, suggestionHandler, lockService);
 
         handlers.put(providerId, handler);
 

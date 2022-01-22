@@ -24,12 +24,11 @@ import java.util.Optional;
 @Component
 public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProviderCommand {
 
-    private static final String NAME = "disable";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderDisableCommand.class);
 
-    private final DiscordProviderFromVkService vkProviderService;
+    private static final String NAME = "disable";
 
+    private final DiscordProviderFromVkService vkProviderService;
     private final MediaActionService mediaActionService;
 
     @Autowired
@@ -43,10 +42,11 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
 
         Optional<DiscordProviderFromVk> providerOptional = vkProviderService.findById(entityId);
         if (providerOptional.isEmpty()) {
@@ -57,8 +57,6 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
             return ConfigWizardState.END;
         }
         DiscordProviderFromVk provider = providerOptional.get();
-
-        List<MessageEmbed> responses = session.getResponses();
 
         if (!provider.isEnabled()) {
             // todo already disabled response
@@ -91,7 +89,6 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
         return null;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

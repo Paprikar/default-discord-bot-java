@@ -1,6 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
-import dev.paprikar.defaultdiscordbot.utils.DefaultObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +111,14 @@ public class DiscordProviderFromVk {
 
     @Override
     public String toString() {
-        return DefaultObjectMapper.serializeAsString(this);
+        return "DiscordProviderFromVk{" +
+                "id=" + id +
+                ", category=" + category +
+                ", name='" + name + '\'' +
+                ", groupId=" + groupId +
+                ", token='" + token + '\'' +
+                ", enabled=" + enabled +
+                '}';
     }
 
     @Override

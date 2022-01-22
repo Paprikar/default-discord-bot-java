@@ -15,7 +15,6 @@ public class DiscordPingCommand implements DiscordCommand {
         event.getChannel().sendMessage("...pong").queue();
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

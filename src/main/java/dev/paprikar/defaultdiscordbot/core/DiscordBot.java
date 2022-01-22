@@ -19,13 +19,9 @@ public class DiscordBot {
     private static final Logger logger = LoggerFactory.getLogger(DiscordBot.class);
 
     private final DiscordCategoryService categoryService;
-
     private final MediaActionService mediaActionService;
-
     private final DiscordEventListener eventListener;
-
     private final JDAService jdaService;
-
     private final DdbConfig config;
 
     @Autowired

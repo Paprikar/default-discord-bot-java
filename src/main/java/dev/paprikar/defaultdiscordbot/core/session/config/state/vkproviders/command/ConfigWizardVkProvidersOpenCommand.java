@@ -17,9 +17,9 @@ import java.util.List;
 @Component
 public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvidersCommand {
 
-    private static final String NAME = "open";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersOpenCommand.class);
+
+    private static final String NAME = "open";
 
     private final DiscordProviderFromVkService vkProviderService;
 
@@ -32,9 +32,8 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvide
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
-        List<DiscordProviderFromVk> providers = vkProviderService
-                .findAllByCategoryId(session.getEntityId());
+                                     String argsString) {
+        List<DiscordProviderFromVk> providers = vkProviderService.findAllByCategoryId(session.getEntityId());
         // todo use name index ?
         DiscordProviderFromVk targetProvider = null;
         for (DiscordProviderFromVk p : providers) {
@@ -55,7 +54,6 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvide
         return ConfigWizardState.VK_PROVIDER;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

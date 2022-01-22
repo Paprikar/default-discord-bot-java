@@ -8,10 +8,10 @@ public enum ConcurrencyScope {
     // Key: CategoryId
     CATEGORY_APPROVE_CONFIGURATION,
 
-    // Key: SuggestionChannelId
+    // Key: CategoryId
     CATEGORY_PROVIDER_FROM_DISCORD_CONFIGURATION,
 
-    // Key: GroupId
+    // Key: ProviderId
     CATEGORY_PROVIDER_FROM_VK_CONFIGURATION,
 
     // Key: CategoryId

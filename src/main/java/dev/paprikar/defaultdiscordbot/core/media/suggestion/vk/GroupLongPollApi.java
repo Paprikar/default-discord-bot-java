@@ -27,13 +27,13 @@ import java.util.concurrent.locks.Lock;
 
 class GroupLongPollApi extends EventsHandler {
 
+    protected static final VkApiClient client = VkSuggestionService.CLIENT;
+
     private static final Logger logger = LoggerFactory.getLogger(GroupLongPollApi.class);
 
     private static final int DEFAULT_WAIT_TIME = 25;
 
     protected final VkSuggestionService suggestionService;
-
-    protected final VkApiClient client;
 
     protected final GroupActor actor;
 
@@ -41,11 +41,9 @@ class GroupLongPollApi extends EventsHandler {
 
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    // in seconds
-    private final int maxReconnectDelay;
+    private final int maxReconnectDelay; // in seconds
 
-    // in seconds
-    private final int waitTime;
+    private final int waitTime; // in seconds
 
     private volatile ScheduledFuture<?> taskFuture;
 
@@ -59,22 +57,29 @@ class GroupLongPollApi extends EventsHandler {
 
     private DiscordProviderFromVk providerCached = null;
 
-    // in seconds
-    private int lastReconnectDelay = 1;
+    private int lastReconnectDelay = 1; // in seconds
 
-    public GroupLongPollApi(VkApiClient client, GroupActor actor, int maxReconnectDelay,
-                            VkSuggestionService suggestionService, LockService lockService) {
-        this(client, actor, maxReconnectDelay, DEFAULT_WAIT_TIME, suggestionService, lockService);
+    public GroupLongPollApi(GroupActor actor,
+                            int maxReconnectDelay,
+                            VkSuggestionService suggestionService,
+                            LockService lockService) {
+        this(actor, maxReconnectDelay, DEFAULT_WAIT_TIME, suggestionService, lockService);
     }
 
-    public GroupLongPollApi(VkApiClient client, GroupActor actor, int maxReconnectDelay, int waitTime,
-                            VkSuggestionService suggestionService, LockService lockService) {
-        this.client = client;
+    public GroupLongPollApi(GroupActor actor,
+                            int maxReconnectDelay,
+                            int waitTime,
+                            VkSuggestionService suggestionService,
+                            LockService lockService) {
         this.actor = actor;
         this.maxReconnectDelay = maxReconnectDelay;
         this.waitTime = waitTime;
         this.suggestionService = suggestionService;
         this.lockService = lockService;
+    }
+
+    public boolean isToRun() {
+        return toRun;
     }
 
     public DiscordProviderFromVk getProvider() {

@@ -13,17 +13,14 @@ public class ConcurrencyKey {
         this.key = key;
     }
 
-    @Nonnull
     public static ConcurrencyKey from(@Nonnull ConcurrencyScope scope, @Nonnull Object key) {
         return new ConcurrencyKey(scope, key);
     }
 
-    @Nonnull
     public ConcurrencyScope getScope() {
         return scope;
     }
 
-    @Nonnull
     public Object getKey() {
         return key;
     }

@@ -3,11 +3,11 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.root.command;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetterResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.ConfigWizardRootService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.setter.ConfigWizardRootSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +24,9 @@ import java.util.Optional;
 @Component
 public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
 
-    private static final String NAME = "set";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardRootSetCommand.class);
+
+    private static final String NAME = "set";
 
     private final DiscordGuildService guildService;
 
@@ -46,7 +46,10 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
+        Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
+
         if (argsString == null) {
             logger.error("Required argument 'argsString' is missing");
             // todo internal error response
@@ -66,26 +69,25 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
             return null;
         }
 
-        Optional<DiscordGuild> guildOptional = guildService.findById(session.getEntityId());
+        Optional<DiscordGuild> guildOptional = guildService.findById(entityId);
         if (guildOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get guild={id={}}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get guild={id={}}, ending session", entityId);
 
             return ConfigWizardState.END;
         }
         DiscordGuild guild = guildOptional.get();
 
         String value = parts.getOther();
-        ConfigWizardSetterResponse response = setter.set(value, guild);
-        session.getResponses().add(response.getEmbed());
+        MessageEmbed response = setter.set(value, guild);
+        responses.add(response);
 
-        session.getResponses().add(ConfigWizardRootService.getStateEmbed(guild));
+        responses.add(ConfigWizardRootService.getStateEmbed(guild));
 
         return null;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

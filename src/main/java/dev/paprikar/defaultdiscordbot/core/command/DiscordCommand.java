@@ -8,6 +8,5 @@ public interface DiscordCommand {
 
     void execute(@Nonnull String argsString, @Nonnull GuildMessageReceivedEvent event);
 
-    @Nonnull
     String getName();
 }

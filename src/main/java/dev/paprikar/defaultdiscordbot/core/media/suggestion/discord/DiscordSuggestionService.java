@@ -5,6 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.LockService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -35,9 +36,7 @@ public class DiscordSuggestionService {
     private static final Logger logger = LoggerFactory.getLogger(DiscordSuggestionService.class);
 
     private final DiscordCategoryService categoryService;
-
     private final ApproveService approveService;
-
     private final LockService lockService;
 
     // Map<SuggestionChannelId, CategoryId>
@@ -100,6 +99,10 @@ public class DiscordSuggestionService {
         message.delete().queue();
 
         handleMessageImages(message, category);
+    }
+
+    public boolean contains(@Nonnull DiscordProviderFromDiscord provider) {
+        return categories.containsKey(provider.getSuggestionChannelId());
     }
 
     public void add(Long categoryId, Long suggestionChannelId) {

@@ -24,12 +24,11 @@ import java.util.Optional;
 @Component
 public class ConfigWizardCategoryDisableCommand implements ConfigWizardCategoryCommand {
 
-    private static final String NAME = "disable";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryDisableCommand.class);
 
-    private final DiscordCategoryService categoryService;
+    private static final String NAME = "disable";
 
+    private final DiscordCategoryService categoryService;
     private final MediaActionService mediaActionService;
 
     @Autowired
@@ -43,10 +42,11 @@ public class ConfigWizardCategoryDisableCommand implements ConfigWizardCategoryC
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
 
         Optional<DiscordCategory> categoryOptional = categoryService.findById(entityId);
         if (categoryOptional.isEmpty()) {
@@ -57,8 +57,6 @@ public class ConfigWizardCategoryDisableCommand implements ConfigWizardCategoryC
             return ConfigWizardState.END;
         }
         DiscordCategory category = categoryOptional.get();
-
-        List<MessageEmbed> responses = session.getResponses();
 
         if (!category.isEnabled()) {
             // todo already disabled response
@@ -85,7 +83,6 @@ public class ConfigWizardCategoryDisableCommand implements ConfigWizardCategoryC
         return null;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

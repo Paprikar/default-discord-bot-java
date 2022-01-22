@@ -17,9 +17,9 @@ import java.util.Optional;
 @Component
 public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDiscordProviderCommand {
 
-    private static final String NAME = "back";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderBackCommand.class);
+
+    private static final String NAME = "back";
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
@@ -32,15 +32,16 @@ public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDisco
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService
-                .findById(session.getEntityId());
+        Long entityId = session.getEntityId();
+
+        Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService.findById(entityId);
         if (discordProviderOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get discordProvider={id={}}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get discordProvider={id={}}, ending session", entityId);
 
             return ConfigWizardState.END;
         }
@@ -49,7 +50,6 @@ public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDisco
         return ConfigWizardState.DISCORD_PROVIDERS;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

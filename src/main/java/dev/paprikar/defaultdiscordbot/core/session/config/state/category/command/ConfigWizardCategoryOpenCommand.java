@@ -16,9 +16,9 @@ import java.util.Map;
 @Component
 public class ConfigWizardCategoryOpenCommand implements ConfigWizardCategoryCommand {
 
-    private static final String NAME = "open";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryOpenCommand.class);
+
+    private static final String NAME = "open";
 
     // Map<Directory, State>
     private final Map<String, ConfigWizardState> targets = new HashMap<>();
@@ -32,7 +32,7 @@ public class ConfigWizardCategoryOpenCommand implements ConfigWizardCategoryComm
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         if (argsString == null) {
             logger.error("Required argument 'argsString' is missing");
             // todo internal error response
@@ -52,7 +52,6 @@ public class ConfigWizardCategoryOpenCommand implements ConfigWizardCategoryComm
         targets.put("vk providers", ConfigWizardState.VK_PROVIDERS);
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

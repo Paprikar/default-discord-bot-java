@@ -31,7 +31,6 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersService.class);
 
     private final DiscordCategoryService categoryService;
-
     private final DiscordProviderFromDiscordService discordProviderService;
 
     @Autowired
@@ -108,7 +107,6 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
         }
     }
 
-    @Nonnull
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.DISCORD_PROVIDERS;

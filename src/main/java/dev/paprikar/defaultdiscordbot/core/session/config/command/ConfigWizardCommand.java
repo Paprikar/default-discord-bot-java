@@ -12,8 +12,7 @@ public interface ConfigWizardCommand {
     @Nullable
     ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                               @Nonnull PrivateSession session,
-                              @Nullable String argsString);
+                              String argsString);
 
-    @Nonnull
     String getName();
 }

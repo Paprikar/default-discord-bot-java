@@ -5,6 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategorySe
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,14 +16,15 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Component
 public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCommand {
 
-    private static final String NAME = "remove";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryRemoveCommand.class);
+
+    private static final String NAME = "remove";
 
     private final DiscordCategoryService categoryService;
 
@@ -35,21 +37,24 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        Optional<DiscordCategory> categoryOptional = categoryService.findById(session.getEntityId());
+        Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
+
+        Optional<DiscordCategory> categoryOptional = categoryService.findById(entityId);
         if (categoryOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get category={id={}}, ending session", entityId);
 
             return ConfigWizardState.END;
         }
         DiscordCategory category = categoryOptional.get();
 
         if (category.isEnabled()) {
-            session.getResponses().add(new EmbedBuilder()
+            responses.add(new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
@@ -62,7 +67,7 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
         session.setEntityId(category.getGuild().getId());
         categoryService.detach(category);
 
-        session.getResponses().add(new EmbedBuilder()
+        responses.add(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
@@ -74,7 +79,6 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
         return ConfigWizardState.CATEGORIES;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

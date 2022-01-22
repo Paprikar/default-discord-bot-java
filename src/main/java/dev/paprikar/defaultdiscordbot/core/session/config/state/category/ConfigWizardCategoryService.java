@@ -112,7 +112,6 @@ public class ConfigWizardCategoryService extends AbstractConfigWizard {
         }
     }
 
-    @Nonnull
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.CATEGORY;

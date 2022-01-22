@@ -1,7 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
-import dev.paprikar.defaultdiscordbot.utils.DefaultObjectMapper;
-
 import javax.persistence.*;
 
 @Entity
@@ -53,7 +51,11 @@ public class DiscordGuild {
 
     @Override
     public String toString() {
-        return DefaultObjectMapper.serializeAsString(this);
+        return "DiscordGuild{" +
+                "id=" + id +
+                ", discordId=" + discordId +
+                ", prefix='" + prefix + '\'' +
+                '}';
     }
 
     @Override

@@ -22,7 +22,7 @@ public class ConfigWizardExitCommand implements ConfigWizardCommand {
     @Nullable
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         session.getResponses().add(new EmbedBuilder()
@@ -35,7 +35,6 @@ public class ConfigWizardExitCommand implements ConfigWizardCommand {
         return ConfigWizardState.END;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

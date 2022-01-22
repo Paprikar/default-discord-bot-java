@@ -17,9 +17,9 @@ import java.util.Optional;
 @Component
 public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProviderCommand {
 
-    private static final String NAME = "back";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderBackCommand.class);
+
+    private static final String NAME = "back";
 
     private final DiscordProviderFromVkService vkProviderService;
 
@@ -32,14 +32,16 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProvider
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
-        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(session.getEntityId());
+        Long entityId = session.getEntityId();
+
+        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(entityId);
         if (vkProviderOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get vkProvider={id={}}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get vkProvider={id={}}, ending session", entityId);
 
             return ConfigWizardState.END;
         }
@@ -48,7 +50,6 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProvider
         return ConfigWizardState.VK_PROVIDERS;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

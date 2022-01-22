@@ -19,12 +19,10 @@ public class FirstWordAndOther {
         }
     }
 
-    @Nonnull
     public String getFirstWord() {
         return firstWord;
     }
 
-    @Nonnull
     public String getOther() {
         return other;
     }

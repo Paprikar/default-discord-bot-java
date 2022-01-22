@@ -2,13 +2,12 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.sett
 
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetter;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetterResponse;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 public interface ConfigWizardVkProviderSetter extends ConfigWizardSetter {
 
-    @Nonnull
-    ConfigWizardSetterResponse set(@Nonnull String value,
-                                   @Nonnull DiscordProviderFromVk provider);
+    List<MessageEmbed> set(@Nonnull String value, @Nonnull DiscordProviderFromVk provider);
 }

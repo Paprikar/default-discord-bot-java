@@ -21,37 +21,30 @@ public class DiscordProviderFromVkService {
         this.repository = repository;
     }
 
-    @Nonnull
     public List<DiscordProviderFromVk> findAll() {
         return repository.findAll();
     }
 
-    @Nonnull
     public Optional<DiscordProviderFromVk> findById(long id) {
         return repository.findById(id);
     }
 
-    @Nonnull
     public DiscordProviderFromVk getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
     }
 
-    @Nonnull
     public List<DiscordProviderFromVk> findAllByCategoryId(long id) {
         return repository.findAllByCategoryId(id);
     }
 
-    @Nonnull
     public List<DiscordProviderFromVk> findAllByCategoryGuildId(long id) {
         return repository.findAllByCategoryGuildId(id);
     }
 
-    @Nonnull
     public List<DiscordProviderFromVk> findAllByCategoryGuildDiscordId(long id) {
         return repository.findAllByCategoryGuildDiscordId(id);
     }
 
-    @Nonnull
     public DiscordProviderFromVk save(@Nonnull DiscordProviderFromVk category) {
         return repository.save(category);
     }
@@ -92,9 +85,7 @@ public class DiscordProviderFromVkService {
         return repository.existsByCategoryGuildDiscordId(id);
     }
 
-    @Nonnull
-    public DiscordProviderFromVk attach(@Nonnull DiscordProviderFromVk provider,
-                                        @Nonnull DiscordCategory category) {
+    public DiscordProviderFromVk attach(@Nonnull DiscordProviderFromVk provider, @Nonnull DiscordCategory category) {
         provider.attach(category);
         return repository.save(provider);
     }

@@ -108,7 +108,6 @@ public class ConfigWizardDiscordProviderService extends AbstractConfigWizard {
         }
     }
 
-    @Nonnull
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.DISCORD_PROVIDER;

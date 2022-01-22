@@ -14,9 +14,9 @@ import javax.annotation.Nullable;
 @Component
 public class ConfigWizardVkProvidersBackCommand implements ConfigWizardVkProvidersCommand {
 
-    private static final String NAME = "back";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersBackCommand.class);
+
+    private static final String NAME = "back";
 
     @Autowired
     public ConfigWizardVkProvidersBackCommand() {
@@ -26,13 +26,12 @@ public class ConfigWizardVkProvidersBackCommand implements ConfigWizardVkProvide
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         return ConfigWizardState.CATEGORY;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

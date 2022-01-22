@@ -1,6 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
-import dev.paprikar.defaultdiscordbot.utils.DefaultObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,7 +179,20 @@ public class DiscordCategory {
 
     @Override
     public String toString() {
-        return DefaultObjectMapper.serializeAsString(this);
+        return "DiscordCategory{" +
+                "id=" + id +
+                ", guild=" + guild +
+                ", name='" + name + '\'' +
+                ", sendingChannelId=" + sendingChannelId +
+                ", approvalChannelId=" + approvalChannelId +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", reserveDays=" + reserveDays +
+                ", positiveApprovalEmoji=" + positiveApprovalEmoji +
+                ", negativeApprovalEmoji=" + negativeApprovalEmoji +
+                ", enabled=" + enabled +
+                ", lastSendTimestamp=" + lastSendTimestamp +
+                '}';
     }
 
     @Override

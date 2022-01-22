@@ -24,12 +24,11 @@ import java.util.Optional;
 @Component
 public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCommand {
 
-    private static final String NAME = "enable";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryEnableCommand.class);
 
-    private final DiscordCategoryService categoryService;
+    private static final String NAME = "enable";
 
+    private final DiscordCategoryService categoryService;
     private final MediaActionService mediaActionService;
 
     @Autowired
@@ -43,10 +42,11 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
 
         Optional<DiscordCategory> categoryOptional = categoryService.findById(entityId);
         if (categoryOptional.isEmpty()) {
@@ -57,8 +57,6 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
             return ConfigWizardState.END;
         }
         DiscordCategory category = categoryOptional.get();
-
-        List<MessageEmbed> responses = session.getResponses();
 
         if (category.isEnabled()) {
             // todo already enabled response
@@ -72,24 +70,20 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
         category = categoryService.save(category);
 
         List<MessageEmbed> errors = mediaActionService.enableCategory(category);
+        responses.addAll(errors);
 
-        if (errors.isEmpty()) {
-            responses.add(new EmbedBuilder()
-                    .setColor(Color.GRAY)
-                    .setTitle("Configuration Wizard")
-                    .setTimestamp(Instant.now())
-                    .appendDescription("The category has been enabled")
-                    .build());
-        } else {
-            responses.addAll(errors);
-        }
+        responses.add(new EmbedBuilder()
+                .setColor(Color.GRAY)
+                .setTitle("Configuration Wizard")
+                .setTimestamp(Instant.now())
+                .appendDescription("The category has been enabled")
+                .build());
 
         responses.add(ConfigWizardCategoryService.getStateEmbed(category));
 
         return null;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,15 +40,10 @@ public class ApproveService {
     private static final Logger logger = LoggerFactory.getLogger(ApproveService.class);
 
     private final DiscordCategoryService categoryService;
-
     private final DiscordMediaRequestService mediaRequestService;
-
     private final SendingService sendingService;
-
     private final JDAService jdaService;
-
     private final LockService lockService;
-
     private final SemaphoreService semaphoreService; // todo without semaphore
 
     // Map<ApprovalChannelId, CategoryId>
@@ -62,7 +56,8 @@ public class ApproveService {
     public ApproveService(DiscordCategoryService categoryService,
                           DiscordMediaRequestService mediaRequestService,
                           SendingService sendingService,
-                          JDAService jdaService, LockService lockService,
+                          JDAService jdaService,
+                          LockService lockService,
                           SemaphoreService semaphoreService) {
         this.categoryService = categoryService;
         this.mediaRequestService = mediaRequestService;
@@ -133,10 +128,11 @@ public class ApproveService {
         );
     }
 
-    public void submit(@Nonnull DiscordCategory category, @Nonnull String url,
-                       @Nullable Runnable afterSubmit,
-                       @Nullable Runnable onSubmitSuccess,
-                       @Nullable Consumer<Throwable> onSubmitFailure) {
+    public void submit(@Nonnull DiscordCategory category,
+                       @Nonnull String url,
+                       Runnable afterSubmit,
+                       Runnable onSubmitSuccess,
+                       Consumer<Throwable> onSubmitFailure) {
         Long approvalChannelId = category.getApprovalChannelId();
 
         TextChannel approvalChannel = getTextChannel(approvalChannelId, onSubmitFailure);
@@ -176,10 +172,11 @@ public class ApproveService {
                 .queue(onSendSuccess, onSubmitFailure);
     }
 
-    public void submit(@Nonnull DiscordCategory category, @Nonnull String url,
-                       @Nullable Supplier<? extends RestAction<Void>> afterSubmit,
-                       @Nullable Runnable onSubmitSuccess,
-                       @Nullable Consumer<Throwable> onSubmitFailure) {
+    public void submit(@Nonnull DiscordCategory category,
+                       @Nonnull String url,
+                       Supplier<? extends RestAction<Void>> afterSubmit,
+                       Runnable onSubmitSuccess,
+                       Consumer<Throwable> onSubmitFailure) {
         Long approvalChannelId = category.getApprovalChannelId();
 
         TextChannel approvalChannel = getTextChannel(approvalChannelId, onSubmitFailure);
@@ -206,6 +203,10 @@ public class ApproveService {
     public void approve(DiscordCategory category, String content) {
         mediaRequestService.save(new DiscordMediaRequest(category, content));
         sendingService.update(category);
+    }
+
+    public boolean contains(@Nonnull DiscordCategory category) {
+        return approvalChannels.containsKey(category.getId());
     }
 
     public void add(@Nonnull DiscordCategory category) {
@@ -305,7 +306,9 @@ public class ApproveService {
         semaphore.release();
     }
 
-    private void onMessageRetrievalSuccess(Message message, DiscordCategory category, String emoji,
+    private void onMessageRetrievalSuccess(Message message,
+                                           DiscordCategory category,
+                                           String emoji,
                                            Semaphore semaphore) {
         String positiveEmoji = category.getPositiveApprovalEmoji().toString();
         String negativeEmoji = category.getNegativeApprovalEmoji().toString();

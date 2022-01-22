@@ -13,6 +13,5 @@ public interface ConfigWizard {
 
     void print(@Nonnull PrivateSession session, boolean addStateEmbed);
 
-    @Nonnull
     ConfigWizardState getState();
 }

@@ -21,37 +21,30 @@ public class DiscordProviderFromDiscordService {
         this.repository = repository;
     }
 
-    @Nonnull
     public List<DiscordProviderFromDiscord> findAll() {
         return repository.findAll();
     }
 
-    @Nonnull
     public Optional<DiscordProviderFromDiscord> findById(long id) {
         return repository.findById(id);
     }
 
-    @Nonnull
     public DiscordProviderFromDiscord getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
     }
 
-    @Nonnull
     public List<DiscordProviderFromDiscord> findAllByCategoryId(long id) {
         return repository.findAllByCategoryId(id);
     }
 
-    @Nonnull
     public List<DiscordProviderFromDiscord> findAllByCategoryGuildId(long id) {
         return repository.findAllByCategoryGuildId(id);
     }
 
-    @Nonnull
     public List<DiscordProviderFromDiscord> findAllByCategoryGuildDiscordId(long id) {
         return repository.findAllByCategoryGuildDiscordId(id);
     }
 
-    @Nonnull
     public DiscordProviderFromDiscord save(@Nonnull DiscordProviderFromDiscord category) {
         return repository.save(category);
     }
@@ -92,7 +85,6 @@ public class DiscordProviderFromDiscordService {
         return repository.existsByCategoryGuildDiscordId(id);
     }
 
-    @Nonnull
     public DiscordProviderFromDiscord attach(@Nonnull DiscordProviderFromDiscord provider,
                                              @Nonnull DiscordCategory category) {
         provider.attach(category);

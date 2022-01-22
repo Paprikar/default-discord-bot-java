@@ -61,6 +61,10 @@ public class SendingService {
         lock.unlock();
     }
 
+    public boolean contains(@Nonnull DiscordCategory category) {
+        return senders.containsKey(category.getId());
+    }
+
     public void add(@Nonnull DiscordCategory category, @Nonnull MediaRequestSender sender) {
         Long categoryId = category.getId();
         Lock lock = new ReentrantLock();

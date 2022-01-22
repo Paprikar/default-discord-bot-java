@@ -1,7 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.entity;
 
-import dev.paprikar.defaultdiscordbot.utils.DefaultObjectMapper;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -75,7 +73,12 @@ public class DiscordMediaRequest {
 
     @Override
     public String toString() {
-        return DefaultObjectMapper.serializeAsString(this);
+        return "DiscordMediaRequest{" +
+                "id=" + id +
+                ", category=" + category +
+                ", content='" + content + '\'' +
+                ", creationTimestamp=" + creationTimestamp +
+                '}';
     }
 
     @Override

@@ -6,7 +6,9 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategorySe
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import net.dv8tion.jda.api.EmbedBuilder;
+import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderNameValidator;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,97 +17,76 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.awt.*;
-import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Component
 public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvidersCommand {
 
-    private static final String NAME = "add";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersAddCommand.class);
 
-    private final DiscordCategoryService categoryService;
+    private static final String NAME = "add";
 
+    private final DiscordCategoryService categoryService;
     private final DiscordProviderFromVkService vkProviderService;
+    private final ConfigWizardVkProviderNameValidator validator;
 
     @Autowired
     public ConfigWizardVkProvidersAddCommand(DiscordCategoryService categoryService,
-                                             DiscordProviderFromVkService vkProviderService) {
+                                             DiscordProviderFromVkService vkProviderService,
+                                             ConfigWizardVkProviderNameValidator validator) {
         this.categoryService = categoryService;
         this.vkProviderService = vkProviderService;
+        this.validator = validator;
     }
 
     @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
+        List<MessageEmbed> responses = session.getResponses();
+
         if (argsString == null) {
             logger.error("Required argument 'argsString' is missing");
             // todo internal error response
             return null;
         }
 
-        if (argsString.isEmpty()) {
-            session.getResponses().add(new EmbedBuilder()
-                    .setColor(Color.RED)
-                    .setTitle("Configuration Wizard Error")
-                    .setTimestamp(Instant.now())
-                    .appendDescription("The name cannot be empty")
-                    .build()
-            );
-            return null;
-        }
-
-        if (argsString.length() > 32) {
-            session.getResponses().add(new EmbedBuilder()
-                    .setColor(Color.RED)
-                    .setTitle("Configuration Wizard Error")
-                    .setTimestamp(Instant.now())
-                    .appendDescription("The length of the name cannot be more than 32 characters")
-                    .build()
-            );
-            return null;
-        }
-
-        long categoryId = session.getEntityId();
-        // todo use name index ?
-        for (DiscordProviderFromVk p : vkProviderService.findAllByCategoryId(categoryId)) {
-            if (p.getName().equals(argsString)) {
-                session.getResponses().add(new EmbedBuilder()
-                        .setColor(Color.RED)
-                        .setTitle("Configuration Wizard Error")
-                        .setTimestamp(Instant.now())
-                        .appendDescription("The name of vk provider must be unique")
-                        .build()
-                );
-                return null;
-            }
-        }
-
+        Long categoryId = session.getEntityId();
         Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
         if (categoryOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get category={id={}}, ending session", categoryId);
 
             return ConfigWizardState.END;
         }
+        DiscordCategory category = categoryOptional.get();
 
         DiscordProviderFromVk provider = new DiscordProviderFromVk();
-        provider.setName(argsString);
-        provider = vkProviderService.attach(provider, categoryOptional.get());
+
+        provider.attach(category);
+
+        ConfigWizardValidatorProcessingResponse<String> response = validator.process(argsString, provider);
+        String name = response.getValue();
+        MessageEmbed error = response.getError();
+
+        if (error != null) {
+            responses.add(error);
+            return null;
+        }
+
+        provider.setName(name);
+        provider = vkProviderService.save(provider);
 
         session.setEntityId(provider.getId());
 
-        logger.debug("Add at VK_PROVIDERS: name={}, session={}", argsString, session);
+        logger.debug("Add at VK_PROVIDERS: name={}, session={}", name, session);
 
         return ConfigWizardState.VK_PROVIDER;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

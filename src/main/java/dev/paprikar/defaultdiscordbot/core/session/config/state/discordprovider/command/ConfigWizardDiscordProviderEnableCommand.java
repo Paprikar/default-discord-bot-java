@@ -24,12 +24,11 @@ import java.util.Optional;
 @Component
 public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDiscordProviderCommand {
 
-    private static final String NAME = "enable";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderEnableCommand.class);
 
-    private final DiscordProviderFromDiscordService discordProviderService;
+    private static final String NAME = "enable";
 
+    private final DiscordProviderFromDiscordService discordProviderService;
     private final MediaActionService mediaActionService;
 
     @Autowired
@@ -43,10 +42,11 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
 
         Optional<DiscordProviderFromDiscord> providerOptional = discordProviderService.findById(entityId);
         if (providerOptional.isEmpty()) {
@@ -57,8 +57,6 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
             return ConfigWizardState.END;
         }
         DiscordProviderFromDiscord provider = providerOptional.get();
-
-        List<MessageEmbed> responses = session.getResponses();
 
         if (provider.isEnabled()) {
             // todo already enabled response
@@ -73,6 +71,7 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
 
         if (provider.getCategory().isEnabled()) {
             List<MessageEmbed> errors = mediaActionService.enableDiscordProvider(provider);
+            responses.addAll(errors);
 
             if (errors.isEmpty()) {
                 responses.add(new EmbedBuilder()
@@ -81,8 +80,6 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
                         .setTimestamp(Instant.now())
                         .appendDescription("The provider has been enabled")
                         .build());
-            } else {
-                responses.addAll(errors);
             }
         } else {
             responses.add(new EmbedBuilder()
@@ -98,7 +95,6 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
         return null;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

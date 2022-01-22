@@ -20,27 +20,22 @@ public class DiscordMediaRequestService {
         this.repository = repository;
     }
 
-    @Nonnull
     public List<DiscordMediaRequest> findAll() {
         return repository.findAll();
     }
 
-    @Nonnull
     public Optional<DiscordMediaRequest> findById(long id) {
         return repository.findById(id);
     }
 
-    @Nonnull
     public DiscordMediaRequest getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
     }
 
-    @Nonnull
     public List<DiscordMediaRequest> findAllByCategoryId(long id) {
         return repository.findAllByCategoryId(id);
     }
 
-    @Nonnull
     public DiscordMediaRequest save(@Nonnull DiscordMediaRequest mediaRequest) {
         return repository.save(mediaRequest);
     }
@@ -61,12 +56,10 @@ public class DiscordMediaRequestService {
         return repository.existsById(id);
     }
 
-    @Nonnull
     public Optional<DiscordMediaRequest> findFirstByCategoryId(long id) {
         return repository.findFirstByCategoryIdOrderByCreationTimestampAsc(id);
     }
 
-    @Nonnull
     public DiscordMediaRequest getFirstByCategoryId(long id) throws EntityNotFoundException {
         return repository.getFirstByCategoryIdOrderByCreationTimestampAsc(id);
     }

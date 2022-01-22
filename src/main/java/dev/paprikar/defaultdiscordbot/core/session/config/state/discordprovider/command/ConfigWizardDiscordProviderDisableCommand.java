@@ -24,12 +24,11 @@ import java.util.Optional;
 @Component
 public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDiscordProviderCommand {
 
-    private static final String NAME = "disable";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderDisableCommand.class);
 
-    private final DiscordProviderFromDiscordService discordProviderService;
+    private static final String NAME = "disable";
 
+    private final DiscordProviderFromDiscordService discordProviderService;
     private final MediaActionService mediaActionService;
 
     @Autowired
@@ -43,10 +42,11 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDi
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
         logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
 
         Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
 
         Optional<DiscordProviderFromDiscord> providerOptional = discordProviderService.findById(entityId);
         if (providerOptional.isEmpty()) {
@@ -57,8 +57,6 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDi
             return ConfigWizardState.END;
         }
         DiscordProviderFromDiscord provider = providerOptional.get();
-
-        List<MessageEmbed> responses = session.getResponses();
 
         if (!provider.isEnabled()) {
             // todo already disabled response
@@ -91,7 +89,6 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDi
         return null;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

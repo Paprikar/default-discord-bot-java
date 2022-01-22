@@ -3,11 +3,11 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.comm
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetterResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.ConfigWizardVkProviderService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.setter.ConfigWizardVkProviderSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +24,9 @@ import java.util.Optional;
 @Component
 public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderCommand {
 
-    private static final String NAME = "set";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderSetCommand.class);
+
+    private static final String NAME = "set";
 
     private final DiscordProviderFromVkService vkProviderService;
 
@@ -47,7 +47,10 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
+        Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
+
         if (argsString == null) {
             logger.error("Required argument 'argsString' is missing");
             // todo internal error response
@@ -67,26 +70,25 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
             return null;
         }
 
-        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(session.getEntityId());
+        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(entityId);
         if (vkProviderOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get vkProvider={id={}}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get vkProvider={id={}}, ending session", entityId);
 
             return ConfigWizardState.END;
         }
         DiscordProviderFromVk provider = vkProviderOptional.get();
 
         String value = parts.getOther();
-        ConfigWizardSetterResponse response = setter.set(value, provider);
-        session.getResponses().add(response.getEmbed());
+        List<MessageEmbed> setResponses = setter.set(value, provider);
+        responses.addAll(setResponses);
 
-        session.getResponses().add(ConfigWizardVkProviderService.getStateEmbed(provider));
+        responses.add(ConfigWizardVkProviderService.getStateEmbed(provider));
 
         return null;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;

@@ -2,8 +2,10 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.sett
 
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetterResponse;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderNameValidator;
+import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,80 +19,43 @@ import java.util.List;
 @Component
 public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderSetter {
 
-    private static final String VARIABLE_NAME = "name";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderNameSetter.class);
 
+    private static final String VARIABLE_NAME = "name";
+
     private final DiscordProviderFromVkService vkProviderService;
+    private final ConfigWizardVkProviderNameValidator validator;
 
     @Autowired
-    public ConfigWizardVkProviderNameSetter(DiscordProviderFromVkService vkProviderService) {
+    public ConfigWizardVkProviderNameSetter(DiscordProviderFromVkService vkProviderService,
+                                            ConfigWizardVkProviderNameValidator validator) {
         this.vkProviderService = vkProviderService;
+        this.validator = validator;
     }
 
-    @Nonnull
     @Override
-    public ConfigWizardSetterResponse set(@Nonnull String value, @Nonnull DiscordProviderFromVk provider) {
-        if (value.isEmpty()) {
-            return new ConfigWizardSetterResponse(false, new EmbedBuilder()
-                    .setColor(Color.RED)
-                    .setTitle("Configuration Wizard Error")
-                    .setTimestamp(Instant.now())
-                    .appendDescription("The name cannot be empty")
-                    .build()
-            );
+    public List<MessageEmbed> set(@Nonnull String value, @Nonnull DiscordProviderFromVk provider) {
+        ConfigWizardValidatorProcessingResponse<String> response = validator.process(value, provider);
+        String name = response.getValue();
+        MessageEmbed error = response.getError();
+
+        if (error != null) {
+            return List.of(error);
         }
 
-        if (value.length() > 32) {
-            return new ConfigWizardSetterResponse(false, new EmbedBuilder()
-                    .setColor(Color.RED)
-                    .setTitle("Configuration Wizard Error")
-                    .setTimestamp(Instant.now())
-                    .appendDescription("The length of the name cannot be more than 32 characters")
-                    .build()
-            );
-        }
-
-        if (provider.getName().equals(value)) {
-            return new ConfigWizardSetterResponse(false, new EmbedBuilder()
-                    .setColor(Color.RED)
-                    .setTitle("Configuration Wizard Error")
-                    .setTimestamp(Instant.now())
-                    .appendDescription("Changing vk provider name to the same one does not make sense")
-                    .build()
-            );
-        }
-
-        List<DiscordProviderFromVk> providers = vkProviderService
-                .findAllByCategoryId(provider.getCategory().getId());
-        // todo use name index ?
-        for (DiscordProviderFromVk p : providers) {
-            if (p.getName().equals(value)) {
-                return new ConfigWizardSetterResponse(false, new EmbedBuilder()
-                        .setColor(Color.RED)
-                        .setTitle("Configuration Wizard Error")
-                        .setTimestamp(Instant.now())
-                        .appendDescription("The name of vk provider must be unique")
-                        .build()
-                );
-            }
-        }
-
-        provider.setName(value);
+        provider.setName(name);
         provider = vkProviderService.save(provider);
 
-        logger.debug("The vkProvider={id={}} value 'name' is set to '{}'", provider.getId(), value);
+        logger.debug("The vkProvider={id={}} value '{}' is set to '{}'", provider.getId(), VARIABLE_NAME, value);
 
-        return new ConfigWizardSetterResponse(true, new EmbedBuilder()
+        return List.of(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The value `name` has been set to `" + value + "`")
-                .build()
-        );
+                .appendDescription("The value `" + VARIABLE_NAME + "` has been set to `" + value + "`")
+                .build());
     }
 
-    @Nonnull
     @Override
     public String getVariableName() {
         return VARIABLE_NAME;

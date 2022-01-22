@@ -3,11 +3,11 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.category.comman
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetterResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.ConfigWizardCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter.ConfigWizardCategorySetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +24,9 @@ import java.util.Optional;
 @Component
 public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryCommand {
 
-    private static final String NAME = "set";
-
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategorySetCommand.class);
+
+    private static final String NAME = "set";
 
     private final DiscordCategoryService categoryService;
 
@@ -47,16 +47,21 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
-                                     @Nullable String argsString) {
+                                     String argsString) {
+        Long entityId = session.getEntityId();
+        List<MessageEmbed> responses = session.getResponses();
+
         if (argsString == null) {
             logger.error("Required argument 'argsString' is missing");
             // todo internal error response
             return null;
         }
+
         if (argsString.isEmpty()) {
             // todo illegal args response
             return null;
         }
+
         FirstWordAndOther parts = new FirstWordAndOther(argsString);
         String varName = parts.getFirstWord();
         ConfigWizardCategorySetter setter = setters.get(varName);
@@ -65,26 +70,25 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
             return null;
         }
 
-        Optional<DiscordCategory> categoryOptional = categoryService.findById(session.getEntityId());
+        Optional<DiscordCategory> categoryOptional = categoryService.findById(entityId);
         if (categoryOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get category={id={}}, ending session", session.getEntityId());
+            logger.error("execute(): Unable to get category={id={}}, ending session", entityId);
 
             return ConfigWizardState.END;
         }
         DiscordCategory category = categoryOptional.get();
 
         String value = parts.getOther();
-        ConfigWizardSetterResponse response = setter.set(value, category);
-        session.getResponses().add(response.getEmbed());
+        List<MessageEmbed> setResponses = setter.set(value, category);
+        responses.addAll(setResponses);
 
-        session.getResponses().add(ConfigWizardCategoryService.getStateEmbed(category));
+        responses.add(ConfigWizardCategoryService.getStateEmbed(category));
 
         return null;
     }
 
-    @Nonnull
     @Override
     public String getName() {
         return NAME;
