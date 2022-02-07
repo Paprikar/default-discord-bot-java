@@ -5,6 +5,7 @@ import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.events.EventsHandler;
 import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ApiGroupAuthException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.callback.longpoll.responses.GetLongPollEventsResponse;
 import com.vk.api.sdk.objects.callback.messages.CallbackMessage;
@@ -12,7 +13,7 @@ import com.vk.api.sdk.objects.groups.LongPollServer;
 import com.vk.api.sdk.objects.groups.responses.GetLongPollServerResponse;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.LockService;
+import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 class GroupLongPollApi extends EventsHandler {
 
@@ -37,7 +37,7 @@ class GroupLongPollApi extends EventsHandler {
 
     protected final GroupActor actor;
 
-    private final LockService lockService;
+    private final MonitorService monitorService;
 
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
@@ -62,20 +62,20 @@ class GroupLongPollApi extends EventsHandler {
     public GroupLongPollApi(GroupActor actor,
                             int maxReconnectDelay,
                             VkSuggestionService suggestionService,
-                            LockService lockService) {
-        this(actor, maxReconnectDelay, DEFAULT_WAIT_TIME, suggestionService, lockService);
+                            MonitorService monitorService) {
+        this(actor, maxReconnectDelay, DEFAULT_WAIT_TIME, suggestionService, monitorService);
     }
 
     public GroupLongPollApi(GroupActor actor,
                             int maxReconnectDelay,
                             int waitTime,
                             VkSuggestionService suggestionService,
-                            LockService lockService) {
+                            MonitorService monitorService) {
         this.actor = actor;
         this.maxReconnectDelay = maxReconnectDelay;
         this.waitTime = waitTime;
         this.suggestionService = suggestionService;
-        this.lockService = lockService;
+        this.monitorService = monitorService;
     }
 
     public boolean isToRun() {
@@ -140,7 +140,9 @@ class GroupLongPollApi extends EventsHandler {
 
         suggestionService.handlers.remove(providerId);
 
-        lockService.remove(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
+        ConcurrencyKey monitorKey = ConcurrencyKey
+                .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
+        monitorService.remove(monitorKey);
     }
 
     private class UpdaterTask implements Runnable {
@@ -175,6 +177,7 @@ class GroupLongPollApi extends EventsHandler {
                 } catch (ApiException | ClientException e) {
                     logger.debug("UpdaterTask#handleUpdates(): provider={id={}}. " +
                             "An error occurred while running the Long Poll handler", providerId, e);
+
                     lpServer = getLongPollServer();
                     if (lpServer == null) {
                         return;
@@ -185,23 +188,20 @@ class GroupLongPollApi extends EventsHandler {
         }
 
         private boolean tryToRun() {
-            ConcurrencyKey lockKey = ConcurrencyKey
+            ConcurrencyKey monitorKey = ConcurrencyKey
                     .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
-            Lock lock = lockService.get(lockKey);
-            if (lock == null) {
+            Object monitor = monitorService.get(monitorKey);
+            if (monitor == null) {
                 return false;
             }
 
-            lock.lock();
-
-            boolean toRun = GroupLongPollApi.this.toRun;
-            if (!toRun) {
-                onStop();
+            synchronized (monitor) {
+                boolean toRun = GroupLongPollApi.this.toRun;
+                if (!toRun) {
+                    onStop();
+                }
+                return toRun;
             }
-
-            lock.unlock();
-
-            return toRun;
         }
 
         private LongPollServer getLongPollServer() {
@@ -218,6 +218,22 @@ class GroupLongPollApi extends EventsHandler {
                 logger.debug("UpdaterTask#getLongPollServer(): provider={id={}}. " +
                         "An error occurred while getting the Long Poll server", providerId, e);
 
+                // stop if creds is no longer valid
+                if (e instanceof ApiGroupAuthException) {
+                    ConcurrencyKey monitorKey = ConcurrencyKey
+                            .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
+                    Object monitor = monitorService.get(monitorKey);
+                    if (monitor == null) {
+                        return null;
+                    }
+
+                    synchronized (monitor) {
+                        toRun = false;
+                        onStop();
+                        return null;
+                    }
+                }
+
                 scheduleTask();
 
                 return null;
@@ -232,30 +248,26 @@ class GroupLongPollApi extends EventsHandler {
         }
 
         private void scheduleTask() {
-            ConcurrencyKey lockKey = ConcurrencyKey
+            ConcurrencyKey monitorKey = ConcurrencyKey
                     .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
-            Lock lock = lockService.get(lockKey);
-            if (lock == null) {
+            Object monitor = monitorService.get(monitorKey);
+            if (monitor == null) {
                 return;
             }
 
-            lock.lock();
+            synchronized (monitor) {
+                if (!toRun) {
+                    onStop();
+                    return;
+                }
 
-            if (!toRun) {
-                onStop();
+                int delay = getDelay();
 
-                lock.unlock();
-                return;
+                logger.debug("UpdaterTask#scheduleTask(): provider={id={}}. " +
+                        "Attempting to reconnect in {}s", providerId, delay);
+
+                taskFuture = executor.schedule(new UpdaterTask(), delay, TimeUnit.SECONDS);
             }
-
-            int delay = getDelay();
-
-            logger.debug("UpdaterTask#scheduleTask(): provider={id={}}. " +
-                    "Attempting to reconnect in {}s", providerId, delay);
-
-            taskFuture = executor.schedule(new UpdaterTask(), delay, TimeUnit.SECONDS);
-
-            lock.unlock();
         }
 
         private int getDelay() {
@@ -269,33 +281,31 @@ class GroupLongPollApi extends EventsHandler {
          */
         private boolean parseUpdates(List<JsonObject> updates) {
             providerCached = provider;
-            ConcurrencyKey lockKey = ConcurrencyKey
+
+            ConcurrencyKey monitorKey = ConcurrencyKey
                     .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
-            Lock lock = lockService.get(lockKey);
-            if (lock == null) {
+            Object monitor = monitorService.get(monitorKey);
+            if (monitor == null) {
                 return true;
             }
 
-            lock.lock();
-
-            if (!toRun) {
-                onStop();
-
-                lock.unlock();
-                return true;
-            }
-
-            for (JsonObject update : updates) {
-                try {
-                    parse(gson.fromJson(update, CallbackMessage.class));
-                } catch (RuntimeException e) {
-                    logger.error("UpdaterTask#parseUpdates(): provider={id={}}. " +
-                            "An error occurred while parsing the update", providerId, e);
+            synchronized (monitor) {
+                if (!toRun) {
+                    onStop();
+                    return true;
                 }
-            }
 
-            lock.unlock();
-            return false;
+                updates.forEach(update -> {
+                    try {
+                        parse(gson.fromJson(update, CallbackMessage.class));
+                    } catch (RuntimeException e) {
+                        logger.error("UpdaterTask#parseUpdates(): provider={id={}}. " +
+                                "An error occurred while parsing the update", providerId, e);
+                    }
+                });
+
+                return false;
+            }
         }
     }
 }

@@ -28,9 +28,7 @@ public class DiscordCommandHandler {
     public DiscordCommandHandler(DiscordGuildService guildService, List<DiscordCommand> commands) {
         this.guildService = guildService;
 
-        for (DiscordCommand c : commands) {
-            this.commands.put(c.getName(), c);
-        }
+        commands.forEach(command -> this.commands.put(command.getName(), command));
     }
 
     public void handleGuildMessageReceivedEvent(@Nonnull GuildMessageReceivedEvent event) {

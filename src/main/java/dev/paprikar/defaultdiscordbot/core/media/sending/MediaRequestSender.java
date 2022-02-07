@@ -4,9 +4,10 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordMediaRequest;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordMediaRequestService;
+import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import java.sql.Timestamp;
 import java.time.*;
 import java.util.Optional;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 public class MediaRequestSender {
 
@@ -24,13 +26,15 @@ public class MediaRequestSender {
 
     private final JDA jda;
 
-    private final DiscordMediaRequestService mediaRequestService;
-
     private final DiscordCategoryService categoryService;
+
+    private final DiscordMediaRequestService mediaRequestService;
 
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     private final Object lock = new Object();
+
+    private final RequestErrorHandler requestSendingErrorHandler;
 
     private volatile boolean toTerminate;
 
@@ -40,12 +44,24 @@ public class MediaRequestSender {
 
     private volatile LocalDateTime lastSendDateTime;
 
-    public MediaRequestSender(JDA jda,
-                              DiscordMediaRequestService mediaRequestService,
-                              DiscordCategoryService categoryService) {
+    public MediaRequestSender(@Nonnull JDA jda,
+                              @Nonnull DiscordCategoryService categoryService,
+                              @Nonnull DiscordMediaRequestService mediaRequestService) {
         this.jda = jda;
-        this.mediaRequestService = mediaRequestService;
         this.categoryService = categoryService;
+        this.mediaRequestService = mediaRequestService;
+
+        // exception can usually occur when the connection is lost or the channel is unavailable,
+        // which in both cases causes the sender to stop working externally via events.
+        this.requestSendingErrorHandler = RequestErrorHandler.createBuilder()
+                .setMessage("An error occurred while sending the suggestion")
+                .setAction(() -> {
+                    toTerminate = true;
+                    // revert lastSendDateTime changes
+                    lastSendDateTime = LocalDateTime.from(category.getLastSendTimestamp().toInstant());
+                })
+                .warnOn(ErrorResponse.UNKNOWN_CHANNEL)
+                .build();
     }
 
     @Nullable
@@ -62,6 +78,7 @@ public class MediaRequestSender {
                 logger.error(message);
                 throw new IllegalStateException(message);
             }
+
             Timestamp dt = category.getLastSendTimestamp();
             if (dt == null) {
                 lastSendDateTime = null;
@@ -129,57 +146,34 @@ public class MediaRequestSender {
                 // normally should not happen
                 toTerminate = true;
                 lastSendDateTime = LocalDateTime.from(category.getLastSendTimestamp().toInstant());
-                logger.error("No requests were found to be sent");
+                logger.error("SenderTask#sendRequest(): No requests were found to be sent");
                 return;
             }
             DiscordMediaRequest request = requestOptional.get();
 
-            TextChannel channel = jda.getTextChannelById(category.getSendingChannelId());
+            Long sendingChannelId = category.getSendingChannelId();
+            TextChannel channel = jda.getTextChannelById(sendingChannelId);
             if (channel == null) {
                 // can happen if the service has not stopped yet after the channel deletion event
                 toTerminate = true;
-                logger.warn("The channel for sending requests cannot be found");
+                logger.warn("SenderTask#sendRequest(): The channel for sending requests cannot be found");
                 return;
             }
 
-            try {
-                channel
-                        .sendMessage(request.getContent())
-                        .submit()
-                        .whenComplete((message, throwable) -> onRequestSendingComplete(throwable, request))
-                        .get();
-            } catch (InterruptedException | ExecutionException e) {
-                toTerminate = true;
-                logger.error(e.toString());
-            }
-        }
+            Consumer<Message> onSendSuccess = message -> {
+                logger.debug(
+                        "SenderTask#sendRequest(): The request with id={} was successfully sent to text channel with id={}",
+                        request.getId(), sendingChannelId);
 
-        private void onRequestSendingComplete(Throwable throwable, DiscordMediaRequest request) {
-            if (throwable == null) {
                 mediaRequestService.delete(request);
                 // save lastSendDateTime changes
                 category.setLastSendTimestamp(
                         Timestamp.from(lastSendDateTime.atZone(ZoneId.systemDefault()).toInstant()));
                 MediaRequestSender.this.category = categoryService.save(category);
-                return;
-            }
+            };
 
-            // exception can usually occur when the connection is lost or the channel is unavailable,
-            // which in both cases causes the sender to stop working externally via events.
-            toTerminate = true;
-            // revert lastSendDateTime changes
-            lastSendDateTime = LocalDateTime.from(category.getLastSendTimestamp().toInstant());
-            String message = "Failed to send request";
-            if (throwable instanceof ErrorResponseException) {
-                ErrorResponseException ere = (ErrorResponseException) throwable;
-                if (ere.isServerError() || ere.getErrorResponse() == ErrorResponse.UNKNOWN_CHANNEL) {
-                    logger.warn(message, throwable);
-                } else {
-                    logger.error(message, throwable);
-                }
-            } else {
-                logger.error(message, throwable);
-            }
+            channel.sendMessage(request.getContent())
+                    .queue(onSendSuccess, requestSendingErrorHandler);
         }
 
         private void schedule() {

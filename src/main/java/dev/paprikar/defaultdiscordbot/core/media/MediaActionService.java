@@ -3,7 +3,6 @@ package dev.paprikar.defaultdiscordbot.core.media;
 import dev.paprikar.defaultdiscordbot.core.JDAService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveValidator;
-import dev.paprikar.defaultdiscordbot.core.media.sending.MediaRequestSender;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingValidator;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
@@ -44,7 +43,6 @@ public class MediaActionService {
     private final VkSuggestionService vkSuggestionService;
     private final ApproveService approveService;
     private final SendingService sendingService;
-    private final JDAService jdaService;
     private final SendingValidator sendingValidator;
     private final ApproveValidator approveValidator;
     private final DiscordSuggestionValidator discordSuggestionValidator;
@@ -59,7 +57,6 @@ public class MediaActionService {
                               VkSuggestionService vkSuggestionService,
                               ApproveService approveService,
                               SendingService sendingService,
-                              JDAService jdaService,
                               SendingValidator sendingValidator,
                               ApproveValidator approveValidator,
                               DiscordSuggestionValidator discordSuggestionValidator,
@@ -72,7 +69,6 @@ public class MediaActionService {
         this.vkSuggestionService = vkSuggestionService;
         this.approveService = approveService;
         this.sendingService = sendingService;
-        this.jdaService = jdaService;
         this.sendingValidator = sendingValidator;
         this.approveValidator = approveValidator;
         this.discordSuggestionValidator = discordSuggestionValidator;
@@ -84,9 +80,9 @@ public class MediaActionService {
     public List<MessageEmbed> enableCategory(@Nonnull DiscordCategory category) {
         List<MessageEmbed> errors = new ArrayList<>();
 
-        JDA jda = jdaService.get();
+        JDA jda = JDAService.get();
         if (jda == null) {
-            logger.warn("enableCategory(): Failed to get jda");
+            logger.error("enableCategory(): Failed to get jda");
             errors.add(new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
@@ -152,11 +148,11 @@ public class MediaActionService {
             return errors;
         }
 
-        sendingService.add(category, new MediaRequestSender(jda, mediaRequestService, categoryService));
+        sendingService.add(category, jda);
 
         errors = sendingValidator.validateFinally(category, jda);
         if (!errors.isEmpty()) {
-            sendingService.remove(categoryId);
+            sendingService.remove(category);
 
             logger.debug("enableSending(): Media sending for category={id={}} was not enabled due to final errors",
                     categoryId);
@@ -169,18 +165,18 @@ public class MediaActionService {
         return errors;
     }
 
-    private void disableSending(@Nonnull DiscordCategory category) {
+    public void disableSending(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
 
-        sendingService.remove(categoryId);
+        sendingService.remove(category);
 
         logger.debug("disableSending(): Media sending for category={id={}} is disabled", categoryId);
     }
 
     public List<MessageEmbed> enableApprove(@Nonnull DiscordCategory category) {
-        JDA jda = jdaService.get();
+        JDA jda = JDAService.get();
         if (jda == null) {
-            logger.warn("enableApprove(): Failed to get jda");
+            logger.error("enableApprove(): Failed to get jda");
             return List.of(new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
@@ -220,7 +216,7 @@ public class MediaActionService {
         return errors;
     }
 
-    private void disableApprove(@Nonnull DiscordCategory category) {
+    public void disableApprove(@Nonnull DiscordCategory category) {
         approveService.remove(category);
 
         logger.debug("disableApprove(): Media approve for category={id={}} is disabled", category.getId());
@@ -229,9 +225,9 @@ public class MediaActionService {
     // DISCORD PROVIDER OPERATIONS
 
     public List<MessageEmbed> enableDiscordProvider(@Nonnull DiscordProviderFromDiscord provider) {
-        JDA jda = jdaService.get();
+        JDA jda = JDAService.get();
         if (jda == null) {
-            logger.warn("enableDiscordProvider(): Failed to get jda");
+            logger.error("enableDiscordProvider(): Failed to get jda");
             return List.of(new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
@@ -243,7 +239,7 @@ public class MediaActionService {
         return enableDiscordProvider(provider, jda);
     }
 
-    private List<MessageEmbed> enableDiscordProvider(@Nonnull DiscordProviderFromDiscord provider, @Nonnull JDA jda) {
+    public List<MessageEmbed> enableDiscordProvider(@Nonnull DiscordProviderFromDiscord provider, @Nonnull JDA jda) {
         Long providerId = provider.getId();
 
         List<MessageEmbed> errors = discordSuggestionValidator.validateInitially(provider);
@@ -254,12 +250,11 @@ public class MediaActionService {
             return errors;
         }
 
-        Long suggestionChannelId = provider.getSuggestionChannelId();
-        discordSuggestionService.add(provider.getCategory().getId(), suggestionChannelId);
+        discordSuggestionService.add(provider);
 
         errors = discordSuggestionValidator.validateFinally(provider, jda);
         if (!errors.isEmpty()) {
-            discordSuggestionService.remove(suggestionChannelId);
+            discordSuggestionService.remove(provider);
 
             logger.debug("enableDiscordProvider(): provider={id={}} was not enabled due to final errors",
                     providerId);
@@ -273,7 +268,7 @@ public class MediaActionService {
     }
 
     public void disableDiscordProvider(@Nonnull DiscordProviderFromDiscord provider) {
-        discordSuggestionService.remove(provider.getSuggestionChannelId());
+        discordSuggestionService.remove(provider);
 
         logger.debug("disableDiscordProvider(): provider={id={}} is disabled", provider.getId());
     }
@@ -293,8 +288,6 @@ public class MediaActionService {
 
         errors = vkSuggestionValidator.validateFinally(provider);
         if (!errors.isEmpty()) {
-            vkSuggestionService.remove(provider);
-
             logger.debug("enableVkProvider(): provider={id={}} was not enabled due to final errors",
                     providerId);
 

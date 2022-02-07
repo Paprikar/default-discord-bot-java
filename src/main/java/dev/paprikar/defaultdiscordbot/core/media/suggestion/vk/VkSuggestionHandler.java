@@ -12,8 +12,10 @@ import com.vk.api.sdk.objects.wall.WallpostAttachmentType;
 import com.vk.api.sdk.objects.wall.WallpostFull;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
@@ -34,30 +36,29 @@ public class VkSuggestionHandler {
 
     private final Map<PhotoSizesType, Integer> photoSizeTypeIndexes = new EnumMap<>(PhotoSizesType.class);
 
+    private final RequestErrorHandler suggestionSubmittingErrorHandler;
+
+    @Autowired
     public VkSuggestionHandler(ApproveService approveService) {
         this.approveService = approveService;
 
         // bigger value - bigger size
         // uncropped
-        photoSizeTypeIndexes.put(PhotoSizesType.W, 10);
-        photoSizeTypeIndexes.put(PhotoSizesType.Z, 9);
-        photoSizeTypeIndexes.put(PhotoSizesType.Y, 8);
-        photoSizeTypeIndexes.put(PhotoSizesType.X, 7);
-        photoSizeTypeIndexes.put(PhotoSizesType.M, 6);
-        photoSizeTypeIndexes.put(PhotoSizesType.S, 5);
+        this.photoSizeTypeIndexes.put(PhotoSizesType.W, 10);
+        this.photoSizeTypeIndexes.put(PhotoSizesType.Z, 9);
+        this.photoSizeTypeIndexes.put(PhotoSizesType.Y, 8);
+        this.photoSizeTypeIndexes.put(PhotoSizesType.X, 7);
+        this.photoSizeTypeIndexes.put(PhotoSizesType.M, 6);
+        this.photoSizeTypeIndexes.put(PhotoSizesType.S, 5);
         // cropped
-        photoSizeTypeIndexes.put(PhotoSizesType.R, 4);
-        photoSizeTypeIndexes.put(PhotoSizesType.Q, 3);
-        photoSizeTypeIndexes.put(PhotoSizesType.P, 2);
-        photoSizeTypeIndexes.put(PhotoSizesType.O, 1);
-    }
+        this.photoSizeTypeIndexes.put(PhotoSizesType.R, 4);
+        this.photoSizeTypeIndexes.put(PhotoSizesType.Q, 3);
+        this.photoSizeTypeIndexes.put(PhotoSizesType.P, 2);
+        this.photoSizeTypeIndexes.put(PhotoSizesType.O, 1);
 
-    private static void onSuggestionSubmitSuccess() {
-        logger.debug("onSuggestionSubmitSuccess(): The suggestion was successfully submitted");
-    }
-
-    private static void onSuggestionSubmitFailure(Throwable throwable) {
-        logger.warn("onSuggestionSubmitFailure(): An error occurred while submitting the suggestion", throwable);
+        this.suggestionSubmittingErrorHandler = RequestErrorHandler.createBuilder()
+                .setMessage("An error occurred while submitting the suggestion")
+                .build();
     }
 
     public void handleMessageNewEvent(@Nonnull Message message,
@@ -96,12 +97,10 @@ public class VkSuggestionHandler {
         // todo thrust list
 
         // todo transaction-like batch submit
-        for (String url : urls) {
+        urls.forEach(url -> {
             logger.debug("handleMessagePhotos(): Submitting the suggestion with url={}", url);
-            approveService.submit(provider.getCategory(), url, (Runnable) null,
-                    VkSuggestionHandler::onSuggestionSubmitSuccess,
-                    VkSuggestionHandler::onSuggestionSubmitFailure);
-        }
+            approveService.submit(provider.getCategory(), url, suggestionSubmittingErrorHandler);
+        });
 
         executeRequest(client.messages().send(actor)
                 .randomId(random.nextInt())

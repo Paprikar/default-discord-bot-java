@@ -2,14 +2,16 @@ package dev.paprikar.defaultdiscordbot.core.media.suggestion.discord;
 
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.LockService;
+import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -21,14 +23,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 
 @Service
 public class DiscordSuggestionService {
@@ -37,132 +34,156 @@ public class DiscordSuggestionService {
 
     private final DiscordCategoryService categoryService;
     private final ApproveService approveService;
-    private final LockService lockService;
+    private final MonitorService monitorService;
 
-    // Map<SuggestionChannelId, CategoryId>
+    // Map<ProviderId, CategoryId>
     private final Map<Long, Long> categories = new ConcurrentHashMap<>();
+
+    // Map<ProviderId, SuggestionChannelId>
+    private final Map<Long, Long> suggestionChannels = new ConcurrentHashMap<>();
+
+    // Map<SuggestionChannelId, ProviderId>
+    private final Map<Long, Long> providers = new ConcurrentHashMap<>();
+
+    private final RequestErrorHandler suggestionHandlingErrorHandler;
+
+    private final RequestErrorHandler suggestionSubmittingErrorHandler;
 
     @Autowired
     public DiscordSuggestionService(DiscordCategoryService categoryService,
                                     ApproveService approveService,
-                                    LockService lockService) {
+                                    MonitorService monitorService) {
         this.categoryService = categoryService;
         this.approveService = approveService;
-        this.lockService = lockService;
-    }
+        this.monitorService = monitorService;
 
-    private static void onSuggestionSubmitSuccess() {
-        logger.debug("onSuggestionSubmitSuccess(): The suggestion was successfully submitted");
-    }
+        this.suggestionHandlingErrorHandler = RequestErrorHandler.createBuilder()
+                .setMessage("An error occurred while handling the suggestion")
+                .build();
 
-    private static void onSuggestionSubmitFailure(Throwable throwable) {
-        logger.warn("onSuggestionSubmitFailure(): An error occurred while submitting the suggestion", throwable);
+        this.suggestionSubmittingErrorHandler = RequestErrorHandler.createBuilder()
+                .setMessage("An error occurred while submitting the suggestion")
+                .build();
     }
 
     public void handleTextChannelDeleteEvent(@Nonnull TextChannelDeleteEvent event) {
         Long channelId = event.getChannel().getIdLong();
-        Long categoryId = categories.get(channelId);
-        if (categoryId == null) {
+
+        Long providerId = providers.get(channelId);
+        if (providerId == null) {
             return;
         }
 
-        ConcurrencyKey lockKey = ConcurrencyKey
-                .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_DISCORD_CONFIGURATION, categoryId);
-        Lock lock = lockService.get(lockKey);
-        if (lock == null) {
+        ConcurrencyKey monitorKey = ConcurrencyKey
+                .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_DISCORD_CONFIGURATION, providerId);
+        Object monitor = monitorService.get(monitorKey);
+        if (monitor == null) {
             return;
         }
 
-        lock.lock();
+        synchronized (monitor) {
+            categories.remove(providerId);
+            suggestionChannels.remove(providerId);
+            providers.remove(channelId);
+            monitorService.remove(monitorKey);
+        }
 
-        categories.remove(channelId);
-
-        lockService.remove(lockKey);
-
-        lock.unlock();
+        logger.debug("handleTextChannelDeleteEvent(): discordProvider={id={}} is disabled "
+                + "due to the deletion of the required text channel with id={}", providerId, channelId);
     }
 
     public void handleGuildMessageReceivedEvent(@Nonnull GuildMessageReceivedEvent event) {
         Message message = event.getMessage();
+        Long channelId = event.getChannel().getIdLong();
 
-        Long categoryId = categories.get(event.getChannel().getIdLong());
-        if (categoryId == null) {
+        Long providerId = providers.get(channelId);
+        if (providerId == null) {
             return;
         }
 
+        Long categoryId = categories.get(providerId);
         Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
         if (categoryOptional.isEmpty()) {
             return;
         }
         DiscordCategory category = categoryOptional.get();
 
-        message.delete().queue();
+        try {
+            message.delete().complete();
+            handleMessageImages(message, category);
+        } catch (RuntimeException e) {
+            suggestionHandlingErrorHandler.accept(e);
+        }
+    }
 
-        handleMessageImages(message, category);
+    public void add(@Nonnull DiscordProviderFromDiscord provider) {
+        Long categoryId = provider.getCategory().getId();
+        Long providerId = provider.getId();
+        Long suggestionChannelId = provider.getSuggestionChannelId();
+
+        ConcurrencyKey monitorKey = ConcurrencyKey
+                .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_DISCORD_CONFIGURATION, providerId);
+        Object monitor = new Object();
+
+        synchronized (monitor) {
+            if (monitorService.putIfAbsent(monitorKey, monitor) != null) {
+                return;
+            }
+
+            categories.put(providerId, categoryId);
+            suggestionChannels.put(providerId, suggestionChannelId);
+            providers.put(suggestionChannelId, providerId);
+        }
+    }
+
+    public void remove(@Nonnull DiscordProviderFromDiscord provider) {
+        Long providerId = provider.getId();
+        Long suggestionChannelId = provider.getSuggestionChannelId();
+
+        ConcurrencyKey monitorKey = ConcurrencyKey
+                .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_DISCORD_CONFIGURATION, providerId);
+        Object monitor = monitorService.get(monitorKey);
+        if (monitor == null) {
+            return;
+        }
+
+        synchronized (monitor) {
+            categories.remove(providerId);
+            suggestionChannels.remove(providerId);
+            providers.remove(suggestionChannelId);
+            monitorService.remove(monitorKey);
+        }
+    }
+
+    public void update(@Nonnull DiscordProviderFromDiscord provider) {
+        Long providerId = provider.getId();
+        Long oldSuggestionChannelId = suggestionChannels.get(providerId);
+        Long newSuggestionChannelId = provider.getSuggestionChannelId();
+
+        if (Objects.equals(oldSuggestionChannelId, newSuggestionChannelId)) {
+            return;
+        }
+
+        Object monitor = monitorService.get(ConcurrencyScope.CATEGORY_PROVIDER_FROM_DISCORD_CONFIGURATION, providerId);
+        if (monitor == null) {
+            return;
+        }
+
+        synchronized (monitor) {
+            suggestionChannels.put(providerId, newSuggestionChannelId);
+            providers.remove(oldSuggestionChannelId);
+            providers.put(newSuggestionChannelId, providerId);
+        }
     }
 
     public boolean contains(@Nonnull DiscordProviderFromDiscord provider) {
-        return categories.containsKey(provider.getSuggestionChannelId());
-    }
-
-    public void add(Long categoryId, Long suggestionChannelId) {
-        Lock lock = new ReentrantLock();
-        lock.lock();
-        // todo per provider lock
-        ConcurrencyKey lockKey = ConcurrencyKey
-                .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_DISCORD_CONFIGURATION, categoryId);
-        if (lockService.putIfAbsent(lockKey, lock) != null) {
-            lock.unlock();
-            return;
-        }
-
-        categories.put(suggestionChannelId, categoryId);
-
-        lock.unlock();
-    }
-
-    public void remove(Long suggestionChannelId) {
-        Long categoryId = categories.get(suggestionChannelId);
-        if (categoryId == null) {
-            return;
-        }
-
-        ConcurrencyKey lockKey = ConcurrencyKey
-                .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_DISCORD_CONFIGURATION, categoryId);
-        Lock lock = lockService.get(lockKey);
-        if (lock == null) {
-            return;
-        }
-
-        lock.lock();
-
-        categories.remove(suggestionChannelId);
-
-        lockService.remove(lockKey);
-
-        lock.unlock();
-    }
-
-    public void update(Long oldSuggestionChannelId, Long newSuggestionChannelId) {
-        Long categoryId = categories.get(oldSuggestionChannelId);
-        Lock lock = lockService.get(ConcurrencyScope.CATEGORY_PROVIDER_FROM_DISCORD_CONFIGURATION, categoryId);
-        if (lock == null) {
-            return;
-        }
-
-        lock.lock();
-
-        categories.put(newSuggestionChannelId, categoryId);
-        if (!oldSuggestionChannelId.equals(newSuggestionChannelId)) {
-            categories.remove(oldSuggestionChannelId);
-        }
-
-        lock.unlock();
+        return categories.containsKey(provider.getId());
     }
 
     private void handleMessageImages(Message message, DiscordCategory category) {
         List<String> urls = new ArrayList<>();
         List<Message.Attachment> attachments = message.getAttachments();
+        RestAction<PrivateChannel> privateChannel = message.getAuthor().openPrivateChannel();
 
         if (attachments.isEmpty()) {
             MessageEmbed embed = new EmbedBuilder()
@@ -172,10 +193,10 @@ public class DiscordSuggestionService {
                     .appendDescription("The message must contain at least one attachment")
                     .build();
 
-            message.getAuthor().openPrivateChannel()
-                    .flatMap(channel -> channel.sendMessageEmbeds(embed))
-                    .queue();
-
+            privateChannel
+                    .flatMap(channel -> channel.sendMessageEmbeds(embed)
+                            .and(channel.close()))
+                    .complete();
             return;
         }
 
@@ -188,10 +209,10 @@ public class DiscordSuggestionService {
                         .appendDescription("The attachments of the message must be images only")
                         .build();
 
-                message.getAuthor().openPrivateChannel()
-                        .flatMap(channel -> channel.sendMessageEmbeds(embed))
-                        .queue();
-
+                privateChannel
+                        .flatMap(channel -> channel.sendMessageEmbeds(embed)
+                                .and(channel.close()))
+                        .complete();
                 return;
             }
 
@@ -201,12 +222,10 @@ public class DiscordSuggestionService {
         // todo thrust list
 
         // todo transaction-like batch submit
-        for (String url : urls) {
-            logger.debug("handleMessageImages(): Submitting the suggestion with url={}", url);
-            approveService.submit(category, url, (Supplier<? extends RestAction<Void>>) null,
-                    DiscordSuggestionService::onSuggestionSubmitSuccess,
-                    DiscordSuggestionService::onSuggestionSubmitFailure);
-        }
+        urls.forEach(url -> {
+            logger.debug("handleMessagePhotos(): Submitting the suggestion with url={}", url);
+            approveService.submit(category, url, suggestionSubmittingErrorHandler);
+        });
 
         MessageEmbed embed = new EmbedBuilder()
                 .setColor(Color.GRAY)
@@ -215,8 +234,9 @@ public class DiscordSuggestionService {
                 .appendDescription("Suggestion sent successfully")
                 .build();
 
-        message.getAuthor().openPrivateChannel()
-                .flatMap(channel -> channel.sendMessageEmbeds(embed))
-                .queue();
+        privateChannel
+                .flatMap(channel -> channel.sendMessageEmbeds(embed)
+                        .and(channel.close()))
+                .complete();
     }
 }

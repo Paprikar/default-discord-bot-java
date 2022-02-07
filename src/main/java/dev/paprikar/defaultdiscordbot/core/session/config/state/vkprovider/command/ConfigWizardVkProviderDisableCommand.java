@@ -5,7 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.ConfigWizardVkProviderService;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.ConfigWizardVkProviderDescriptionService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -30,12 +30,15 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
 
     private final DiscordProviderFromVkService vkProviderService;
     private final MediaActionService mediaActionService;
+    private final ConfigWizardVkProviderDescriptionService descriptionService;
 
     @Autowired
     public ConfigWizardVkProviderDisableCommand(DiscordProviderFromVkService vkProviderService,
-                                                MediaActionService mediaActionService) {
+                                                MediaActionService mediaActionService,
+                                                ConfigWizardVkProviderDescriptionService descriptionService) {
         this.vkProviderService = vkProviderService;
         this.mediaActionService = mediaActionService;
+        this.descriptionService = descriptionService;
     }
 
     @Nullable
@@ -61,7 +64,7 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
         if (!provider.isEnabled()) {
             // todo already disabled response
 
-            responses.add(ConfigWizardVkProviderService.getStateEmbed(provider));
+            responses.add(descriptionService.getDescription(provider));
 
             return null;
         }
@@ -84,7 +87,7 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
                 .appendDescription(message)
                 .build());
 
-        responses.add(ConfigWizardVkProviderService.getStateEmbed(provider));
+        responses.add(descriptionService.getDescription(provider));
 
         return null;
     }

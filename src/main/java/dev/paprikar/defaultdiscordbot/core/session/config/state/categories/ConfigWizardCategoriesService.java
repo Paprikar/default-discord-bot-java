@@ -1,12 +1,10 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.categories;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesCommand;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -17,8 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.transaction.Transactional;
-import java.awt.*;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,43 +24,18 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesService.class);
 
     private final DiscordCategoryService categoryService;
+    private final ConfigWizardCategoriesDescriptionService descriptionService;
 
     @Autowired
     public ConfigWizardCategoriesService(DiscordCategoryService categoryService,
+                                         ConfigWizardCategoriesDescriptionService descriptionService,
                                          List<ConfigWizardCategoriesCommand> commands) {
         super();
 
         this.categoryService = categoryService;
+        this.descriptionService = descriptionService;
 
-        for (ConfigWizardCategoriesCommand c : commands) {
-            this.commands.put(c.getName(), c);
-        }
-    }
-
-    public static MessageEmbed getStateEmbed(List<DiscordCategory> categories) {
-        EmbedBuilder builder = new EmbedBuilder();
-        builder
-                .setColor(Color.GRAY)
-                .setTitle("Configuration Wizard")
-                .setTimestamp(Instant.now());
-
-        builder.appendDescription("Current directory: `/categories`\n\n");
-
-        if (!categories.isEmpty()) {
-            builder.appendDescription("Categories:\n");
-            for (DiscordCategory c : categories) {
-                builder.appendDescription("`" + c.getName() + "`\n");
-            }
-            builder.appendDescription("\n");
-        }
-
-        builder.appendDescription("Available commands:\n");
-        builder.appendDescription("`open` `<name>`\n");
-        builder.appendDescription("`add` `<name>`\n");
-        builder.appendDescription("`back`\n");
-        builder.appendDescription("`exit`");
-
-        return builder.build();
+        commands.forEach(command -> this.commands.put(command.getName(), command));
     }
 
     @Nullable
@@ -82,11 +53,13 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
         List<MessageEmbed> responses = session.getResponses();
 
         if (addStateEmbed) {
-            responses.add(getStateEmbed(categoryService.findAllByGuildId(session.getEntityId())));
+            responses.add(descriptionService.getDescription(categoryService.findAllByGuildId(session.getEntityId())));
         }
 
         if (!responses.isEmpty()) {
-            session.getChannel().flatMap(channel -> channel.sendMessageEmbeds(responses)).queue();
+            session.getChannel()
+                    .flatMap(channel -> channel.sendMessageEmbeds(responses))
+                    .queue(null, printingErrorHandler);
             session.setResponses(new ArrayList<>());
         }
     }

@@ -32,7 +32,6 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
     private final DiscordProviderFromDiscordService discordProviderService;
     private final MediaActionService mediaActionService;
     private final DiscordSuggestionService discordSuggestionService;
-    private final JDAService jdaService;
     private final ConfigWizardDiscordTextChannelIdValidator validator;
 
     @Autowired
@@ -40,20 +39,18 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
             DiscordProviderFromDiscordService discordProviderService,
             MediaActionService mediaActionService,
             DiscordSuggestionService discordSuggestionService,
-            JDAService jdaService,
             ConfigWizardDiscordTextChannelIdValidator validator) {
         this.discordProviderService = discordProviderService;
         this.mediaActionService = mediaActionService;
         this.discordSuggestionService = discordSuggestionService;
-        this.jdaService = jdaService;
         this.validator = validator;
     }
 
     @Override
     public List<MessageEmbed> set(@Nonnull String value, @Nonnull DiscordProviderFromDiscord provider) {
-        JDA jda = jdaService.get();
+        JDA jda = JDAService.get();
         if (jda == null) {
-            logger.warn("set(): Failed to get jda");
+            logger.error("set(): Failed to get jda");
             return List.of(new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
@@ -63,7 +60,7 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
         }
 
         ConfigWizardValidatorProcessingResponse<Long> response = validator.process(value);
-        Long newChannelId = response.getValue();
+        Long channelId = response.getValue();
         MessageEmbed error = response.getError();
 
         if (error != null) {
@@ -74,18 +71,17 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
         boolean enabledResponse = false;
 
         if (provider.isEnabled()) {
-            error = validator.test(newChannelId, provider.getCategory().getGuild().getDiscordId(), jda);
+            error = validator.test(channelId, provider.getCategory().getGuild().getDiscordId(), jda);
             if (error != null) {
                 responses.add(error);
                 return responses;
             }
 
-            long oldChannelId = provider.getSuggestionChannelId();
-            provider.setSuggestionChannelId(newChannelId);
+            provider.setSuggestionChannelId(channelId);
             provider = discordProviderService.save(provider);
 
             if (discordSuggestionService.contains(provider)) {
-                discordSuggestionService.update(oldChannelId, newChannelId);
+                discordSuggestionService.update(provider);
             } else {
                 List<MessageEmbed> errors = mediaActionService.enableDiscordProvider(provider);
                 if (errors.isEmpty()) {
@@ -93,7 +89,7 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
                 }
             }
         } else {
-            provider.setSuggestionChannelId(newChannelId);
+            provider.setSuggestionChannelId(channelId);
             provider = discordProviderService.save(provider);
         }
 

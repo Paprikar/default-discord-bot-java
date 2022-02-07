@@ -59,7 +59,7 @@ public class ConfigWizardCategoryNameValidator {
 
         List<DiscordCategory> categories = categoryService.findAllByGuildId(category.getGuild().getId());
         for (DiscordCategory c : categories) {
-            if (c.getName().equals(value)) {
+            if (value.equals(c.getName())) {
                 MessageEmbed error = new EmbedBuilder()
                         .setColor(Color.RED)
                         .setTitle("Configuration Wizard Error")

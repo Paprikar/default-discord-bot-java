@@ -4,6 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.PrivateChannel;
@@ -32,13 +33,17 @@ public class SessionService {
     // Set<DiscordGuildId>
     private final Set<Long> activeGuilds = ConcurrentHashMap.newKeySet();
 
+    private final RequestErrorHandler channelClosingErrorHandler;
+
     @Autowired
     public SessionService(DiscordGuildService guildService, List<ConfigWizard> configWizards) {
         this.guildService = guildService;
 
-        for (ConfigWizard s : configWizards) {
-            this.configWizardServices.put(s.getState(), s);
-        }
+        configWizards.forEach(service -> this.configWizardServices.put(service.getState(), service));
+
+        this.channelClosingErrorHandler = RequestErrorHandler.createBuilder()
+                .setMessage("An error occurred while closing the session channel")
+                .build();
     }
 
     public void handlePrivateMessageReceivedEvent(PrivateMessageReceivedEvent event) {
@@ -57,10 +62,14 @@ public class SessionService {
             activePrivateSessions.remove(userId);
             activeGuilds.remove(session.getDiscordGuildId());
 
-            session.getChannel().flatMap(PrivateChannel::close).queue();
+            session.getChannel()
+                    .flatMap(PrivateChannel::close)
+                    .queue(null, channelClosingErrorHandler);
+
             logger.debug("handlePrivateMessageReceivedEvent(): Configuration session is ended: userId={}", userId);
             return;
         }
+
         if (targetState == null) {
             service.print(session, false);
         } else {
@@ -93,11 +102,12 @@ public class SessionService {
         if (guildOptional.isEmpty()) {
             return;
         }
+        Long guildId = guildOptional.get().getId();
 
         ConfigWizard initialService = configWizardServices.get(ConfigWizardState.ROOT);
 
-        PrivateSession session = new PrivateSession(event.getAuthor().openPrivateChannel(), initialService,
-                guildOptional.get().getId(), discordGuildId);
+        PrivateSession session = new PrivateSession(event.getAuthor().openPrivateChannel(), initialService, guildId,
+                discordGuildId);
 
         activePrivateSessions.put(userId, session);
 

@@ -4,7 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.ConfigWizardDiscordProviderService;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.ConfigWizardDiscordProviderDescriptionService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.setter.ConfigWizardDiscordProviderSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,18 +29,19 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
     private static final String NAME = "set";
 
     private final DiscordProviderFromDiscordService discordProviderService;
+    private final ConfigWizardDiscordProviderDescriptionService descriptionService;
 
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardDiscordProviderSetter> setters = new HashMap<>();
 
     @Autowired
     public ConfigWizardDiscordProviderSetCommand(DiscordProviderFromDiscordService discordProviderService,
+                                                 ConfigWizardDiscordProviderDescriptionService descriptionService,
                                                  List<ConfigWizardDiscordProviderSetter> setters) {
         this.discordProviderService = discordProviderService;
+        this.descriptionService = descriptionService;
 
-        for (ConfigWizardDiscordProviderSetter s : setters) {
-            this.setters.put(s.getVariableName(), s);
-        }
+        setters.forEach(setter -> this.setters.put(setter.getVariableName(), setter));
     }
 
     @Nullable
@@ -84,7 +85,7 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
         List<MessageEmbed> setResponses = setter.set(value, provider);
         responses.addAll(setResponses);
 
-        responses.add(ConfigWizardDiscordProviderService.getStateEmbed(provider));
+        responses.add(descriptionService.getDescription(provider));
 
         return null;
     }

@@ -4,7 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.category.ConfigWizardCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.category.ConfigWizardCategoryDescriptionService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter.ConfigWizardCategorySetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,18 +29,19 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
     private static final String NAME = "set";
 
     private final DiscordCategoryService categoryService;
+    private final ConfigWizardCategoryDescriptionService descriptionService;
 
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardCategorySetter> setters = new HashMap<>();
 
     @Autowired
     public ConfigWizardCategorySetCommand(DiscordCategoryService categoryService,
+                                          ConfigWizardCategoryDescriptionService descriptionService,
                                           List<ConfigWizardCategorySetter> setters) {
         this.categoryService = categoryService;
+        this.descriptionService = descriptionService;
 
-        for (ConfigWizardCategorySetter s : setters) {
-            this.setters.put(s.getVariableName(), s);
-        }
+        setters.forEach(setter -> this.setters.put(setter.getVariableName(), setter));
     }
 
     @Nullable
@@ -84,7 +85,7 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
         List<MessageEmbed> setResponses = setter.set(value, category);
         responses.addAll(setResponses);
 
-        responses.add(ConfigWizardCategoryService.getStateEmbed(category));
+        responses.add(descriptionService.getDescription(category));
 
         return null;
     }

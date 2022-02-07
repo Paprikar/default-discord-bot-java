@@ -3,22 +3,19 @@ package dev.paprikar.defaultdiscordbot.core.media.approve;
 import dev.paprikar.defaultdiscordbot.core.JDAService;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.LockService;
-import dev.paprikar.defaultdiscordbot.core.concurrency.SemaphoreService;
+import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordMediaRequest;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordMediaRequestService;
+import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.requests.ErrorResponse;
-import net.dv8tion.jda.api.requests.RestAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +23,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 @Service
 public class ApproveService {
@@ -42,9 +36,7 @@ public class ApproveService {
     private final DiscordCategoryService categoryService;
     private final DiscordMediaRequestService mediaRequestService;
     private final SendingService sendingService;
-    private final JDAService jdaService;
-    private final LockService lockService;
-    private final SemaphoreService semaphoreService; // todo without semaphore
+    private final MonitorService monitorService;
 
     // Map<ApprovalChannelId, CategoryId>
     private final Map<Long, Long> categories = new ConcurrentHashMap<>();
@@ -52,19 +44,21 @@ public class ApproveService {
     // Map<CategoryId, ApprovalChannelId>
     private final Map<Long, Long> approvalChannels = new ConcurrentHashMap<>();
 
+    private final RequestErrorHandler suggestionProcessingErrorHandler;
+
     @Autowired
     public ApproveService(DiscordCategoryService categoryService,
                           DiscordMediaRequestService mediaRequestService,
                           SendingService sendingService,
-                          JDAService jdaService,
-                          LockService lockService,
-                          SemaphoreService semaphoreService) {
+                          MonitorService monitorService) {
         this.categoryService = categoryService;
         this.mediaRequestService = mediaRequestService;
         this.sendingService = sendingService;
-        this.jdaService = jdaService;
-        this.lockService = lockService;
-        this.semaphoreService = semaphoreService;
+        this.monitorService = monitorService;
+
+        this.suggestionProcessingErrorHandler = RequestErrorHandler.createBuilder()
+                .setMessage("An error occurred while processing the suggestion")
+                .build();
     }
 
     public void handleTextChannelDeleteEvent(@Nonnull TextChannelDeleteEvent event) {
@@ -74,22 +68,21 @@ public class ApproveService {
             return;
         }
 
-        ConcurrencyKey lockKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_APPROVE_CONFIGURATION, categoryId);
-        Lock lock = lockService.get(lockKey);
-        if (lock == null) {
+        ConcurrencyKey monitorKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_APPROVE_CONFIGURATION, categoryId);
+        Object monitor = monitorService.get(monitorKey);
+        if (monitor == null) {
             return;
         }
 
-        lock.lock();
+        synchronized (monitor) {
+            categories.remove(channelId);
+            approvalChannels.remove(categoryId);
+            monitorService.remove(monitorKey);
+            monitorService.remove(ConcurrencyScope.CATEGORY_APPROVE, categoryId);
+        }
 
-        categories.remove(channelId);
-        approvalChannels.remove(categoryId);
-
-        semaphoreService.remove(ConcurrencyScope.CATEGORY_APPROVE, categoryId);
-
-        lockService.remove(lockKey);
-
-        lock.unlock();
+        logger.debug("handleTextChannelDeleteEvent(): Media approve for category={id={}} is disabled "
+                + "due to the deletion of the required text channel with id={}", categoryId, channelId);
     }
 
     public void handleGuildMessageReactionAddEvent(@Nonnull GuildMessageReactionAddEvent event) {
@@ -104,8 +97,8 @@ public class ApproveService {
             return;
         }
 
-        Semaphore semaphore = semaphoreService.get(ConcurrencyScope.CATEGORY_APPROVE, categoryId);
-        if (semaphore == null) {
+        Object monitor = monitorService.get(ConcurrencyScope.CATEGORY_APPROVE, categoryId);
+        if (monitor == null) {
             return;
         }
 
@@ -115,89 +108,51 @@ public class ApproveService {
         }
         DiscordCategory category = categoryOptional.get();
 
-        try {
-            semaphore.acquire();
-        } catch (InterruptedException e) {
-            logger.error("handleGuildMessageReactionAddEvent(): The semaphore release was interrupted", e);
-            return;
-        }
+        synchronized (monitor) {
+            try {
+                Message message = event.retrieveMessage().complete();
 
-        event.retrieveMessage().queue(
-                message -> onMessageRetrievalSuccess(message, category, emoji, semaphore),
-                throwable -> onReactionProcessingFailure(throwable, semaphore)
-        );
+                String positiveEmoji = category.getPositiveApprovalEmoji().toString();
+                String negativeEmoji = category.getNegativeApprovalEmoji().toString();
+
+                // todo suggester info
+                if (emoji.equals(positiveEmoji)) {
+                    message.delete().complete();
+                    approve(category, message.getContentRaw());
+                } else if (emoji.equals(negativeEmoji)) {
+                    message.delete().complete();
+                }
+            } catch (RuntimeException e) {
+                suggestionProcessingErrorHandler.accept(e);
+            }
+        }
     }
 
     public void submit(@Nonnull DiscordCategory category,
                        @Nonnull String url,
-                       Runnable afterSubmit,
-                       Runnable onSubmitSuccess,
-                       Consumer<Throwable> onSubmitFailure) {
+                       Consumer<Throwable> onSubmitError) {
         Long approvalChannelId = category.getApprovalChannelId();
 
-        TextChannel approvalChannel = getTextChannel(approvalChannelId, onSubmitFailure);
+        TextChannel approvalChannel = getTextChannel(approvalChannelId, onSubmitError);
         if (approvalChannel == null) {
             return;
         }
 
-        Consumer<Void> onSendSuccess;
-        if (afterSubmit == null) {
-            if (onSubmitSuccess == null) {
-                onSendSuccess = null;
-            } else {
-                onSendSuccess = unused -> onSubmitSuccess.run();
-            }
-        } else {
-            onSendSuccess = unused -> {
-                boolean success = false;
-                try {
-                    afterSubmit.run();
-                    success = true;
-                } catch (RuntimeException e) {
-                    if (onSubmitFailure != null) {
-                        onSubmitFailure.accept(e);
-                    }
-                }
-                if (success && onSubmitSuccess != null) {
-                    onSubmitSuccess.run();
-                }
-            };
-        }
+        String positiveEmoji = category.getPositiveApprovalEmoji().toString();
+        String negativeEmoji = category.getNegativeApprovalEmoji().toString();
+
+        logger.debug("submit(): Submitting the suggestion with url={} to text channel with id={}",
+                url, approvalChannelId);
+
+        Consumer<Void> onSubmitSuccess = unused -> logger.debug("submit(): The suggestion with url={} "
+                + "was successfully submitted to text channel with id={}", url, approvalChannelId);
 
         // todo add suggester info
         approvalChannel.sendMessage(url)
                 .flatMap(message -> message
-                        .addReaction(category.getPositiveApprovalEmoji().toString())
-                        .and(message.addReaction(category.getNegativeApprovalEmoji().toString())))
-                .queue(onSendSuccess, onSubmitFailure);
-    }
-
-    public void submit(@Nonnull DiscordCategory category,
-                       @Nonnull String url,
-                       Supplier<? extends RestAction<Void>> afterSubmit,
-                       Runnable onSubmitSuccess,
-                       Consumer<Throwable> onSubmitFailure) {
-        Long approvalChannelId = category.getApprovalChannelId();
-
-        TextChannel approvalChannel = getTextChannel(approvalChannelId, onSubmitFailure);
-        if (approvalChannel == null) {
-            return;
-        }
-
-        // todo add suggester info
-        RestAction<Void> restAction = approvalChannel.sendMessage(url)
-                .flatMap(message -> message
-                        .addReaction(category.getPositiveApprovalEmoji().toString())
-                        .and(message.addReaction(category.getNegativeApprovalEmoji().toString())));
-
-        if (afterSubmit != null) {
-            restAction = restAction.flatMap(unused -> afterSubmit.get());
-        }
-
-        restAction.queue(
-                onSubmitSuccess == null ? null : unused -> onSubmitSuccess.run(),
-                onSubmitFailure
-        );
+                        .addReaction(positiveEmoji)
+                        .and(message.addReaction(negativeEmoji)))
+                .queue(onSubmitSuccess, onSubmitError);
     }
 
     public void approve(DiscordCategory category, String content) {
@@ -205,75 +160,70 @@ public class ApproveService {
         sendingService.update(category);
     }
 
-    public boolean contains(@Nonnull DiscordCategory category) {
-        return approvalChannels.containsKey(category.getId());
-    }
-
     public void add(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
-        Lock lock = new ReentrantLock();
-        lock.lock();
-        ConcurrencyKey lockKey = ConcurrencyKey
-                .from(ConcurrencyScope.CATEGORY_APPROVE_CONFIGURATION, categoryId);
-        if (lockService.putIfAbsent(lockKey, lock) != null) {
-            lock.unlock();
-            return;
-        }
-
         Long approvalChannelId = category.getApprovalChannelId();
-        categories.put(approvalChannelId, categoryId);
-        approvalChannels.put(categoryId, approvalChannelId);
 
-        semaphoreService.add(ConcurrencyScope.CATEGORY_APPROVE, categoryId);
+        ConcurrencyKey monitorKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_APPROVE_CONFIGURATION, categoryId);
+        Object monitor = new Object();
 
-        lock.unlock();
+        synchronized (monitor) {
+            if (monitorService.putIfAbsent(monitorKey, monitor) != null) {
+                return;
+            }
+
+            categories.put(approvalChannelId, categoryId);
+            approvalChannels.put(categoryId, approvalChannelId);
+            monitorService.add(ConcurrencyScope.CATEGORY_APPROVE, categoryId);
+        }
     }
 
     public void remove(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
-        ConcurrencyKey lockKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_APPROVE_CONFIGURATION, categoryId);
-        Lock lock = lockService.get(lockKey);
-        if (lock == null) {
+        Long approvalChannelId = category.getApprovalChannelId();
+
+        ConcurrencyKey monitorKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_APPROVE_CONFIGURATION, categoryId);
+        Object monitor = monitorService.get(monitorKey);
+        if (monitor == null) {
             return;
         }
 
-        lock.lock();
-
-        categories.remove(category.getApprovalChannelId());
-        approvalChannels.remove(categoryId);
-
-        semaphoreService.remove(ConcurrencyScope.CATEGORY_APPROVE, categoryId);
-
-        lockService.remove(lockKey);
-
-        lock.unlock();
+        synchronized (monitor) {
+            categories.remove(approvalChannelId);
+            approvalChannels.remove(categoryId);
+            monitorService.remove(monitorKey);
+            monitorService.remove(ConcurrencyScope.CATEGORY_APPROVE, categoryId);
+        }
     }
 
     public void update(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
-        Lock lock = lockService.get(ConcurrencyScope.CATEGORY_APPROVE_CONFIGURATION, categoryId);
-        if (lock == null) {
+
+        Object monitor = monitorService.get(ConcurrencyScope.CATEGORY_APPROVE_CONFIGURATION, categoryId);
+        if (monitor == null) {
             return;
         }
 
-        lock.lock();
+        synchronized (monitor) {
+            Long newApprovalChannelId = category.getApprovalChannelId();
+            Long oldApprovalChannelId = approvalChannels.put(categoryId, newApprovalChannelId);
 
-        Long newApprovalChannelId = category.getApprovalChannelId();
-        Long oldApprovalChannelId = approvalChannels.put(categoryId, newApprovalChannelId);
-
-        // update approval channel id
-        if (!newApprovalChannelId.equals(oldApprovalChannelId)) {
-            categories.remove(oldApprovalChannelId);
-            categories.put(newApprovalChannelId, categoryId);
+            // update approval channel id
+            if (!Objects.equals(newApprovalChannelId, oldApprovalChannelId)) {
+                categories.remove(oldApprovalChannelId);
+                categories.put(newApprovalChannelId, categoryId);
+            }
         }
+    }
 
-        lock.unlock();
+    public boolean contains(@Nonnull DiscordCategory category) {
+        return approvalChannels.containsKey(category.getId());
     }
 
     private TextChannel getTextChannel(Long channelId, Consumer<Throwable> onSuggestionSubmitFailure) {
-        JDA jda = jdaService.get();
+        JDA jda = JDAService.get();
         if (jda == null) {
-            logger.warn("getTextChannel(): Failed to get jda");
+            logger.error("getTextChannel(): Failed to get jda");
             return null;
         }
 
@@ -286,49 +236,5 @@ public class ApproveService {
             }
         }
         return textChannel;
-    }
-
-    // can usually occur when the connection is lost or the channel is unavailable
-    private void onReactionProcessingFailure(Throwable throwable, Semaphore semaphore) {
-        String message = "onReactionProcessingFailure(): Failed to process approval request";
-        if (throwable instanceof ErrorResponseException) {
-            ErrorResponseException ere = (ErrorResponseException) throwable;
-            if (ere.isServerError()
-                    || ere.getErrorResponse() == ErrorResponse.UNKNOWN_CHANNEL
-                    || ere.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
-                logger.warn(message, throwable);
-            } else {
-                logger.error(message, throwable);
-            }
-        } else {
-            logger.error(message, throwable);
-        }
-        semaphore.release();
-    }
-
-    private void onMessageRetrievalSuccess(Message message,
-                                           DiscordCategory category,
-                                           String emoji,
-                                           Semaphore semaphore) {
-        String positiveEmoji = category.getPositiveApprovalEmoji().toString();
-        String negativeEmoji = category.getNegativeApprovalEmoji().toString();
-
-        if (emoji.equals(positiveEmoji)) {
-            message.delete().queue(unused -> onMessageDeletionSuccessPositive(message, category, semaphore),
-                    throwable -> onReactionProcessingFailure(throwable, semaphore));
-        } else if (emoji.equals(negativeEmoji)) {
-            message.delete().queue(unused -> onMessageDeletionSuccessNegative(semaphore),
-                    throwable -> onReactionProcessingFailure(throwable, semaphore));
-        }
-    }
-
-    private void onMessageDeletionSuccessPositive(Message message, DiscordCategory category, Semaphore semaphore) {
-        // todo suggester info
-        approve(category, message.getContentRaw());
-        semaphore.release();
-    }
-
-    private void onMessageDeletionSuccessNegative(Semaphore semaphore) {
-        semaphore.release();
     }
 }

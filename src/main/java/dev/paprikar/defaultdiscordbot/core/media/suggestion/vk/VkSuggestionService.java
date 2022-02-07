@@ -6,7 +6,7 @@ import com.vk.api.sdk.httpclient.HttpTransportClient;
 import dev.paprikar.defaultdiscordbot.config.DdbConfig;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.LockService;
+import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +17,6 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class VkSuggestionService {
@@ -31,103 +29,94 @@ public class VkSuggestionService {
     final Map<Long, GroupLongPollApi> handlers = new ConcurrentHashMap<>();
 
     private final VkSuggestionHandler suggestionHandler;
-    private final LockService lockService;
+    private final MonitorService monitorService;
     private final DdbConfig config;
 
     @Autowired
-    public VkSuggestionService(VkSuggestionHandler suggestionHandler, LockService lockService, DdbConfig config) {
+    public VkSuggestionService(VkSuggestionHandler suggestionHandler, MonitorService monitorService, DdbConfig config) {
         this.suggestionHandler = suggestionHandler;
-        this.lockService = lockService;
+        this.monitorService = monitorService;
         this.config = config;
-    }
-
-    public boolean contains(@Nonnull DiscordProviderFromVk provider) {
-        return handlers.containsKey(provider.getId());
     }
 
     public void add(@Nonnull DiscordProviderFromVk provider) {
         Long providerId = provider.getId();
-        Lock newLock = new ReentrantLock();
-        newLock.lock();
-        ConcurrencyKey lockKey = ConcurrencyKey
+        Integer groupId = provider.getGroupId();
+        String token = provider.getToken();
+        Integer vkMaxReconnectDelay = config.getVkMaxReconnectDelay();
+
+        ConcurrencyKey monitorKey = ConcurrencyKey
                 .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
-        Lock oldLock = lockService.putIfAbsent(lockKey, newLock);
-        if (oldLock != null) { // try to reuse the handler before its stopped
-            newLock.unlock();
-            oldLock.lock();
+        Object newMonitor = new Object();
 
-            GroupLongPollApi handler = handlers.get(providerId);
-
-            if (handler != null) { // there are only unstopped handlers in the map
-                if (!handler.isToRun()) { // idempotency
-                    handler.start(provider);
+        synchronized (newMonitor) {
+            Object oldMonitor = monitorService.putIfAbsent(monitorKey, newMonitor);
+            if (oldMonitor != null) { // try to reuse the handler before its stopped
+                synchronized (oldMonitor) {
+                    GroupLongPollApi handler = handlers.get(providerId);
+                    if (handler != null) { // there are only unstopped handlers in the map
+                        if (!handler.isToRun()) { // idempotency
+                            handler.start(provider);
+                        }
+                        return;
+                    }
                 }
-
-                oldLock.unlock();
-                return;
             }
 
-            oldLock.unlock();
+            // create a new handler when there was none or when the old one cannot be reused
+            GroupActor actor = new GroupActor(groupId, token);
+            GroupLongPollApi handler = new GroupLongPollApiHandler(
+                    actor, vkMaxReconnectDelay, this, suggestionHandler, monitorService);
+
+            handlers.put(providerId, handler);
+
+            handler.start(provider);
         }
-
-        // create a new handler when there was none or when the old one cannot be reused
-        GroupActor actor = new GroupActor(provider.getGroupId(), provider.getToken());
-        GroupLongPollApi handler = new GroupLongPollApiHandler(
-                actor, config.getVkMaxReconnectDelay(), this, suggestionHandler, lockService);
-
-        handlers.put(providerId, handler);
-
-        handler.start(provider);
-
-        newLock.unlock();
     }
 
     public void remove(@Nonnull DiscordProviderFromVk provider) {
         Long providerId = provider.getId();
-        ConcurrencyKey lockKey = ConcurrencyKey
-                .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
-        Lock lock = lockService.get(lockKey);
-        if (lock == null) {
+
+        Object monitor = monitorService.get(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
+        if (monitor == null) {
             return;
         }
 
-        lock.lock();
+        synchronized (monitor) {
+            GroupLongPollApi handler = handlers.get(providerId);
 
-        GroupLongPollApi handler = handlers.get(providerId);
-
-        if (handler != null) {
-            handler.stop();
+            if (handler != null) {
+                handler.stop();
+            }
         }
-
-        lock.unlock();
     }
 
     public void update(@Nonnull DiscordProviderFromVk provider) {
         Long providerId = provider.getId();
-        Lock lock = lockService.get(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
-        if (lock == null) {
+
+        Object monitor = monitorService.get(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
+        if (monitor == null) {
             return;
         }
 
-        lock.lock();
+        synchronized (monitor) {
+            GroupLongPollApi handler = handlers.get(providerId);
 
-        GroupLongPollApi handler = handlers.get(providerId);
+            if (handler == null) {
+                return;
+            }
 
-        if (handler == null) {
-            lock.unlock();
-            return;
+            if (!Objects.equals(handler.getProvider().getId(), provider.getId())) {
+                String message = "Provider update is possible, but not a replacement";
+                logger.error(message);
+                throw new IllegalStateException(message);
+            }
+
+            handler.update(provider);
         }
+    }
 
-        if (!Objects.equals(handler.getProvider(), provider)) {
-            lock.unlock();
-
-            String message = "Provider update is possible, but not a replacement";
-            logger.error(message);
-            throw new IllegalStateException(message);
-        }
-
-        handler.update(provider);
-
-        lock.unlock();
+    public boolean contains(@Nonnull DiscordProviderFromVk provider) {
+        return handlers.containsKey(provider.getId());
     }
 }

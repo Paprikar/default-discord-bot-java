@@ -31,27 +31,24 @@ public class ConfigWizardCategoryPositiveApprovalEmojiSetter implements ConfigWi
     private final DiscordCategoryService categoryService;
     private final MediaActionService mediaActionService;
     private final ApproveService approveService;
-    private final JDAService jdaService;
     private final ConfigWizardCategoryApprovalEmojiValidator validator;
 
     @Autowired
     public ConfigWizardCategoryPositiveApprovalEmojiSetter(DiscordCategoryService categoryService,
                                                            MediaActionService mediaActionService,
                                                            ApproveService approveService,
-                                                           JDAService jdaService,
                                                            ConfigWizardCategoryApprovalEmojiValidator validator) {
         this.categoryService = categoryService;
         this.mediaActionService = mediaActionService;
         this.approveService = approveService;
-        this.jdaService = jdaService;
         this.validator = validator;
     }
 
     @Override
     public List<MessageEmbed> set(@Nonnull String value, @Nonnull DiscordCategory category) {
-        JDA jda = jdaService.get();
+        JDA jda = JDAService.get();
         if (jda == null) {
-            logger.warn("set(): Failed to get jda");
+            logger.error("set(): Failed to get jda");
             return List.of(new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")

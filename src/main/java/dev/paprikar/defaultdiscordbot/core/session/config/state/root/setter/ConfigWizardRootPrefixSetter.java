@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.root.setter;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.validation.ConfigWizardRootPrefixValidator;
+import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;

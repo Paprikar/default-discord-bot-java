@@ -4,7 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.ConfigWizardVkProviderService;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.ConfigWizardVkProviderDescriptionService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.setter.ConfigWizardVkProviderSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,18 +29,19 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
     private static final String NAME = "set";
 
     private final DiscordProviderFromVkService vkProviderService;
+    private final ConfigWizardVkProviderDescriptionService descriptionService;
 
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardVkProviderSetter> setters = new HashMap<>();
 
     @Autowired
     public ConfigWizardVkProviderSetCommand(DiscordProviderFromVkService vkProviderService,
+                                            ConfigWizardVkProviderDescriptionService descriptionService,
                                             List<ConfigWizardVkProviderSetter> setters) {
         this.vkProviderService = vkProviderService;
+        this.descriptionService = descriptionService;
 
-        for (ConfigWizardVkProviderSetter s : setters) {
-            this.setters.put(s.getVariableName(), s);
-        }
+        setters.forEach(setter -> this.setters.put(setter.getVariableName(), setter));
     }
 
     @Nullable
@@ -84,7 +85,7 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
         List<MessageEmbed> setResponses = setter.set(value, provider);
         responses.addAll(setResponses);
 
-        responses.add(ConfigWizardVkProviderService.getStateEmbed(provider));
+        responses.add(descriptionService.getDescription(provider));
 
         return null;
     }

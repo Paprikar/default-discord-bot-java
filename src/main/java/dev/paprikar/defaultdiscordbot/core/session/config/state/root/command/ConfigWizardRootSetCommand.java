@@ -4,7 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.root.ConfigWizardRootService;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.root.ConfigWizardRootDescriptionService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.setter.ConfigWizardRootSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,17 +29,19 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
     private static final String NAME = "set";
 
     private final DiscordGuildService guildService;
+    private final ConfigWizardRootDescriptionService descriptionService;
 
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardRootSetter> setters = new HashMap<>();
 
     @Autowired
-    public ConfigWizardRootSetCommand(DiscordGuildService guildService, List<ConfigWizardRootSetter> setters) {
+    public ConfigWizardRootSetCommand(DiscordGuildService guildService,
+                                      ConfigWizardRootDescriptionService descriptionService,
+                                      List<ConfigWizardRootSetter> setters) {
         this.guildService = guildService;
+        this.descriptionService = descriptionService;
 
-        for (ConfigWizardRootSetter s : setters) {
-            this.setters.put(s.getVariableName(), s);
-        }
+        setters.forEach(setter -> this.setters.put(setter.getVariableName(), setter));
     }
 
     @Nullable
@@ -83,7 +85,7 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
         MessageEmbed response = setter.set(value, guild);
         responses.add(response);
 
-        responses.add(ConfigWizardRootService.getStateEmbed(guild));
+        responses.add(descriptionService.getDescription(guild));
 
         return null;
     }

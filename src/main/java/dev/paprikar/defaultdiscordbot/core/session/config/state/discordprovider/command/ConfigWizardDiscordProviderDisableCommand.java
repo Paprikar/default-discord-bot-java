@@ -5,7 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.ConfigWizardDiscordProviderService;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.ConfigWizardDiscordProviderDescriptionService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -30,12 +30,16 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDi
 
     private final DiscordProviderFromDiscordService discordProviderService;
     private final MediaActionService mediaActionService;
+    private final ConfigWizardDiscordProviderDescriptionService descriptionService;
 
     @Autowired
-    public ConfigWizardDiscordProviderDisableCommand(DiscordProviderFromDiscordService discordProviderService,
-                                                     MediaActionService mediaActionService) {
+    public ConfigWizardDiscordProviderDisableCommand(
+            DiscordProviderFromDiscordService discordProviderService,
+            MediaActionService mediaActionService,
+            ConfigWizardDiscordProviderDescriptionService descriptionService) {
         this.discordProviderService = discordProviderService;
         this.mediaActionService = mediaActionService;
+        this.descriptionService = descriptionService;
     }
 
     @Nullable
@@ -61,7 +65,7 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDi
         if (!provider.isEnabled()) {
             // todo already disabled response
 
-            responses.add(ConfigWizardDiscordProviderService.getStateEmbed(provider));
+            responses.add(descriptionService.getDescription(provider));
 
             return null;
         }
@@ -84,7 +88,7 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDi
                 .appendDescription(message)
                 .build());
 
-        responses.add(ConfigWizardDiscordProviderService.getStateEmbed(provider));
+        responses.add(descriptionService.getDescription(provider));
 
         return null;
     }

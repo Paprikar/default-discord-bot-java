@@ -4,6 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardExitCommand;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 import javax.annotation.Nonnull;
@@ -16,8 +17,14 @@ public abstract class AbstractConfigWizard implements ConfigWizard {
     // Map<CommandName, Command>
     protected final Map<String, ConfigWizardCommand> commands = new HashMap<>();
 
+    protected RequestErrorHandler printingErrorHandler;
+
     protected AbstractConfigWizard() {
         setupCommands();
+
+        this.printingErrorHandler = RequestErrorHandler.createBuilder()
+                .setMessage("An error occurred while printing the session responses")
+                .build();
     }
 
     @Nullable

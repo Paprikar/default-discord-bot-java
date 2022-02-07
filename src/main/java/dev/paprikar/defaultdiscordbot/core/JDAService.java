@@ -2,19 +2,21 @@ package dev.paprikar.defaultdiscordbot.core;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.security.auth.login.LoginException;
 
-@Service
 public class JDAService {
 
-    private JDA jda = null;
+    private static JDA jda = null;
 
-    public JDA build(@Nonnull String token, Integer maxReconnectDelay, DiscordEventListener eventListener)
+    public static JDA build(@Nonnull String token, Integer maxReconnectDelay, DiscordEventListener eventListener)
             throws LoginException {
+        if (jda != null) {
+            return jda;
+        }
+
         JDABuilder builder = JDABuilder.createDefault(token);
 
         if (maxReconnectDelay != null) {
@@ -30,7 +32,7 @@ public class JDAService {
     }
 
     @Nullable
-    public JDA get() {
+    public static JDA get() {
         return jda;
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategoriesCommand {
@@ -35,13 +36,10 @@ public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategories
                                      String argsString) {
         List<DiscordCategory> categories = categoryService.findAllByGuildId(session.getEntityId());
         // todo use name index ?
-        DiscordCategory targetCategory = null;
-        for (DiscordCategory c : categories) {
-            if (c.getName().equals(argsString)) {
-                targetCategory = c;
-                break;
-            }
-        }
+        DiscordCategory targetCategory = categories.stream()
+                .filter(category -> Objects.equals(category.getName(), argsString))
+                .findFirst()
+                .orElse(null);
         if (targetCategory == null) {
             // todo illegal command response
             return null;

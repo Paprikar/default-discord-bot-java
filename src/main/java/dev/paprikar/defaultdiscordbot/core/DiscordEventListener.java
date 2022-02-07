@@ -7,7 +7,6 @@ import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
@@ -213,14 +212,13 @@ public class DiscordEventListener extends ListenerAdapter {
     private void removeDiscordGuild(long guildDiscordId) {
         // todo delete timeout
 
-        for (DiscordCategory c : categoryService.findAllByGuildDiscordId(guildDiscordId)) {
-            mediaActionService.disableCategory(c);
-
-            Long categoryId = c.getId();
+        categoryService.findAllByGuildDiscordId(guildDiscordId).forEach(category -> {
+            mediaActionService.disableCategory(category);
+            Long categoryId = category.getId();
             categoryService.deleteById(categoryId);
             mediaRequestService.deleteByCategoryId(categoryId);
             discordProviderService.deleteAllByCategoryId(categoryId);
-        }
+        });
 
         guildService.deleteByDiscordId(guildDiscordId);
     }

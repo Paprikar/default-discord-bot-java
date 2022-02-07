@@ -21,26 +21,23 @@ public class DiscordBot {
     private final DiscordCategoryService categoryService;
     private final MediaActionService mediaActionService;
     private final DiscordEventListener eventListener;
-    private final JDAService jdaService;
     private final DdbConfig config;
 
     @Autowired
     public DiscordBot(DiscordCategoryService categoryService,
                       MediaActionService mediaActionService,
                       DiscordEventListener eventListener,
-                      JDAService jdaService,
                       DdbConfig config) {
         this.categoryService = categoryService;
         this.mediaActionService = mediaActionService;
         this.eventListener = eventListener;
-        this.jdaService = jdaService;
         this.config = config;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
         try {
-            jdaService
+            JDAService
                     .build(config.getToken(), config.getDiscordMaxReconnectDelay(), eventListener)
                     .awaitReady();
             initBot();

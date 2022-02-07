@@ -5,7 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.category.ConfigWizardCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.category.ConfigWizardCategoryDescriptionService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -30,12 +30,15 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
 
     private final DiscordCategoryService categoryService;
     private final MediaActionService mediaActionService;
+    private final ConfigWizardCategoryDescriptionService descriptionService;
 
     @Autowired
     public ConfigWizardCategoryEnableCommand(DiscordCategoryService categoryService,
-                                             MediaActionService mediaActionService) {
+                                             MediaActionService mediaActionService,
+                                             ConfigWizardCategoryDescriptionService descriptionService) {
         this.categoryService = categoryService;
         this.mediaActionService = mediaActionService;
+        this.descriptionService = descriptionService;
     }
 
     @Nullable
@@ -61,7 +64,7 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
         if (category.isEnabled()) {
             // todo already enabled response
 
-            responses.add(ConfigWizardCategoryService.getStateEmbed(category));
+            responses.add(descriptionService.getDescription(category));
 
             return null;
         }
@@ -79,7 +82,7 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
                 .appendDescription("The category has been enabled")
                 .build());
 
-        responses.add(ConfigWizardCategoryService.getStateEmbed(category));
+        responses.add(descriptionService.getDescription(category));
 
         return null;
     }

@@ -2,8 +2,11 @@ package dev.paprikar.defaultdiscordbot.core.media.sending;
 
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
-import dev.paprikar.defaultdiscordbot.core.concurrency.LockService;
+import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordMediaRequestService;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,16 +15,17 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class SendingService {
 
     private static final Logger logger = LoggerFactory.getLogger(SendingService.class);
 
-    private final LockService lockService;
+    private final DiscordCategoryService categoryService;
+    private final DiscordMediaRequestService mediaRequestService;
+    private final MonitorService monitorService;
 
     // Map<CategoryId, Sender>
     private final Map<Long, MediaRequestSender> senders = new ConcurrentHashMap<>();
@@ -30,8 +34,12 @@ public class SendingService {
     private final Map<Long, Long> categories = new ConcurrentHashMap<>();
 
     @Autowired
-    public SendingService(LockService lockService) {
-        this.lockService = lockService;
+    public SendingService(DiscordCategoryService categoryService,
+                          DiscordMediaRequestService mediaRequestService,
+                          MonitorService monitorService) {
+        this.categoryService = categoryService;
+        this.mediaRequestService = mediaRequestService;
+        this.monitorService = monitorService;
     }
 
     public void handleTextChannelDeleteEvent(@Nonnull TextChannelDeleteEvent event) {
@@ -41,106 +49,99 @@ public class SendingService {
             return;
         }
 
-        ConcurrencyKey lockKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
-        Lock lock = lockService.get(lockKey);
-        if (lock == null) {
+        ConcurrencyKey monitorKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
+        Object monitor = monitorService.get(monitorKey);
+        if (monitor == null) {
             return;
         }
 
-        lock.lock();
+        synchronized (monitor) {
+            MediaRequestSender sender = senders.remove(categoryId);
+            if (sender != null) {
+                sender.stop();
+            }
 
-        categories.remove(channelId);
+            categories.remove(channelId);
 
-        MediaRequestSender sender = senders.remove(categoryId);
-        if (sender != null) {
-            sender.stop();
+            monitorService.remove(monitorKey);
         }
 
-        lockService.remove(lockKey);
-
-        lock.unlock();
+        logger.debug("handleTextChannelDeleteEvent(): Media sending for category={id={}} is disabled "
+                + "due to the deletion of the required text channel with id={}", categoryId, channelId);
     }
 
-    public boolean contains(@Nonnull DiscordCategory category) {
-        return senders.containsKey(category.getId());
-    }
-
-    public void add(@Nonnull DiscordCategory category, @Nonnull MediaRequestSender sender) {
+    public void add(@Nonnull DiscordCategory category, @Nonnull JDA jda) {
         Long categoryId = category.getId();
-        Lock lock = new ReentrantLock();
-        lock.lock();
-        ConcurrencyKey lockKey = ConcurrencyKey
-                .from(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
-        if (lockService.putIfAbsent(lockKey, lock) != null) {
-            lock.unlock();
-            return;
+
+        ConcurrencyKey monitorKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
+        Object monitor = new Object();
+
+        synchronized (monitor) {
+            if (monitorService.putIfAbsent(monitorKey, monitor) != null) {
+                return;
+            }
+
+            MediaRequestSender sender = new MediaRequestSender(jda, categoryService, mediaRequestService);
+
+            senders.put(categoryId, sender);
+            categories.put(category.getSendingChannelId(), categoryId);
+
+            sender.start(category);
         }
-
-        senders.put(categoryId, sender);
-        categories.put(category.getSendingChannelId(), categoryId);
-
-        sender.start(category);
-
-        lock.unlock();
     }
 
-    public void remove(long categoryId) {
-        ConcurrencyKey lockKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
-        Lock lock = lockService.get(lockKey);
-        if (lock == null) {
+    public void remove(@Nonnull DiscordCategory category) {
+        Long categoryId = category.getId();
+
+        ConcurrencyKey monitorKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
+        Object monitor = monitorService.get(monitorKey);
+        if (monitor == null) {
             return;
         }
 
-        lock.lock();
+        synchronized (monitor) {
+            MediaRequestSender sender = senders.remove(categoryId);
+            if (sender != null) {
+                sender.stop();
+            }
 
-        MediaRequestSender sender = senders.remove(categoryId);
-        if (sender == null) {
-            lock.unlock();
-            return;
-        }
-
-        DiscordCategory category = sender.getCategory();
-        sender.stop();
-
-        if (category != null) {
             categories.remove(category.getSendingChannelId());
+
+            monitorService.remove(monitorKey);
         }
-
-        lockService.remove(lockKey);
-
-        lock.unlock();
     }
 
     public void update(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
-        Lock lock = lockService.get(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
-        if (lock == null) {
+
+        Object monitor = monitorService.get(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
+        if (monitor == null) {
             return;
         }
 
-        lock.lock();
-
-        MediaRequestSender sender = senders.get(categoryId);
-        if (sender == null) {
-            String message = "No sender found for the corresponding category";
-            logger.error(message);
-            lock.unlock();
-            return;
-        }
-
-        // update sending channel id
-        DiscordCategory oldCategory = sender.getCategory();
-        if (oldCategory != null) {
-            Long oldSendingChannelId = oldCategory.getSendingChannelId();
-            Long newSendingChannelId = category.getSendingChannelId();
-            if (!oldSendingChannelId.equals(newSendingChannelId)) {
-                categories.put(newSendingChannelId, categoryId);
-                categories.remove(oldSendingChannelId);
+        synchronized (monitor) {
+            MediaRequestSender sender = senders.get(categoryId);
+            if (sender == null) {
+                logger.error("No sender found for the corresponding category");
+                return;
             }
+
+            // update sending channel id
+            DiscordCategory oldCategory = sender.getCategory();
+            if (oldCategory != null) {
+                Long oldSendingChannelId = oldCategory.getSendingChannelId();
+                Long newSendingChannelId = category.getSendingChannelId();
+                if (!Objects.equals(oldSendingChannelId, newSendingChannelId)) {
+                    categories.remove(oldSendingChannelId);
+                    categories.put(newSendingChannelId, categoryId);
+                }
+            }
+
+            sender.update(category);
         }
+    }
 
-        sender.update(category);
-
-        lock.unlock();
+    public boolean contains(@Nonnull DiscordCategory category) {
+        return senders.containsKey(category.getId());
     }
 }

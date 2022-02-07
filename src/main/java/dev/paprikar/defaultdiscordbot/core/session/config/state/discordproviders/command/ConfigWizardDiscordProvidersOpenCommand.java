@@ -35,13 +35,10 @@ public class ConfigWizardDiscordProvidersOpenCommand implements ConfigWizardDisc
                                      String argsString) {
         List<DiscordProviderFromDiscord> providers = discordProviderService.findAllByCategoryId(session.getEntityId());
         // todo use name index ?
-        DiscordProviderFromDiscord targetProvider = null;
-        for (DiscordProviderFromDiscord p : providers) {
-            if (p.getName().equals(argsString)) {
-                targetProvider = p;
-                break;
-            }
-        }
+        DiscordProviderFromDiscord targetProvider = providers.stream()
+                .filter(provider -> argsString.equals(provider.getName()))
+                .findFirst()
+                .orElse(null);
         if (targetProvider == null) {
             // todo illegal command response
             return null;

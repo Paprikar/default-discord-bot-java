@@ -2,7 +2,7 @@ package dev.paprikar.defaultdiscordbot.core.media.suggestion.vk;
 
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.objects.messages.Message;
-import dev.paprikar.defaultdiscordbot.core.concurrency.LockService;
+import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +18,8 @@ public class GroupLongPollApiHandler extends GroupLongPollApi {
                                    int maxReconnectDelay,
                                    VkSuggestionService suggestionService,
                                    VkSuggestionHandler suggestionHandler,
-                                   LockService lockService) {
-        super(actor, maxReconnectDelay, suggestionService, lockService);
+                                   MonitorService monitorService) {
+        super(actor, maxReconnectDelay, suggestionService, monitorService);
 
         this.suggestionHandler = suggestionHandler;
     }
@@ -29,8 +29,8 @@ public class GroupLongPollApiHandler extends GroupLongPollApi {
                                    int waitTime,
                                    VkSuggestionService suggestionService,
                                    VkSuggestionHandler suggestionHandler,
-                                   LockService lockService) {
-        super(actor, maxReconnectDelay, waitTime, suggestionService, lockService);
+                                   MonitorService monitorService) {
+        super(actor, maxReconnectDelay, waitTime, suggestionService, monitorService);
 
         this.suggestionHandler = suggestionHandler;
     }
