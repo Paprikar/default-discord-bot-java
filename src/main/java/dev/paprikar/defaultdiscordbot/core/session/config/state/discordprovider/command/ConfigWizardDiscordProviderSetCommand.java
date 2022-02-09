@@ -75,7 +75,8 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
         if (discordProviderOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get discordProvider={id={}}, ending session", entityId);
+            logger.error("execute(): Unable to get discordProvider={id={}}, "
+                    + "ending privateSession={}", entityId, session);
 
             return ConfigWizardState.END;
         }

@@ -3,42 +3,49 @@ package dev.paprikar.defaultdiscordbot.core.session;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.entities.User;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PrivateSession {
 
-    private RestAction<PrivateChannel> channel;
+    private PrivateChannel channel;
+
+    private Long guildDiscordId;
 
     private ConfigWizard service;
 
     private Long entityId;
 
-    private Long discordGuildId;
-
     private List<MessageEmbed> responses = new ArrayList<>();
 
-    public PrivateSession() {
-    }
-
-    public PrivateSession(RestAction<PrivateChannel> channel,
-                          ConfigWizard service,
-                          Long entityId,
-                          Long discordGuildId) {
-        this.channel = channel;
+    public PrivateSession(@Nonnull User user,
+                          @Nonnull Long guildDiscordId,
+                          @Nonnull ConfigWizard service,
+                          @Nonnull Long entityId)
+            throws RuntimeException {
+        this.channel = user.openPrivateChannel().complete();
+        this.guildDiscordId = guildDiscordId;
         this.service = service;
         this.entityId = entityId;
-        this.discordGuildId = discordGuildId;
     }
 
-    public RestAction<PrivateChannel> getChannel() {
+    public PrivateChannel getChannel() {
         return channel;
     }
 
-    public void setChannel(RestAction<PrivateChannel> channel) {
+    public void setChannel(PrivateChannel channel) {
         this.channel = channel;
+    }
+
+    public Long getGuildDiscordId() {
+        return guildDiscordId;
+    }
+
+    public void setGuildDiscordId(Long guildDiscordId) {
+        this.guildDiscordId = guildDiscordId;
     }
 
     public ConfigWizard getService() {
@@ -57,19 +64,22 @@ public class PrivateSession {
         this.entityId = entityId;
     }
 
-    public Long getDiscordGuildId() {
-        return discordGuildId;
-    }
-
-    public void setDiscordGuildId(Long discordGuildId) {
-        this.discordGuildId = discordGuildId;
-    }
-
     public List<MessageEmbed> getResponses() {
         return responses;
     }
 
     public void setResponses(List<MessageEmbed> responses) {
         this.responses = responses;
+    }
+
+    @Override
+    public String toString() {
+        return "PrivateSession{" +
+                "userId=" + channel.getUser().getId() +
+                ", channelId=" + channel.getId() +
+                ", guildDiscordId=" + guildDiscordId +
+                ", state=" + service.getState() +
+                ", entityId=" + entityId +
+                '}';
     }
 }

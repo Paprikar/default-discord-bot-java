@@ -161,9 +161,8 @@ public class MediaRequestSender {
             }
 
             Consumer<Message> onSendSuccess = message -> {
-                logger.debug(
-                        "SenderTask#sendRequest(): The request with id={} was successfully sent to text channel with id={}",
-                        request.getId(), sendingChannelId);
+                logger.debug("SenderTask#sendRequest(): The request with id={} was successfully sent"
+                        + " to text channel with id={}", request.getId(), sendingChannelId);
 
                 mediaRequestService.delete(request);
                 // save lastSendDateTime changes

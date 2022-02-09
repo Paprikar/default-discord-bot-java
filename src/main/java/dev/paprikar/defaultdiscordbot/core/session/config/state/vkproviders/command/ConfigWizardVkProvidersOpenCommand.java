@@ -46,7 +46,7 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvide
 
         session.setEntityId(targetProvider.getId());
 
-        logger.debug("Open at VK_PROVIDERS: target='{}', session={}", argsString, session);
+        logger.debug("Open at VK_PROVIDERS: privateSession={}, target='{}'", session, argsString);
 
         return ConfigWizardState.VK_PROVIDER;
     }

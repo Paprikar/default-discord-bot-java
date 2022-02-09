@@ -46,7 +46,7 @@ public class ConfigWizardDiscordProvidersOpenCommand implements ConfigWizardDisc
 
         session.setEntityId(targetProvider.getId());
 
-        logger.debug("Open at DISCORD_PROVIDERS: target='{}', session={}", argsString, session);
+        logger.debug("Open at DISCORD_PROVIDERS: privateSession={}, target='{}'", session, argsString);
 
         return ConfigWizardState.DISCORD_PROVIDER;
     }

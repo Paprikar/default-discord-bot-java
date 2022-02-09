@@ -38,7 +38,7 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      String argsString) {
-        logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
+        logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
         Long entityId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
@@ -47,7 +47,7 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
         if (categoryOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get category={id={}}, ending session", entityId);
+            logger.error("execute(): Unable to get category={id={}}, ending privateSession={}", entityId, session);
 
             return ConfigWizardState.END;
         }

@@ -22,6 +22,8 @@ public class DdbConfig implements Validator {
     @NestedConfigurationProperty
     private DdbDefaults defaults;
 
+    private Integer discordEventPoolSize = 0;
+
     private Integer discordMaxReconnectDelay = 64;
 
     private Integer vkMaxReconnectDelay = 64;
@@ -45,6 +47,14 @@ public class DdbConfig implements Validator {
         this.defaults = defaults;
     }
 
+    public Integer getDiscordEventPoolSize() {
+        return discordEventPoolSize;
+    }
+
+    public void setDiscordEventPoolSize(Integer discordEventPoolSize) {
+        this.discordEventPoolSize = discordEventPoolSize;
+    }
+
     public Integer getDiscordMaxReconnectDelay() {
         return discordMaxReconnectDelay;
     }
@@ -66,6 +76,7 @@ public class DdbConfig implements Validator {
         return "DdbConfig{" +
                 "token='" + token + '\'' +
                 ", defaults=" + defaults +
+                ", discordEventPoolSize=" + discordEventPoolSize +
                 ", discordMaxReconnectDelay=" + discordMaxReconnectDelay +
                 ", vkMaxReconnectDelay=" + vkMaxReconnectDelay +
                 '}';
@@ -82,9 +93,18 @@ public class DdbConfig implements Validator {
 
         config.defaults.validate(errors);
 
+        validateDiscordEventPoolSize(errors);
+
         validateDiscordMaxReconnectDelay(errors);
 
         validateVkMaxReconnectDelay(errors);
+    }
+
+    private void validateDiscordEventPoolSize(Errors errors) {
+        if (discordEventPoolSize < 0) {
+            errors.rejectValue(PropertyFieldName.DISCORD_EVENT_POOL_SIZE, "field.invalid",
+                    "The value must be greater than or equal to 0");
+        }
     }
 
     private void validateDiscordMaxReconnectDelay(Errors errors) {
@@ -102,6 +122,8 @@ public class DdbConfig implements Validator {
     }
 
     static class PropertyFieldName {
+
+        public static final String DISCORD_EVENT_POOL_SIZE = "discord-event-pool-size";
 
         public static final String DISCORD_MAX_RECONNECT_DELAY = "discord-max-reconnect-delay";
 

@@ -47,7 +47,7 @@ public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategories
 
         session.setEntityId(targetCategory.getId());
 
-        logger.debug("Open at CATEGORIES: target='{}', session={}", argsString, session);
+        logger.debug("Open at CATEGORIES: privateSession={}, target='{}'", session, argsString);
 
         return ConfigWizardState.CATEGORY;
     }

@@ -58,7 +58,7 @@ public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardDisco
         if (categoryOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get category={id={}}, ending session", categoryId);
+            logger.error("execute(): Unable to get category={id={}}, ending privateSession={}", categoryId, session);
 
             return ConfigWizardState.END;
         }
@@ -82,7 +82,7 @@ public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardDisco
 
         session.setEntityId(provider.getId());
 
-        logger.debug("Add at DISCORD_PROVIDERS: name={}, session={}", name, session);
+        logger.debug("Add at DISCORD_PROVIDERS: privateSession={}, name='{}'", session, name);
 
         return ConfigWizardState.DISCORD_PROVIDER;
     }

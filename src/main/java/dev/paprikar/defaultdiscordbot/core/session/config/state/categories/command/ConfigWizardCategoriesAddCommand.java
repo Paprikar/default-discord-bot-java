@@ -63,7 +63,7 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
         if (guildOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get guild={id={}}, ending session", guildId);
+            logger.error("execute(): Unable to get guild={id={}}, ending privateSession={}", guildId, session);
 
             return ConfigWizardState.END;
         }
@@ -90,7 +90,7 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
 
         session.setEntityId(category.getId());
 
-        logger.debug("Add at CATEGORIES: name={}, session={}", name, session);
+        logger.debug("Add at CATEGORIES: privateSession={}, name='{}'", session, name);
 
         return ConfigWizardState.CATEGORY;
     }

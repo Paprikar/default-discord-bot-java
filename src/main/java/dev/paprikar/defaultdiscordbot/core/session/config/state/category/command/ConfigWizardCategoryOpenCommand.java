@@ -43,7 +43,7 @@ public class ConfigWizardCategoryOpenCommand implements ConfigWizardCategoryComm
             // todo illegal command response
             return null;
         }
-        logger.debug("Open at CATEGORY: targetState='{}'", argsString);
+        logger.debug("Open at CATEGORY: privateSession={}, target='{}'", session, argsString);
         return targetState;
     }
 

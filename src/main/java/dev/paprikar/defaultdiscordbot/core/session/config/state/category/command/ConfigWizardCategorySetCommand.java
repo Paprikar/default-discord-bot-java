@@ -75,7 +75,7 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
         if (categoryOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get category={id={}}, ending session", entityId);
+            logger.error("execute(): Unable to get category={id={}}, ending privateSession={}", entityId, session);
 
             return ConfigWizardState.END;
         }

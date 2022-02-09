@@ -23,7 +23,7 @@ public class ConfigWizardExitCommand implements ConfigWizardCommand {
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      String argsString) {
-        logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
+        logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
         session.getResponses().add(new EmbedBuilder()
                 .setColor(Color.GRAY)

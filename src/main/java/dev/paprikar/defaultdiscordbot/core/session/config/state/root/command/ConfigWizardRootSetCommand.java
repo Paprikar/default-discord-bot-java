@@ -75,7 +75,7 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
         if (guildOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get guild={id={}}, ending session", entityId);
+            logger.error("execute(): Unable to get guild={id={}}, ending privateSession={}", entityId, session);
 
             return ConfigWizardState.END;
         }

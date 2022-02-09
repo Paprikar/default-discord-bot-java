@@ -7,7 +7,6 @@ import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -30,7 +29,7 @@ public class SessionService {
     // Map<InitiatorUserId, Session>
     private final Map<Long, PrivateSession> activePrivateSessions = new ConcurrentHashMap<>();
 
-    // Set<DiscordGuildId>
+    // Set<GuildDiscordId>
     private final Set<Long> activeGuilds = ConcurrentHashMap.newKeySet();
 
     private final RequestErrorHandler channelClosingErrorHandler;
@@ -60,13 +59,14 @@ public class SessionService {
             service.print(session, false);
 
             activePrivateSessions.remove(userId);
-            activeGuilds.remove(session.getDiscordGuildId());
+            activeGuilds.remove(session.getGuildDiscordId());
 
             session.getChannel()
-                    .flatMap(PrivateChannel::close)
+                    .close()
                     .queue(null, channelClosingErrorHandler);
 
-            logger.debug("handlePrivateMessageReceivedEvent(): Configuration session is ended: userId={}", userId);
+            logger.debug("handlePrivateMessageReceivedEvent(): "
+                    + "Configuration session is ended: privateSession={}", session);
             return;
         }
 
@@ -92,13 +92,13 @@ public class SessionService {
             return;
         }
 
-        long discordGuildId = event.getGuild().getIdLong();
-        if (!activeGuilds.add(discordGuildId)) {
+        long guildDiscordId = event.getGuild().getIdLong();
+        if (!activeGuilds.add(guildDiscordId)) {
             // todo session is already active response
             return;
         }
 
-        Optional<DiscordGuild> guildOptional = guildService.findByDiscordId(discordGuildId);
+        Optional<DiscordGuild> guildOptional = guildService.findByDiscordId(guildDiscordId);
         if (guildOptional.isEmpty()) {
             return;
         }
@@ -106,8 +106,13 @@ public class SessionService {
 
         ConfigWizard initialService = configWizardServices.get(ConfigWizardState.ROOT);
 
-        PrivateSession session = new PrivateSession(event.getAuthor().openPrivateChannel(), initialService, guildId,
-                discordGuildId);
+        PrivateSession session;
+        try {
+            session = new PrivateSession(event.getAuthor(), guildDiscordId, initialService, guildId);
+        } catch (RuntimeException e) {
+            // todo internal error response
+            return;
+        }
 
         activePrivateSessions.put(userId, session);
 

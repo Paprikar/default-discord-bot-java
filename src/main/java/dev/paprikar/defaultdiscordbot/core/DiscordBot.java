@@ -38,7 +38,8 @@ public class DiscordBot {
     public void init() {
         try {
             JDAService
-                    .build(config.getToken(), config.getDiscordMaxReconnectDelay(), eventListener)
+                    .build(config.getToken(), config.getDiscordEventPoolSize(), config.getDiscordMaxReconnectDelay(),
+                            eventListener)
                     .awaitReady();
             initBot();
         } catch (LoginException | InterruptedException e) {

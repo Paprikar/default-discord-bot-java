@@ -38,7 +38,7 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      String argsString) {
-        logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
+        logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
         Long entityId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
@@ -47,7 +47,8 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
         if (discordProviderOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get discordProvider={id={}, ending session", entityId);
+            logger.error("execute(): Unable to get discordProvider={id={}, "
+                    + "ending privateSession={}", entityId, session);
 
             return ConfigWizardState.END;
         }

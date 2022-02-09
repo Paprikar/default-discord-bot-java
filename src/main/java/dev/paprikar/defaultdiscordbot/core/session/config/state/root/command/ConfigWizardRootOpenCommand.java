@@ -45,7 +45,7 @@ public class ConfigWizardRootOpenCommand implements ConfigWizardRootCommand {
             return null;
         }
 
-        logger.debug("Open at ROOT: targetState='{}'", argsString);
+        logger.debug("Open at ROOT: privateSession={}, target='{}'", session, argsString);
 
         return targetState;
     }

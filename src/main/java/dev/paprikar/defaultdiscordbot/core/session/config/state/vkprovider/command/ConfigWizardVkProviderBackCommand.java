@@ -33,7 +33,7 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProvider
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      String argsString) {
-        logger.trace("execute(): event={}, sessionInfo={}, argsString='{}'", event, session, argsString);
+        logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
         Long entityId = session.getEntityId();
 
@@ -41,7 +41,7 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProvider
         if (vkProviderOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get vkProvider={id={}}, ending session", entityId);
+            logger.error("execute(): Unable to get vkProvider={id={}}, ending privateSession={}", entityId, session);
 
             return ConfigWizardState.END;
         }

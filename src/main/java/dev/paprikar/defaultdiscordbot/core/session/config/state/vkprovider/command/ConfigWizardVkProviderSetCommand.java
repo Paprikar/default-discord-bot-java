@@ -75,7 +75,7 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
         if (vkProviderOptional.isEmpty()) {
             // todo error response
 
-            logger.error("execute(): Unable to get vkProvider={id={}}, ending session", entityId);
+            logger.error("execute(): Unable to get vkProvider={id={}}, ending privateSession={}", entityId, session);
 
             return ConfigWizardState.END;
         }

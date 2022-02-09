@@ -44,7 +44,7 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
     @Transactional
     @Override
     public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
-        logger.trace("handle(): event={}, sessionInfo={}", event, session);
+        logger.trace("handle(): privateSession={}", session);
 
         return super.handle(event, session);
     }
@@ -68,7 +68,7 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
 
         if (!responses.isEmpty()) {
             session.getChannel()
-                    .flatMap(channel -> channel.sendMessageEmbeds(responses))
+                    .sendMessageEmbeds(responses)
                     .queue(null, printingErrorHandler);
             session.setResponses(new ArrayList<>());
         }
