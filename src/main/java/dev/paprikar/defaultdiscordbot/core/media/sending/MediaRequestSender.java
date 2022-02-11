@@ -1,5 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.media.sending;
 
+import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
+import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
+import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordMediaRequest;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
@@ -30,9 +33,9 @@ public class MediaRequestSender {
 
     private final DiscordMediaRequestService mediaRequestService;
 
-    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private final MonitorService monitorService;
 
-    private final Object lock = new Object();
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     private final RequestErrorHandler requestSendingErrorHandler;
 
@@ -46,10 +49,12 @@ public class MediaRequestSender {
 
     public MediaRequestSender(@Nonnull JDA jda,
                               @Nonnull DiscordCategoryService categoryService,
-                              @Nonnull DiscordMediaRequestService mediaRequestService) {
+                              @Nonnull DiscordMediaRequestService mediaRequestService,
+                              @Nonnull MonitorService monitorService) {
         this.jda = jda;
         this.categoryService = categoryService;
         this.mediaRequestService = mediaRequestService;
+        this.monitorService = monitorService;
 
         // exception can usually occur when the connection is lost or the channel is unavailable,
         // which in both cases causes the sender to stop working externally via events.
@@ -66,47 +71,41 @@ public class MediaRequestSender {
 
     @Nullable
     public DiscordCategory getCategory() {
-        synchronized (lock) {
-            return category;
-        }
+        return category;
     }
 
     public void start(@Nonnull DiscordCategory category) {
-        synchronized (lock) {
-            if (taskFuture != null) {
-                String message = "Sender is already started";
-                logger.error(message);
-                throw new IllegalStateException(message);
-            }
-
-            Timestamp dt = category.getLastSendTimestamp();
-            if (dt == null) {
-                lastSendDateTime = null;
-            } else {
-                lastSendDateTime = dt.toLocalDateTime();
-            }
-            toTerminate = false;
-            taskFuture = executor.schedule(new SenderTask(category, false), 0, TimeUnit.NANOSECONDS);
-            this.category = category;
+        if (taskFuture != null) {
+            String message = "Sender is already started";
+            logger.error(message);
+            throw new IllegalStateException(message);
         }
+
+        Timestamp dt = category.getLastSendTimestamp();
+        if (dt == null) {
+            lastSendDateTime = null;
+        } else {
+            lastSendDateTime = dt.toLocalDateTime();
+        }
+        toTerminate = false;
+        taskFuture = executor.schedule(new SenderTask(category, false), 0, TimeUnit.NANOSECONDS);
+        this.category = category;
     }
 
     public void stop() {
-        synchronized (lock) {
-            if (taskFuture != null) {
-                taskFuture.cancel(false);
-                if (!taskFuture.isDone()) {
-                    try {
-                        taskFuture.get(); // todo fix deadlock with SenderTask#run()
-                    } catch (InterruptedException | ExecutionException e) {
-                        logger.error(e.toString());
-                    }
+        if (taskFuture != null) {
+            taskFuture.cancel(false);
+            if (!taskFuture.isDone()) {
+                try {
+                    taskFuture.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error(e.toString());
                 }
             }
-            toTerminate = true;
-            taskFuture = null;
-            category = null;
         }
+        toTerminate = true;
+        taskFuture = null;
+        category = null;
     }
 
     public void update(@Nonnull DiscordCategory category) {
@@ -127,7 +126,14 @@ public class MediaRequestSender {
 
         @Override
         public void run() {
-            synchronized (lock) {
+            ConcurrencyKey monitorKey = ConcurrencyKey
+                    .from(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, category.getId());
+            Object monitor = monitorService.get(monitorKey);
+            if (monitor == null) {
+                return;
+            }
+
+            synchronized (monitor) {
                 if (toSend) {
                     sendRequest();
                 }

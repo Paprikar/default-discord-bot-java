@@ -33,9 +33,9 @@ class GroupLongPollApi extends EventsHandler {
 
     private static final int DEFAULT_WAIT_TIME = 25;
 
-    protected final VkSuggestionService suggestionService;
-
     protected final GroupActor actor;
+
+    private final VkSuggestionService suggestionService;
 
     private final MonitorService monitorService;
 

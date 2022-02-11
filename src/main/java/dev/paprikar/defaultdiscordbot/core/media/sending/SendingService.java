@@ -81,7 +81,8 @@ public class SendingService {
                 return;
             }
 
-            MediaRequestSender sender = new MediaRequestSender(jda, categoryService, mediaRequestService);
+            MediaRequestSender sender = new MediaRequestSender(jda, categoryService, mediaRequestService,
+                    monitorService);
 
             senders.put(categoryId, sender);
             categories.put(category.getSendingChannelId(), categoryId);
