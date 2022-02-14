@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 @Component
@@ -28,7 +27,6 @@ public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDisco
         this.discordProviderService = discordProviderService;
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -39,12 +37,8 @@ public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDisco
 
         Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService.findById(entityId);
         if (discordProviderOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get discordProvider={id={}}, "
-                    + "ending privateSession={}", entityId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", entityId, session);
+            return ConfigWizardState.IGNORE;
         }
 
         session.setEntityId(discordProviderOptional.get().getCategory().getId());

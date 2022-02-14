@@ -2,6 +2,10 @@ package dev.paprikar.defaultdiscordbot.core.session.config;
 
 public enum ConfigWizardState {
 
+    IGNORE,
+
+    KEEP,
+
     END,
 
     ROOT,
@@ -16,5 +20,5 @@ public enum ConfigWizardState {
 
     VK_PROVIDERS,
 
-    VK_PROVIDER
+    VK_PROVIDER,
 }

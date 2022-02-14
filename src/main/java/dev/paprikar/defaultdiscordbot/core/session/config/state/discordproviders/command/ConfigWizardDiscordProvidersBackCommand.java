@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 @Component
 public class ConfigWizardDiscordProvidersBackCommand implements ConfigWizardDiscordProvidersCommand {
@@ -22,7 +21,6 @@ public class ConfigWizardDiscordProvidersBackCommand implements ConfigWizardDisc
     public ConfigWizardDiscordProvidersBackCommand() {
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,

@@ -162,7 +162,8 @@ public class MediaRequestSender {
             if (channel == null) {
                 // can happen if the service has not stopped yet after the channel deletion event
                 toTerminate = true;
-                logger.warn("SenderTask#sendRequest(): The channel for sending requests cannot be found");
+                logger.warn("SenderTask#sendRequest(): The channel with id={} for sending requests cannot be found",
+                        sendingChannelId);
                 return;
             }
 

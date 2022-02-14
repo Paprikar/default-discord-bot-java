@@ -5,7 +5,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.ConfigWizardVkProviderDescriptionService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
@@ -30,18 +28,14 @@ public class ConfigWizardVkProviderEnableCommand implements ConfigWizardVkProvid
 
     private final DiscordProviderFromVkService vkProviderService;
     private final MediaActionService mediaActionService;
-    private final ConfigWizardVkProviderDescriptionService descriptionService;
 
     @Autowired
     public ConfigWizardVkProviderEnableCommand(DiscordProviderFromVkService vkProviderService,
-                                               MediaActionService mediaActionService,
-                                               ConfigWizardVkProviderDescriptionService descriptionService) {
+                                               MediaActionService mediaActionService) {
         this.vkProviderService = vkProviderService;
         this.mediaActionService = mediaActionService;
-        this.descriptionService = descriptionService;
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -53,20 +47,21 @@ public class ConfigWizardVkProviderEnableCommand implements ConfigWizardVkProvid
 
         Optional<DiscordProviderFromVk> providerOptional = vkProviderService.findById(entityId);
         if (providerOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get vkProvider={id={}}, ending privateSession={}", entityId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get vkProvider={id={}} for privateSession={}", entityId, session);
+            return ConfigWizardState.IGNORE;
         }
         DiscordProviderFromVk provider = providerOptional.get();
 
         if (provider.isEnabled()) {
-            // todo already enabled response
+            responses.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The provider is already enabled")
+                    .build()
+            );
 
-            responses.add(descriptionService.getDescription(provider));
-
-            return null;
+            return ConfigWizardState.KEEP;
         }
 
         provider.setEnabled(true);
@@ -93,9 +88,7 @@ public class ConfigWizardVkProviderEnableCommand implements ConfigWizardVkProvid
                     .build());
         }
 
-        responses.add(descriptionService.getDescription(provider));
-
-        return null;
+        return ConfigWizardState.KEEP;
     }
 
     @Override

@@ -5,8 +5,10 @@ import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildServi
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -14,6 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
+import java.time.Instant;
+import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,7 +37,7 @@ public class SessionService {
     // Set<GuildDiscordId>
     private final Set<Long> activeGuilds = ConcurrentHashMap.newKeySet();
 
-    private final RequestErrorHandler channelClosingErrorHandler;
+    private final RequestErrorHandler executionErrorHandler;
 
     @Autowired
     public SessionService(DiscordGuildService guildService, List<ConfigWizard> configWizards) {
@@ -40,8 +45,8 @@ public class SessionService {
 
         configWizards.forEach(service -> this.configWizardServices.put(service.getState(), service));
 
-        this.channelClosingErrorHandler = RequestErrorHandler.createBuilder()
-                .setMessage("An error occurred while closing the session channel")
+        this.executionErrorHandler = RequestErrorHandler.createBuilder()
+                .setMessage("An error occurred while executing the JDA request")
                 .build();
     }
 
@@ -55,27 +60,29 @@ public class SessionService {
         ConfigWizard service = session.getService();
         ConfigWizardState targetState = service.handle(event, session);
 
-        if (targetState == ConfigWizardState.END) {
-            service.print(session, false);
+        switch (targetState) {
+            case IGNORE:
+                break;
+            case KEEP:
+                service.print(session, true);
+                break;
+            case END:
+                service.print(session, false);
 
-            activePrivateSessions.remove(userId);
-            activeGuilds.remove(session.getGuildDiscordId());
+                activePrivateSessions.remove(userId);
+                activeGuilds.remove(session.getGuildDiscordId());
 
-            session.getChannel()
-                    .close()
-                    .queue(null, channelClosingErrorHandler);
+                session.getChannel()
+                        .close()
+                        .queue(null, executionErrorHandler);
 
-            logger.debug("handlePrivateMessageReceivedEvent(): "
-                    + "Configuration session is ended: privateSession={}", session);
-            return;
-        }
-
-        if (targetState == null) {
-            service.print(session, false);
-        } else {
-            service = configWizardServices.get(targetState);
-            session.setService(service);
-            service.print(session, true);
+                logger.debug("handlePrivateMessageReceivedEvent(): "
+                        + "Configuration session is ended: privateSession={}", session);
+                break;
+            default:
+                service = configWizardServices.get(targetState);
+                session.setService(service);
+                service.print(session, true);
         }
     }
 
@@ -86,15 +93,36 @@ public class SessionService {
         }
 
         long userId = event.getAuthor().getIdLong();
-        // Ignore if any session is already started
-        if (activePrivateSessions.containsKey(userId)) {
-            // todo response ?
+        PrivateSession session = activePrivateSessions.get(userId);
+        if (session != null) {
+            session.getResponses().add(new EmbedBuilder()
+                    .setColor(Color.GRAY)
+                    .setTitle("Configuration Wizard")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("Configuration session is already started")
+                    .build());
+
+            session.getService().print(session, true);
+
             return;
         }
 
         long guildDiscordId = event.getGuild().getIdLong();
         if (!activeGuilds.add(guildDiscordId)) {
-            // todo session is already active response
+            MessageEmbed embed = new EmbedBuilder()
+                    .setColor(Color.GRAY)
+                    .setTitle("Configuration Wizard")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("Another configuration session is taking place now")
+                    .build();
+
+            event.getAuthor().openPrivateChannel()
+                    .flatMap(channel -> channel
+                            .sendMessageEmbeds(embed)
+                            .reference(event.getMessage())
+                            .and(channel.close()))
+                    .queue(null, executionErrorHandler);
+
             return;
         }
 
@@ -106,11 +134,9 @@ public class SessionService {
 
         ConfigWizard initialService = configWizardServices.get(ConfigWizardState.ROOT);
 
-        PrivateSession session;
         try {
             session = new PrivateSession(event.getAuthor(), guildDiscordId, initialService, guildId);
         } catch (RuntimeException e) {
-            // todo internal error response
             return;
         }
 

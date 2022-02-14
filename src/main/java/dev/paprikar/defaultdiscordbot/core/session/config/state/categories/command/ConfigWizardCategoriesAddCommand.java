@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +44,6 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
         this.config = config;
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -53,19 +51,15 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
         List<MessageEmbed> responses = session.getResponses();
 
         if (argsString == null) {
-            logger.error("Required argument 'argsString' is missing");
-            // todo internal error response
-            return null;
+            logger.error("Required argument 'argsString' is missing for privateSession={}", session);
+            return ConfigWizardState.IGNORE;
         }
 
         Long guildId = session.getEntityId();
         Optional<DiscordGuild> guildOptional = guildService.findById(guildId);
         if (guildOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get guild={id={}}, ending privateSession={}", guildId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get guild={id={}} for privateSession={}", guildId, session);
+            return ConfigWizardState.IGNORE;
         }
         DiscordGuild guild = guildOptional.get();
 
@@ -82,7 +76,7 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
 
         if (error != null) {
             responses.add(error);
-            return null;
+            return ConfigWizardState.KEEP;
         }
 
         category.setName(name);

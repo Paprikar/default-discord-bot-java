@@ -31,7 +31,7 @@ public class ConfigWizardVkProviderNameValidator {
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("The name can not be empty")
+                    .appendDescription("The name cannot be empty")
                     .build();
             return new ConfigWizardValidatorProcessingResponse<>(null, error);
         }

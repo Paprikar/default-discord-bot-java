@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 
@@ -18,8 +17,6 @@ public class ConfigWizardExitCommand implements ConfigWizardCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardExitCommand.class);
 
-    @Override
-    @Nullable
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
                                      String argsString) {
@@ -32,6 +29,7 @@ public class ConfigWizardExitCommand implements ConfigWizardCommand {
                 .appendDescription("Configuration session is ended")
                 .build()
         );
+
         return ConfigWizardState.END;
     }
 

@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +39,6 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvider
         this.validator = validator;
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -48,19 +46,15 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvider
         List<MessageEmbed> responses = session.getResponses();
 
         if (argsString == null) {
-            logger.error("Required argument 'argsString' is missing");
-            // todo internal error response
-            return null;
+            logger.error("Required argument 'argsString' is missing for privateSession={}", session);
+            return ConfigWizardState.IGNORE;
         }
 
         Long categoryId = session.getEntityId();
         Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
         if (categoryOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get category={id={}}, ending privateSession={}", categoryId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get category={id={}} for privateSession={}", categoryId, session);
+            return ConfigWizardState.IGNORE;
         }
         DiscordCategory category = categoryOptional.get();
 
@@ -74,7 +68,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvider
 
         if (error != null) {
             responses.add(error);
-            return null;
+            return ConfigWizardState.KEEP;
         }
 
         provider.setName(name);

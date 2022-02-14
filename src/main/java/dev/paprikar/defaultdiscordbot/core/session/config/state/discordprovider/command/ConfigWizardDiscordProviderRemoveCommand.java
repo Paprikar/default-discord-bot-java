@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
@@ -33,7 +32,6 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
         this.discordProviderService = discordProviderService;
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -45,12 +43,8 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
 
         Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService.findById(entityId);
         if (discordProviderOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get discordProvider={id={}, "
-                    + "ending privateSession={}", entityId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get discordProvider={id={} for privateSession={}", entityId, session);
+            return ConfigWizardState.IGNORE;
         }
         DiscordProviderFromDiscord provider = discordProviderOptional.get();
 
@@ -59,10 +53,10 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("The discord provider that is enabled cannot be deleted")
+                    .appendDescription("The provider that is enabled cannot be deleted")
                     .build()
             );
-            return null;
+            return ConfigWizardState.KEEP;
         }
 
         session.setEntityId(provider.getCategory().getId());
@@ -72,7 +66,7 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The discord provider `" + provider.getName() + "` has been successfully deleted")
+                .appendDescription("The provider `" + provider.getName() + "` has been successfully deleted")
                 .build()
         );
 

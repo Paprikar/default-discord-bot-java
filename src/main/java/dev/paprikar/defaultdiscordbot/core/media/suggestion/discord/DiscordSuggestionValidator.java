@@ -29,7 +29,15 @@ public class DiscordSuggestionValidator {
 
         Long suggestionChannelId = provider.getSuggestionChannelId();
         if (suggestionChannelId == null) {
-            // todo invalid param response
+            errors.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value of `suggestionChannelId` must be set")
+                    .build());
+        }
+
+        if (!errors.isEmpty()) {
             addFailureEmbed(errors, provider);
         }
 

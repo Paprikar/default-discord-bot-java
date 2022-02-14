@@ -28,15 +28,30 @@ public class ApproveValidator {
         List<MessageEmbed> errors = new ArrayList<>();
 
         if (category.getApprovalChannelId() == null) {
-            // todo invalid param response
+            errors.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value of `approvalChannelId` must be set")
+                    .build());
         }
 
         if (category.getPositiveApprovalEmoji() == null) {
-            // todo invalid param response
+            errors.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value of `positiveApprovalEmoji` must be set")
+                    .build());
         }
 
         if (category.getNegativeApprovalEmoji() == null) {
-            // todo invalid param response
+            errors.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value of `negativeApprovalEmoji` must be set")
+                    .build());
         }
 
         if (!errors.isEmpty()) {

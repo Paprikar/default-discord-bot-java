@@ -4,9 +4,9 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.ConfigWizardDiscordProviderDescriptionService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.setter.ConfigWizardDiscordProviderSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -15,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.awt.*;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,22 +30,18 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
     private static final String NAME = "set";
 
     private final DiscordProviderFromDiscordService discordProviderService;
-    private final ConfigWizardDiscordProviderDescriptionService descriptionService;
 
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardDiscordProviderSetter> setters = new HashMap<>();
 
     @Autowired
     public ConfigWizardDiscordProviderSetCommand(DiscordProviderFromDiscordService discordProviderService,
-                                                 ConfigWizardDiscordProviderDescriptionService descriptionService,
                                                  List<ConfigWizardDiscordProviderSetter> setters) {
         this.discordProviderService = discordProviderService;
-        this.descriptionService = descriptionService;
 
         setters.forEach(setter -> this.setters.put(setter.getVariableName(), setter));
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -53,32 +50,41 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
         List<MessageEmbed> responses = session.getResponses();
 
         if (argsString == null) {
-            logger.error("Required argument 'argsString' is missing");
-            // todo internal error response
-            return null;
+            logger.error("Required argument 'argsString' is missing for privateSession={}", session);
+            return ConfigWizardState.IGNORE;
         }
 
         if (argsString.isEmpty()) {
-            // todo illegal args response
-            return null;
+            session.getResponses().add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The name of variable cannot be empty")
+                    .build()
+            );
+
+            return ConfigWizardState.KEEP;
         }
 
         FirstWordAndOther parts = new FirstWordAndOther(argsString);
         String varName = parts.getFirstWord();
         ConfigWizardDiscordProviderSetter setter = setters.get(varName);
         if (setter == null) {
-            // todo illegal var name response
-            return null;
+            session.getResponses().add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The variable with the name `" + varName + "` does not exist")
+                    .build()
+            );
+
+            return ConfigWizardState.KEEP;
         }
 
         Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService.findById(entityId);
         if (discordProviderOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get discordProvider={id={}}, "
-                    + "ending privateSession={}", entityId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", entityId, session);
+            return ConfigWizardState.IGNORE;
         }
         DiscordProviderFromDiscord provider = discordProviderOptional.get();
 
@@ -86,9 +92,7 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
         List<MessageEmbed> setResponses = setter.set(value, provider);
         responses.addAll(setResponses);
 
-        responses.add(descriptionService.getDescription(provider));
-
-        return null;
+        return ConfigWizardState.KEEP;
     }
 
     @Override

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 @Component
@@ -28,7 +27,6 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryComm
         this.categoryService = categoryService;
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -39,11 +37,8 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryComm
 
         Optional<DiscordCategory> categoryOptional = categoryService.findById(entityId);
         if (categoryOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get category={id={}}, ending privateSession={}", entityId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get category={id={}} for privateSession={}", entityId, session);
+            return ConfigWizardState.IGNORE;
         }
 
         session.setEntityId(categoryOptional.get().getGuild().getId());

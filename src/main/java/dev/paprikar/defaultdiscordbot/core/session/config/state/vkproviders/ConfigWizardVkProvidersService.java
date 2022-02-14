@@ -1,12 +1,14 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command.ConfigWizardVkProvidersCommand;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -15,8 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.transaction.Transactional;
+import java.awt.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,23 +31,19 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
 
     private final DiscordCategoryService categoryService;
     private final DiscordProviderFromVkService vkProviderService;
-    private final ConfigWizardVkProvidersDescriptionService descriptionService;
 
     @Autowired
     public ConfigWizardVkProvidersService(DiscordCategoryService categoryService,
                                           DiscordProviderFromVkService vkProviderService,
-                                          ConfigWizardVkProvidersDescriptionService descriptionService,
                                           List<ConfigWizardVkProvidersCommand> commands) {
         super();
 
         this.categoryService = categoryService;
         this.vkProviderService = vkProviderService;
-        this.descriptionService = descriptionService;
 
         commands.forEach(command -> this.commands.put(command.getName(), command));
     }
 
-    @Nullable
     @Transactional
     @Override
     public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
@@ -61,14 +60,13 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
         if (addStateEmbed) {
             Long categoryId = session.getEntityId();
             Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
-            MessageEmbed embed;
-            if (categoryOptional.isPresent()) {
-                embed = descriptionService.getDescription(
-                        categoryOptional.get(), vkProviderService.findAllByCategoryId(categoryId));
-            } else {
-                embed = null; // todo error response
-                logger.error("print(): Unable to get category={id={}}", session.getEntityId());
+            if (categoryOptional.isEmpty()) {
+                logger.error("print(): Unable to get category={id={}} for privateSession={}", categoryId, session);
+                return;
             }
+
+            MessageEmbed embed = getDescription(
+                    categoryOptional.get(), vkProviderService.findAllByCategoryId(categoryId));
             responses.add(embed);
         }
 
@@ -83,5 +81,32 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
     @Override
     public ConfigWizardState getState() {
         return ConfigWizardState.VK_PROVIDERS;
+    }
+
+    private MessageEmbed getDescription(@Nonnull DiscordCategory category,
+                                        @Nonnull List<DiscordProviderFromVk> providers) {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder
+                .setColor(Color.GRAY)
+                .setTitle("Configuration Wizard")
+                .setTimestamp(Instant.now());
+
+        builder.appendDescription("Current directory: `/categories/" + category.getName() + "/vk providers`\n\n");
+
+        if (!providers.isEmpty()) {
+            builder.appendDescription("Vk providers:\n");
+            providers.stream()
+                    .map(provider -> "`" + provider.getName() + "`\n")
+                    .forEach(builder::appendDescription);
+            builder.appendDescription("\n");
+        }
+
+        builder.appendDescription("Available commands:\n");
+        builder.appendDescription("`open` `<name>`\n");
+        builder.appendDescription("`add` `<name>`\n");
+        builder.appendDescription("`back`\n");
+        builder.appendDescription("`exit`");
+
+        return builder.build();
     }
 }

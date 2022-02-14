@@ -5,7 +5,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.ConfigWizardVkProviderDescriptionService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
@@ -30,18 +28,14 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
 
     private final DiscordProviderFromVkService vkProviderService;
     private final MediaActionService mediaActionService;
-    private final ConfigWizardVkProviderDescriptionService descriptionService;
 
     @Autowired
     public ConfigWizardVkProviderDisableCommand(DiscordProviderFromVkService vkProviderService,
-                                                MediaActionService mediaActionService,
-                                                ConfigWizardVkProviderDescriptionService descriptionService) {
+                                                MediaActionService mediaActionService) {
         this.vkProviderService = vkProviderService;
         this.mediaActionService = mediaActionService;
-        this.descriptionService = descriptionService;
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -53,21 +47,21 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
 
         Optional<DiscordProviderFromVk> providerOptional = vkProviderService.findById(entityId);
         if (providerOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get discordProvider={id={}}, "
-                    + "ending privateSession={}", entityId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", entityId, session);
+            return ConfigWizardState.IGNORE;
         }
         DiscordProviderFromVk provider = providerOptional.get();
 
         if (!provider.isEnabled()) {
-            // todo already disabled response
+            responses.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The provider is already disabled")
+                    .build()
+            );
 
-            responses.add(descriptionService.getDescription(provider));
-
-            return null;
+            return ConfigWizardState.KEEP;
         }
 
         provider.setEnabled(false);
@@ -76,7 +70,6 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
         String message;
         if (provider.getCategory().isEnabled()) {
             mediaActionService.disableVkProvider(provider);
-
             message = "The provider has been disabled";
         } else {
             message = "The flag `enabled` has been unset";
@@ -88,9 +81,7 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
                 .appendDescription(message)
                 .build());
 
-        responses.add(descriptionService.getDescription(provider));
-
-        return null;
+        return ConfigWizardState.KEEP;
     }
 
     @Override

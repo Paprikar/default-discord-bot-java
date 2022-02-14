@@ -5,7 +5,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.category.ConfigWizardCategoryDescriptionService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
@@ -30,18 +28,14 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
 
     private final DiscordCategoryService categoryService;
     private final MediaActionService mediaActionService;
-    private final ConfigWizardCategoryDescriptionService descriptionService;
 
     @Autowired
     public ConfigWizardCategoryEnableCommand(DiscordCategoryService categoryService,
-                                             MediaActionService mediaActionService,
-                                             ConfigWizardCategoryDescriptionService descriptionService) {
+                                             MediaActionService mediaActionService) {
         this.categoryService = categoryService;
         this.mediaActionService = mediaActionService;
-        this.descriptionService = descriptionService;
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -53,20 +47,21 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
 
         Optional<DiscordCategory> categoryOptional = categoryService.findById(entityId);
         if (categoryOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get category={id={}}, ending privateSession={}", entityId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get category={id={}} for privateSession={}", entityId, session);
+            return ConfigWizardState.IGNORE;
         }
         DiscordCategory category = categoryOptional.get();
 
         if (category.isEnabled()) {
-            // todo already enabled response
+            responses.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The category is already enabled")
+                    .build()
+            );
 
-            responses.add(descriptionService.getDescription(category));
-
-            return null;
+            return ConfigWizardState.KEEP;
         }
 
         category.setEnabled(true);
@@ -82,9 +77,7 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
                 .appendDescription("The category has been enabled")
                 .build());
 
-        responses.add(descriptionService.getDescription(category));
-
-        return null;
+        return ConfigWizardState.KEEP;
     }
 
     @Override

@@ -28,12 +28,22 @@ public class VkSuggestionValidator {
 
         Integer groupId = provider.getGroupId();
         if (groupId == null) {
-            // todo invalid param response
+            errors.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value of `groupId` must be set")
+                    .build());
         }
 
         String token = provider.getToken();
         if (token == null) {
-            // todo invalid param response
+            errors.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value of `token` must be set")
+                    .build());
         }
 
         if (!errors.isEmpty()) {

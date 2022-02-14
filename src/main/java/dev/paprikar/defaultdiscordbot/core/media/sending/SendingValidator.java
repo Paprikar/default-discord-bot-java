@@ -28,19 +28,39 @@ public class SendingValidator {
         List<MessageEmbed> errors = new ArrayList<>();
 
         if (category.getSendingChannelId() == null) {
-            // todo invalid param error
+            errors.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value of `sendingChannelId` must be set")
+                    .build());
         }
 
         if (category.getStartTime() == null) {
-            // todo invalid param error
+            errors.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value of `startTime` must be set")
+                    .build());
         }
 
         if (category.getEndTime() == null) {
-            // todo invalid param error
+            errors.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value of `endTime` must be set")
+                    .build());
         }
 
         if (category.getReserveDays() == null) {
-            // todo invalid param error
+            errors.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The value of `reserveDays` must be set")
+                    .build());
         }
 
         if (!errors.isEmpty()) {

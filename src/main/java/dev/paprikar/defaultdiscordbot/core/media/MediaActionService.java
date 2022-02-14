@@ -12,8 +12,6 @@ import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.VkSuggestionValid
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordMediaRequestService;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -35,8 +33,6 @@ public class MediaActionService {
 
     private static final Logger logger = LoggerFactory.getLogger(MediaActionService.class);
 
-    private final DiscordCategoryService categoryService;
-    private final DiscordMediaRequestService mediaRequestService;
     private final DiscordProviderFromDiscordService discordProviderService;
     private final DiscordProviderFromVkService vkProviderService;
     private final DiscordSuggestionService discordSuggestionService;
@@ -49,9 +45,7 @@ public class MediaActionService {
     private final VkSuggestionValidator vkSuggestionValidator;
 
     @Autowired
-    public MediaActionService(DiscordCategoryService categoryService,
-                              DiscordMediaRequestService mediaRequestService,
-                              DiscordProviderFromDiscordService discordProviderService,
+    public MediaActionService(DiscordProviderFromDiscordService discordProviderService,
                               DiscordProviderFromVkService vkProviderService,
                               DiscordSuggestionService discordSuggestionService,
                               VkSuggestionService vkSuggestionService,
@@ -61,8 +55,6 @@ public class MediaActionService {
                               ApproveValidator approveValidator,
                               DiscordSuggestionValidator discordSuggestionValidator,
                               VkSuggestionValidator vkSuggestionValidator) {
-        this.categoryService = categoryService;
-        this.mediaRequestService = mediaRequestService;
         this.discordProviderService = discordProviderService;
         this.vkProviderService = vkProviderService;
         this.discordSuggestionService = discordSuggestionService;

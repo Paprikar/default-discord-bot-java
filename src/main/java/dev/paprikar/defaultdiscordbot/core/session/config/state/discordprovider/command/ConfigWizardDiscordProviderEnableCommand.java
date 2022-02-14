@@ -5,7 +5,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFro
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.ConfigWizardDiscordProviderDescriptionService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
@@ -30,19 +28,15 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
 
     private final DiscordProviderFromDiscordService discordProviderService;
     private final MediaActionService mediaActionService;
-    private final ConfigWizardDiscordProviderDescriptionService descriptionService;
 
     @Autowired
     public ConfigWizardDiscordProviderEnableCommand(
             DiscordProviderFromDiscordService discordProviderService,
-            MediaActionService mediaActionService,
-            ConfigWizardDiscordProviderDescriptionService descriptionService) {
+            MediaActionService mediaActionService) {
         this.discordProviderService = discordProviderService;
         this.mediaActionService = mediaActionService;
-        this.descriptionService = descriptionService;
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -54,21 +48,21 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
 
         Optional<DiscordProviderFromDiscord> providerOptional = discordProviderService.findById(entityId);
         if (providerOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get discordProvider={id={}}, "
-                    + "ending privateSession={}", entityId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", entityId, session);
+            return ConfigWizardState.IGNORE;
         }
         DiscordProviderFromDiscord provider = providerOptional.get();
 
         if (provider.isEnabled()) {
-            // todo already enabled response
+            responses.add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The provider is already enabled")
+                    .build()
+            );
 
-            responses.add(descriptionService.getDescription(provider));
-
-            return null;
+            return ConfigWizardState.KEEP;
         }
 
         provider.setEnabled(true);
@@ -95,9 +89,7 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
                     .build());
         }
 
-        responses.add(descriptionService.getDescription(provider));
-
-        return null;
+        return ConfigWizardState.KEEP;
     }
 
     @Override

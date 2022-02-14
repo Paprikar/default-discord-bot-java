@@ -4,9 +4,9 @@ import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.root.ConfigWizardRootDescriptionService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.setter.ConfigWizardRootSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -15,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.awt.*;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,22 +30,18 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
     private static final String NAME = "set";
 
     private final DiscordGuildService guildService;
-    private final ConfigWizardRootDescriptionService descriptionService;
 
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardRootSetter> setters = new HashMap<>();
 
     @Autowired
     public ConfigWizardRootSetCommand(DiscordGuildService guildService,
-                                      ConfigWizardRootDescriptionService descriptionService,
                                       List<ConfigWizardRootSetter> setters) {
         this.guildService = guildService;
-        this.descriptionService = descriptionService;
 
         setters.forEach(setter -> this.setters.put(setter.getVariableName(), setter));
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -53,31 +50,41 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
         List<MessageEmbed> responses = session.getResponses();
 
         if (argsString == null) {
-            logger.error("Required argument 'argsString' is missing");
-            // todo internal error response
-            return null;
+            logger.error("Required argument 'argsString' is missing for privateSession={}", session);
+            return ConfigWizardState.IGNORE;
         }
 
         if (argsString.isEmpty()) {
-            // todo illegal args response
-            return null;
+            session.getResponses().add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The name of variable cannot be empty")
+                    .build()
+            );
+
+            return ConfigWizardState.KEEP;
         }
 
         FirstWordAndOther parts = new FirstWordAndOther(argsString);
         String varName = parts.getFirstWord();
         ConfigWizardRootSetter setter = setters.get(varName);
         if (setter == null) {
-            // todo illegal var name response
-            return null;
+            session.getResponses().add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The variable with the name `" + varName + "` does not exist")
+                    .build()
+            );
+
+            return ConfigWizardState.KEEP;
         }
 
         Optional<DiscordGuild> guildOptional = guildService.findById(entityId);
         if (guildOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get guild={id={}}, ending privateSession={}", entityId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get guild={id={}} for privateSession={}", entityId, session);
+            return ConfigWizardState.IGNORE;
         }
         DiscordGuild guild = guildOptional.get();
 
@@ -85,9 +92,7 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
         MessageEmbed response = setter.set(value, guild);
         responses.add(response);
 
-        responses.add(descriptionService.getDescription(guild));
-
-        return null;
+        return ConfigWizardState.KEEP;
     }
 
     @Override

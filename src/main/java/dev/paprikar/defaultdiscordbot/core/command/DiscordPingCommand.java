@@ -23,7 +23,9 @@ public class DiscordPingCommand implements DiscordCommand {
 
     @Override
     public void execute(@Nonnull String argsString, @Nonnull GuildMessageReceivedEvent event) {
-        event.getChannel().sendMessage("...pong")
+        event.getChannel()
+                .sendMessage("...pong")
+                .reference(event.getMessage())
                 .queue(null, executionErrorHandler);
     }
 

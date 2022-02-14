@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
@@ -33,7 +32,6 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
         this.vkProviderService = vkProviderService;
     }
 
-    @Nullable
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull PrivateSession session,
@@ -45,11 +43,8 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
 
         Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(entityId);
         if (vkProviderOptional.isEmpty()) {
-            // todo error response
-
-            logger.error("execute(): Unable to get vkProvider={id={}, ending privateSession={}", entityId, session);
-
-            return ConfigWizardState.END;
+            logger.warn("execute(): Unable to get vkProvider={id={} for privateSession={}", entityId, session);
+            return ConfigWizardState.IGNORE;
         }
         DiscordProviderFromVk provider = vkProviderOptional.get();
 
@@ -58,10 +53,11 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("The vk provider that is enabled cannot be deleted")
+                    .appendDescription("The provider that is enabled cannot be deleted")
                     .build()
             );
-            return null;
+
+            return ConfigWizardState.KEEP;
         }
 
         session.setEntityId(provider.getCategory().getId());
@@ -71,7 +67,7 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The vk provider `" + provider.getName() + "` has been successfully deleted")
+                .appendDescription("The provider `" + provider.getName() + "` has been successfully deleted")
                 .build()
         );
 

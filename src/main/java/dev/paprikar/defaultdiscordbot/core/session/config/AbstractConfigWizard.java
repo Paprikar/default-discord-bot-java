@@ -8,7 +8,6 @@ import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +16,7 @@ public abstract class AbstractConfigWizard implements ConfigWizard {
     // Map<CommandName, Command>
     protected final Map<String, ConfigWizardCommand> commands = new HashMap<>();
 
-    protected RequestErrorHandler printingErrorHandler;
+    protected final RequestErrorHandler printingErrorHandler;
 
     protected AbstractConfigWizard() {
         setupCommands();
@@ -27,7 +26,6 @@ public abstract class AbstractConfigWizard implements ConfigWizard {
                 .build();
     }
 
-    @Nullable
     @Override
     public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
         String message = event.getMessage().getContentRaw();
@@ -36,8 +34,7 @@ public abstract class AbstractConfigWizard implements ConfigWizard {
 
         ConfigWizardCommand command = commands.get(commandName);
         if (command == null) {
-            // todo illegal command response ?
-            return null;
+            return ConfigWizardState.IGNORE;
         }
 
         String argsString = parts.getOther();
