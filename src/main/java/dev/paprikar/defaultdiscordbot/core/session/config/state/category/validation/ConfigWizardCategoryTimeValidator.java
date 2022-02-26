@@ -12,9 +12,20 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 
+/**
+ * The category time validator in a configuration session.
+ */
 @Component
 public class ConfigWizardCategoryTimeValidator {
 
+    /**
+     * Performs initial processing of the value.
+     *
+     * @param value
+     *         the value to be processed
+     *
+     * @return the validator processing response
+     */
     public ConfigWizardValidatorProcessingResponse<Time> process(@Nonnull String value) {
         Time time;
         try {

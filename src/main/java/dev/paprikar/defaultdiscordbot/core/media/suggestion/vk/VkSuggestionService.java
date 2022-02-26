@@ -7,7 +7,7 @@ import dev.paprikar.defaultdiscordbot.config.DdbConfig;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +18,22 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service for vk suggestions.
+ */
 @Service
 public class VkSuggestionService {
 
+    /**
+     * An instance of {@link VkApiClient}.
+     */
     public static final VkApiClient CLIENT = new VkApiClient(HttpTransportClient.getInstance());
 
     private static final Logger logger = LoggerFactory.getLogger(VkSuggestionService.class);
 
+    /**
+     * Map to get handlers by corresponding providers ids.
+     */
     // Map<ProviderId, Handler>
     final Map<Long, GroupLongPollApi> handlers = new ConcurrentHashMap<>();
 
@@ -32,13 +41,31 @@ public class VkSuggestionService {
     private final MonitorService monitorService;
     private final DdbConfig config;
 
+    /**
+     * Constructs the service.
+     *
+     * @param suggestionHandler
+     *         an instance of {@link VkSuggestionHandler}
+     * @param monitorService
+     *         an instance of {@link MonitorService}
+     * @param config
+     *         an instance of {@link DdbConfig}
+     */
     @Autowired
-    public VkSuggestionService(VkSuggestionHandler suggestionHandler, MonitorService monitorService, DdbConfig config) {
+    public VkSuggestionService(VkSuggestionHandler suggestionHandler,
+                               MonitorService monitorService,
+                               DdbConfig config) {
         this.suggestionHandler = suggestionHandler;
         this.monitorService = monitorService;
         this.config = config;
     }
 
+    /**
+     * Adds the vk provider to suggestion processing context.
+     *
+     * @param provider
+     *         the vk provider
+     */
     public void add(@Nonnull DiscordProviderFromVk provider) {
         Long providerId = provider.getId();
         Integer groupId = provider.getGroupId();
@@ -74,6 +101,12 @@ public class VkSuggestionService {
         }
     }
 
+    /**
+     * Removes the vk provider from suggestion processing context.
+     *
+     * @param provider
+     *         the vk provider
+     */
     public void remove(@Nonnull DiscordProviderFromVk provider) {
         Long providerId = provider.getId();
 
@@ -91,6 +124,12 @@ public class VkSuggestionService {
         }
     }
 
+    /**
+     * Updates the vk provider in suggestion processing context.
+     *
+     * @param provider
+     *         the vk provider
+     */
     public void update(@Nonnull DiscordProviderFromVk provider) {
         Long providerId = provider.getId();
 
@@ -116,6 +155,14 @@ public class VkSuggestionService {
         }
     }
 
+    /**
+     * Does the vk provider exists in suggestion processing context?
+     *
+     * @param provider
+     *         the vk provider
+     *
+     * @return {@code true} if the vk provider exists in suggestion processing context
+     */
     public boolean contains(@Nonnull DiscordProviderFromVk provider) {
         return handlers.containsKey(provider.getId());
     }

@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -18,6 +18,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The command for removing a category.
+ */
 @Component
 public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCommand {
 
@@ -27,6 +30,12 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
 
     private final DiscordCategoryService categoryService;
 
+    /**
+     * Constructs the command.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     */
     @Autowired
     public ConfigWizardCategoryRemoveCommand(DiscordCategoryService categoryService) {
         this.categoryService = categoryService;
@@ -34,7 +43,7 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 

@@ -14,7 +14,7 @@ import com.vk.api.sdk.objects.groups.responses.GetLongPollServerResponse;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,14 +25,26 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Custom implementation of vk's {@link com.vk.api.sdk.events.longpoll.GroupLongPollApi GroupLongPollApi}.
+ * <p>
+ * Does not react to events after stopping. Allows to reuse a previously
+ * stopped handler, taking into account possible changes in credentials.
+ */
 class GroupLongPollApi extends EventsHandler {
 
+    /**
+     * An instance of {@link VkApiClient}.
+     */
     protected static final VkApiClient client = VkSuggestionService.CLIENT;
 
     private static final Logger logger = LoggerFactory.getLogger(GroupLongPollApi.class);
 
     private static final int DEFAULT_WAIT_TIME = 25;
 
+    /**
+     * The {@link GroupActor} used by this handler.
+     */
     protected final GroupActor actor;
 
     private final VkSuggestionService suggestionService;
@@ -59,6 +71,18 @@ class GroupLongPollApi extends EventsHandler {
 
     private int lastReconnectDelay = 1; // in seconds
 
+    /**
+     * Constructs the handler.
+     *
+     * @param actor
+     *         the {@link GroupActor}
+     * @param maxReconnectDelay
+     *         the maximum reconnection delay of the handler in seconds
+     * @param suggestionService
+     *         an instance of {@link VkSuggestionService}
+     * @param monitorService
+     *         an instance of {@link MonitorService}
+     */
     public GroupLongPollApi(GroupActor actor,
                             int maxReconnectDelay,
                             VkSuggestionService suggestionService,
@@ -66,6 +90,21 @@ class GroupLongPollApi extends EventsHandler {
         this(actor, maxReconnectDelay, DEFAULT_WAIT_TIME, suggestionService, monitorService);
     }
 
+    /**
+     * Constructs the handler.
+     *
+     * @param actor
+     *         the {@link GroupActor}
+     * @param maxReconnectDelay
+     *         the maximum reconnection delay of the handler in seconds
+     * @param waitTime
+     *         the time for which the event request connection is kept. After it expires,
+     *         the connection will be closed and the handler will try to create a new request
+     * @param suggestionService
+     *         an instance of {@link VkSuggestionService}
+     * @param monitorService
+     *         an instance of {@link MonitorService}
+     */
     public GroupLongPollApi(GroupActor actor,
                             int maxReconnectDelay,
                             int waitTime,
@@ -78,18 +117,42 @@ class GroupLongPollApi extends EventsHandler {
         this.monitorService = monitorService;
     }
 
+    /**
+     * Should the handler run?
+     *
+     * @return {@code true} if the handler should run, otherwise {@code false}
+     */
     public boolean isToRun() {
         return toRun;
     }
 
+    /**
+     * @return the vk provider that is used by this handler
+     */
     public DiscordProviderFromVk getProvider() {
         return provider;
     }
 
+    /**
+     * Returns the cached vk provider that is used by this handler.
+     * <p>
+     * Used to optimize access to the vk provider, bypassing the forced lookup to shared memory.
+     *
+     * @return the cached vk provider that is used by this handler
+     */
     protected DiscordProviderFromVk getProviderCached() {
         return providerCached;
     }
 
+    /**
+     * Starts the handler.
+     *
+     * @param provider
+     *         the vk provider
+     *
+     * @throws IllegalStateException
+     *         if the handler is already started
+     */
     public void start(@Nonnull DiscordProviderFromVk provider) {
         providerId = provider.getId();
 
@@ -114,6 +177,9 @@ class GroupLongPollApi extends EventsHandler {
         executor.execute(new UpdaterTask());
     }
 
+    /**
+     * Stops the handler.
+     */
     public void stop() {
         toRun = false;
 
@@ -125,6 +191,12 @@ class GroupLongPollApi extends EventsHandler {
         }
     }
 
+    /**
+     * Updates the handler.
+     *
+     * @param provider
+     *         the vk provider
+     */
     public void update(@Nonnull DiscordProviderFromVk provider) {
         this.provider = provider;
     }

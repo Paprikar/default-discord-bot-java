@@ -1,7 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.setter;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.validation.ConfigWizardDiscordProviderNameValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -16,6 +16,9 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * The discord provider name setter in a configuration session.
+ */
 @Component
 public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscordProviderSetter {
 
@@ -26,6 +29,14 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
     private final DiscordProviderFromDiscordService discordProviderService;
     private final ConfigWizardDiscordProviderNameValidator validator;
 
+    /**
+     * Constructs a setter.
+     *
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     * @param validator
+     *         an instance of {@link ConfigWizardDiscordProviderNameValidator}
+     */
     @Autowired
     public ConfigWizardDiscordProviderNameSetter(DiscordProviderFromDiscordService discordProviderService,
                                                  ConfigWizardDiscordProviderNameValidator validator) {

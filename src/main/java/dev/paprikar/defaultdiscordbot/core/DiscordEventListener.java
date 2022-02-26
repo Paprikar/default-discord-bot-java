@@ -7,12 +7,13 @@ import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordMediaRequestService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
-import dev.paprikar.defaultdiscordbot.core.session.SessionService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSessionService;
 import net.dv8tion.jda.api.events.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -31,6 +32,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 
+/**
+ * The component that defines the event listener of the discord bot.
+ */
 @Component
 public class DiscordEventListener extends ListenerAdapter {
 
@@ -40,36 +44,67 @@ public class DiscordEventListener extends ListenerAdapter {
     private final DiscordCategoryService categoryService;
     private final DiscordMediaRequestService mediaRequestService;
     private final DiscordProviderFromDiscordService discordProviderService;
+    private final DiscordProviderFromVkService vkProviderService;
     private final DiscordCommandHandler commandHandler;
     private final DiscordSuggestionService discordSuggestionService;
     private final ApproveService approveService;
     private final SendingService sendingService;
     private final MediaActionService mediaActionService;
-    private final SessionService sessionService;
+    private final ConfigWizardSessionService configWizardSessionService;
     private final DdbConfig config;
 
+    /**
+     * Constructs the component.
+     *
+     * @param guildService
+     *         an instance of {@link DiscordGuildService}
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param mediaRequestService
+     *         an instance of {@link DiscordMediaRequestService}
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     * @param commandHandler
+     *         an instance of {@link DiscordCommandHandler}
+     * @param discordSuggestionService
+     *         an instance of {@link DiscordSuggestionService}
+     * @param approveService
+     *         an instance of {@link ApproveService}
+     * @param sendingService
+     *         an instance of {@link SendingService}
+     * @param mediaActionService
+     *         an instance of {@link MediaActionService}
+     * @param configWizardSessionService
+     *         an instance of {@link ConfigWizardSessionService}
+     * @param config
+     *         an instance of {@link DdbConfig}
+     */
     @Autowired
     public DiscordEventListener(DiscordGuildService guildService,
                                 DiscordCategoryService categoryService,
                                 DiscordMediaRequestService mediaRequestService,
                                 DiscordProviderFromDiscordService discordProviderService,
+                                DiscordProviderFromVkService vkProviderService,
                                 DiscordCommandHandler commandHandler,
                                 DiscordSuggestionService discordSuggestionService,
                                 ApproveService approveService,
                                 SendingService sendingService,
                                 MediaActionService mediaActionService,
-                                SessionService sessionService,
+                                ConfigWizardSessionService configWizardSessionService,
                                 DdbConfig config) {
         this.guildService = guildService;
         this.categoryService = categoryService;
         this.mediaRequestService = mediaRequestService;
         this.discordProviderService = discordProviderService;
+        this.vkProviderService = vkProviderService;
         this.commandHandler = commandHandler;
         this.discordSuggestionService = discordSuggestionService;
         this.approveService = approveService;
         this.sendingService = sendingService;
         this.mediaActionService = mediaActionService;
-        this.sessionService = sessionService;
+        this.configWizardSessionService = configWizardSessionService;
         this.config = config;
     }
 
@@ -157,7 +192,7 @@ public class DiscordEventListener extends ListenerAdapter {
             return;
         }
 
-        sessionService.handlePrivateMessageReceivedEvent(event);
+        configWizardSessionService.handlePrivateMessageReceivedEvent(event);
     }
 
     @Override
@@ -217,7 +252,8 @@ public class DiscordEventListener extends ListenerAdapter {
             Long categoryId = category.getId();
             categoryService.deleteById(categoryId);
             mediaRequestService.deleteByCategoryId(categoryId);
-            discordProviderService.deleteAllByCategoryId(categoryId);
+            discordProviderService.deleteByCategoryId(categoryId);
+            vkProviderService.deleteByCategoryId(categoryId);
         });
 
         guildService.deleteByDiscordId(guildDiscordId);

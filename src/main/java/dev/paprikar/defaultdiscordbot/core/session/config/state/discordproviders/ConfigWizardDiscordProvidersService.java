@@ -1,10 +1,10 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command.ConfigWizardDiscordProvidersCommand;
@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service for the configuration state of discord providers directory.
+ */
 @Service
 public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
 
@@ -32,6 +35,16 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
     private final DiscordCategoryService categoryService;
     private final DiscordProviderFromDiscordService discordProviderService;
 
+    /**
+     * Constructs a configuration state service.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     * @param commands
+     *         a {@link List} of instances of {@link ConfigWizardDiscordProvidersCommand}
+     */
     @Autowired
     public ConfigWizardDiscordProvidersService(DiscordCategoryService categoryService,
                                                DiscordProviderFromDiscordService discordProviderService,
@@ -46,7 +59,7 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
 
     @Transactional
     @Override
-    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
+    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull ConfigWizardSession session) {
         logger.trace("handle(): privateSession={}", session);
 
         return super.handle(event, session);
@@ -54,7 +67,7 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
 
     @Transactional
     @Override
-    public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
+    public void print(@Nonnull ConfigWizardSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
 
         if (addStateEmbed) {

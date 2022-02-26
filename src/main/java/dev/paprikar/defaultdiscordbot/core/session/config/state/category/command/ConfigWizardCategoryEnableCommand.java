@@ -1,9 +1,9 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.command;
 
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -19,6 +19,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The command for enabling a category.
+ */
 @Component
 public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCommand {
 
@@ -29,6 +32,14 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
     private final DiscordCategoryService categoryService;
     private final MediaActionService mediaActionService;
 
+    /**
+     * Constructs the command.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param mediaActionService
+     *         an instance of {@link MediaActionService}
+     */
     @Autowired
     public ConfigWizardCategoryEnableCommand(DiscordCategoryService categoryService,
                                              MediaActionService mediaActionService) {
@@ -38,7 +49,7 @@ public class ConfigWizardCategoryEnableCommand implements ConfigWizardCategoryCo
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 

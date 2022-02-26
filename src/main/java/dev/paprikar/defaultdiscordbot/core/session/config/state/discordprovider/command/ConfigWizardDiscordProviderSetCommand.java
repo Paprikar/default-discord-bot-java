@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.setter.ConfigWizardDiscordProviderSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The command for setting discord provider variables.
+ */
 @Component
 public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscordProviderCommand {
 
@@ -34,6 +37,14 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardDiscordProviderSetter> setters = new HashMap<>();
 
+    /**
+     * Constructs the command.
+     *
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     * @param setters
+     *         a {@link List} of instances of {@link ConfigWizardDiscordProviderSetter}
+     */
     @Autowired
     public ConfigWizardDiscordProviderSetCommand(DiscordProviderFromDiscordService discordProviderService,
                                                  List<ConfigWizardDiscordProviderSetter> setters) {
@@ -44,7 +55,7 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         Long entityId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();

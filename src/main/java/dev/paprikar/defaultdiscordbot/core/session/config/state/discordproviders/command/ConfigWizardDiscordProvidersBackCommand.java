@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command;
 
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 
+/**
+ * The command for switching from discord providers directory to category directory.
+ */
 @Component
 public class ConfigWizardDiscordProvidersBackCommand implements ConfigWizardDiscordProvidersCommand {
 
@@ -17,13 +20,16 @@ public class ConfigWizardDiscordProvidersBackCommand implements ConfigWizardDisc
 
     private static final String NAME = "back";
 
+    /**
+     * Constructs the command.
+     */
     @Autowired
     public ConfigWizardDiscordProvidersBackCommand() {
     }
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 

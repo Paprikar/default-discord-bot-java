@@ -2,6 +2,9 @@ package dev.paprikar.defaultdiscordbot.core.concurrency;
 
 import javax.annotation.Nonnull;
 
+/**
+ * A composite key for working with concurrency objects.
+ */
 public class ConcurrencyKey {
 
     private final ConcurrencyScope scope;
@@ -13,14 +16,30 @@ public class ConcurrencyKey {
         this.key = key;
     }
 
+    /**
+     * Constructs a key from the concurrency scope and object.
+     *
+     * @param scope
+     *         the scope of concurrency
+     * @param key
+     *         the object for the key composition
+     *
+     * @return the concurrency key
+     */
     public static ConcurrencyKey from(@Nonnull ConcurrencyScope scope, @Nonnull Object key) {
         return new ConcurrencyKey(scope, key);
     }
 
+    /**
+     * @return the scope of concurrency
+     */
     public ConcurrencyScope getScope() {
         return scope;
     }
 
+    /**
+     * @return the object for the key composition
+     */
     public Object getKey() {
         return key;
     }

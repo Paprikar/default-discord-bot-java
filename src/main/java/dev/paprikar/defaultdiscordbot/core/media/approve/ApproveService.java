@@ -5,10 +5,10 @@ import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordMediaRequest;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordMediaRequestService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequest;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
 import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
@@ -28,6 +28,9 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+/**
+ * Service for approval of category suggestions.
+ */
 @Service
 public class ApproveService {
 
@@ -46,6 +49,18 @@ public class ApproveService {
 
     private final RequestErrorHandler suggestionProcessingErrorHandler;
 
+    /**
+     * Constructs an approval service.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param mediaRequestService
+     *         an instance of {@link DiscordMediaRequestService}
+     * @param sendingService
+     *         an instance of {@link SendingService}
+     * @param monitorService
+     *         an instance of {@link MonitorService}
+     */
     @Autowired
     public ApproveService(DiscordCategoryService categoryService,
                           DiscordMediaRequestService mediaRequestService,
@@ -61,6 +76,12 @@ public class ApproveService {
                 .build();
     }
 
+    /**
+     * Handles events of type {@link TextChannelDeleteEvent}.
+     *
+     * @param event
+     *         the event of type {@link TextChannelDeleteEvent} for handling
+     */
     public void handleTextChannelDeleteEvent(@Nonnull TextChannelDeleteEvent event) {
         Long channelId = event.getChannel().getIdLong();
         Long categoryId = categories.get(channelId);
@@ -85,6 +106,12 @@ public class ApproveService {
                 + "due to the deletion of the required text channel with id={}", categoryId, channelId);
     }
 
+    /**
+     * Handles events of type {@link GuildMessageReactionAddEvent}.
+     *
+     * @param event
+     *         the event of type {@link GuildMessageReactionAddEvent} for handling
+     */
     public void handleGuildMessageReactionAddEvent(@Nonnull GuildMessageReactionAddEvent event) {
         MessageReaction.ReactionEmote emote = event.getReactionEmote();
         if (emote.isEmote()) {
@@ -128,6 +155,16 @@ public class ApproveService {
         }
     }
 
+    /**
+     * Submits suggestion for further approval.
+     *
+     * @param category
+     *         the suggestion category
+     * @param url
+     *         the suggestion URL
+     * @param onSubmitError
+     *         the handler for errors during submission
+     */
     public void submit(@Nonnull DiscordCategory category,
                        @Nonnull String url,
                        Consumer<Throwable> onSubmitError) {
@@ -155,11 +192,25 @@ public class ApproveService {
                 .queue(onSubmitSuccess, onSubmitError);
     }
 
+    /**
+     * Approves the suggestion and adds it to the queue.
+     *
+     * @param category
+     *         the suggestion category
+     * @param content
+     *         the suggestion content
+     */
     public void approve(DiscordCategory category, String content) {
         mediaRequestService.save(new DiscordMediaRequest(category, content));
         sendingService.update(category);
     }
 
+    /**
+     * Adds the category to approval processing context.
+     *
+     * @param category
+     *         the category
+     */
     public void add(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
         Long approvalChannelId = category.getApprovalChannelId();
@@ -178,6 +229,12 @@ public class ApproveService {
         }
     }
 
+    /**
+     * Removes the category from approval processing context.
+     *
+     * @param category
+     *         the category
+     */
     public void remove(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
         Long approvalChannelId = category.getApprovalChannelId();
@@ -196,6 +253,12 @@ public class ApproveService {
         }
     }
 
+    /**
+     * Updates the category in approval processing context.
+     *
+     * @param category
+     *         the category
+     */
     public void update(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
 
@@ -216,6 +279,14 @@ public class ApproveService {
         }
     }
 
+    /**
+     * Does the category exists in approval processing context?
+     *
+     * @param category
+     *         the category
+     *
+     * @return {@code true} if the category exists in approval processing context
+     */
     public boolean contains(@Nonnull DiscordCategory category) {
         return approvalChannels.containsKey(category.getId());
     }

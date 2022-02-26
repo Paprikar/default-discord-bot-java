@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.command;
 
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -11,6 +11,9 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 
+/**
+ * The command for ending a configuration session.
+ */
 public class ConfigWizardExitCommand implements ConfigWizardCommand {
 
     private static final String NAME = "exit";
@@ -18,7 +21,7 @@ public class ConfigWizardExitCommand implements ConfigWizardCommand {
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardExitCommand.class);
 
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 

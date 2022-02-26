@@ -9,9 +9,20 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 
+/**
+ * The category reserve days validator in a configuration session.
+ */
 @Component
 public class ConfigWizardCategoryReserveDaysValidator {
 
+    /**
+     * Performs initial processing of the value.
+     *
+     * @param value
+     *         the value to be processed
+     *
+     * @return the validator processing response
+     */
     public ConfigWizardValidatorProcessingResponse<Integer> process(@Nonnull String value) {
         int reserveDays;
         try {

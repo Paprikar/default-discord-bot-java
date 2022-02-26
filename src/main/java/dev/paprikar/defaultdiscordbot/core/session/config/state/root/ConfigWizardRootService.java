@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.root;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.command.ConfigWizardRootCommand;
@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service for the configuration state of initial directory.
+ */
 @Service
 public class ConfigWizardRootService extends AbstractConfigWizard {
 
@@ -29,6 +32,14 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
 
     private final DiscordGuildService guildService;
 
+    /**
+     * Constructs a configuration state service.
+     *
+     * @param guildService
+     *         an instance of {@link DiscordGuildService}
+     * @param commands
+     *         a {@link List} of instances of {@link ConfigWizardRootCommand}
+     */
     @Autowired
     public ConfigWizardRootService(DiscordGuildService guildService,
                                    List<ConfigWizardRootCommand> commands) {
@@ -41,7 +52,7 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
 
     @Transactional
     @Override
-    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
+    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull ConfigWizardSession session) {
         logger.trace("handle(): privateSession={}", session);
 
         return super.handle(event, session);
@@ -49,7 +60,7 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
 
     @Transactional
     @Override
-    public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
+    public void print(@Nonnull ConfigWizardSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
 
         if (addStateEmbed) {

@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
+/**
+ * The command for switching from category directory to categories directory.
+ */
 @Component
 public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryCommand {
 
@@ -22,6 +25,12 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryComm
 
     private final DiscordCategoryService categoryService;
 
+    /**
+     * Constructs the command.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     */
     @Autowired
     public ConfigWizardCategoryBackCommand(DiscordCategoryService categoryService) {
         this.categoryService = categoryService;
@@ -29,7 +38,7 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryComm
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 

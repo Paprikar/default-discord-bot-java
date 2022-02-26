@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -17,6 +17,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The command for switching to a category.
+ */
 @Component
 public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategoriesCommand {
 
@@ -26,6 +29,12 @@ public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategories
 
     private final DiscordCategoryService categoryService;
 
+    /**
+     * Constructs the command.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     */
     @Autowired
     public ConfigWizardCategoriesOpenCommand(DiscordCategoryService categoryService) {
         this.categoryService = categoryService;
@@ -33,7 +42,7 @@ public class ConfigWizardCategoriesOpenCommand implements ConfigWizardCategories
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         List<DiscordCategory> categories = categoryService.findAllByGuildId(session.getEntityId());
         DiscordCategory targetCategory = categories.stream()

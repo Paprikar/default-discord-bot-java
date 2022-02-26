@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 
+/**
+ * The command for testing this bot to see if it works.
+ */
 @Component
 public class DiscordPingCommand implements DiscordCommand {
 
@@ -14,6 +17,9 @@ public class DiscordPingCommand implements DiscordCommand {
 
     private final RequestErrorHandler executionErrorHandler;
 
+    /**
+     * Constructs the command.
+     */
     @Autowired
     public DiscordPingCommand() {
         this.executionErrorHandler = RequestErrorHandler.createBuilder()
@@ -22,7 +28,7 @@ public class DiscordPingCommand implements DiscordCommand {
     }
 
     @Override
-    public void execute(@Nonnull String argsString, @Nonnull GuildMessageReceivedEvent event) {
+    public void execute(@Nonnull GuildMessageReceivedEvent event, @Nonnull String argsString) {
         event.getChannel()
                 .sendMessage("...pong")
                 .reference(event.getMessage())

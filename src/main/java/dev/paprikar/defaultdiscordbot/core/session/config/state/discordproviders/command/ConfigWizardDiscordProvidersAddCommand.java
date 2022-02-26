@@ -1,10 +1,10 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.validation.ConfigWizardDiscordProviderNameValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
@@ -19,6 +19,9 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The command to add discord providers.
+ */
 @Component
 public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardDiscordProvidersCommand {
 
@@ -30,6 +33,16 @@ public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardDisco
     private final DiscordProviderFromDiscordService discordProviderService;
     private final ConfigWizardDiscordProviderNameValidator validator;
 
+    /**
+     * Constructs the command.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     * @param validator
+     *         an instance of {@link ConfigWizardDiscordProviderNameValidator}
+     */
     @Autowired
     public ConfigWizardDiscordProvidersAddCommand(DiscordCategoryService categoryService,
                                                   DiscordProviderFromDiscordService discordProviderService,
@@ -41,7 +54,7 @@ public class ConfigWizardDiscordProvidersAddCommand implements ConfigWizardDisco
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         List<MessageEmbed> responses = session.getResponses();
 

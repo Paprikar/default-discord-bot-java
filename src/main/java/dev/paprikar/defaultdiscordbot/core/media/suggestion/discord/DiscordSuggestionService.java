@@ -4,9 +4,9 @@ import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service for discord suggestions.
+ */
 @Service
 public class DiscordSuggestionService {
 
@@ -49,6 +52,16 @@ public class DiscordSuggestionService {
 
     private final RequestErrorHandler suggestionSubmittingErrorHandler;
 
+    /**
+     * Constructs the service.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param approveService
+     *         an instance of {@link ApproveService}
+     * @param monitorService
+     *         an instance of {@link MonitorService}
+     */
     @Autowired
     public DiscordSuggestionService(DiscordCategoryService categoryService,
                                     ApproveService approveService,
@@ -66,6 +79,12 @@ public class DiscordSuggestionService {
                 .build();
     }
 
+    /**
+     * Handles events of type {@link TextChannelDeleteEvent}.
+     *
+     * @param event
+     *         the event of type {@link TextChannelDeleteEvent} for handling
+     */
     public void handleTextChannelDeleteEvent(@Nonnull TextChannelDeleteEvent event) {
         Long channelId = event.getChannel().getIdLong();
 
@@ -92,6 +111,12 @@ public class DiscordSuggestionService {
                 + "due to the deletion of the required text channel with id={}", providerId, channelId);
     }
 
+    /**
+     * Handles events of type {@link GuildMessageReceivedEvent}.
+     *
+     * @param event
+     *         the event of type {@link GuildMessageReceivedEvent} for handling
+     */
     public void handleGuildMessageReceivedEvent(@Nonnull GuildMessageReceivedEvent event) {
         Message message = event.getMessage();
         Long channelId = event.getChannel().getIdLong();
@@ -116,6 +141,12 @@ public class DiscordSuggestionService {
         }
     }
 
+    /**
+     * Adds the discord provider to suggestion processing context.
+     *
+     * @param provider
+     *         the discord provider
+     */
     public void add(@Nonnull DiscordProviderFromDiscord provider) {
         Long categoryId = provider.getCategory().getId();
         Long providerId = provider.getId();
@@ -136,6 +167,12 @@ public class DiscordSuggestionService {
         }
     }
 
+    /**
+     * Removes the discord provider from suggestion processing context.
+     *
+     * @param provider
+     *         the discord provider
+     */
     public void remove(@Nonnull DiscordProviderFromDiscord provider) {
         Long providerId = provider.getId();
         Long suggestionChannelId = provider.getSuggestionChannelId();
@@ -155,6 +192,12 @@ public class DiscordSuggestionService {
         }
     }
 
+    /**
+     * Updates the discord provider in suggestion processing context.
+     *
+     * @param provider
+     *         the discord provider
+     */
     public void update(@Nonnull DiscordProviderFromDiscord provider) {
         Long providerId = provider.getId();
         Long oldSuggestionChannelId = suggestionChannels.get(providerId);
@@ -176,6 +219,14 @@ public class DiscordSuggestionService {
         }
     }
 
+    /**
+     * Does the discord provider exists in suggestion processing context?
+     *
+     * @param provider
+     *         the discord provider
+     *
+     * @return {@code true} if the discord provider exists in suggestion processing context
+     */
     public boolean contains(@Nonnull DiscordProviderFromDiscord provider) {
         return categories.containsKey(provider.getId());
     }

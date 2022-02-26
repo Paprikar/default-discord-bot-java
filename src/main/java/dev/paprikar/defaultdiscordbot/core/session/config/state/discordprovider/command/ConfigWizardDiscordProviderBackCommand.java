@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
+/**
+ * The command for switching from discord provider directory to discord providers directory.
+ */
 @Component
 public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDiscordProviderCommand {
 
@@ -22,6 +25,12 @@ public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDisco
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
+    /**
+     * Constructs the command.
+     *
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     */
     @Autowired
     public ConfigWizardDiscordProviderBackCommand(DiscordProviderFromDiscordService discordProviderService) {
         this.discordProviderService = discordProviderService;
@@ -29,7 +38,7 @@ public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDisco
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 

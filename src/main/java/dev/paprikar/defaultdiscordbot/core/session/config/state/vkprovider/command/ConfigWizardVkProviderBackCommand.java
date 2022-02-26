@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
+/**
+ * The command for switching from vk provider directory to vk providers directory.
+ */
 @Component
 public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProviderCommand {
 
@@ -22,6 +25,12 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProvider
 
     private final DiscordProviderFromVkService vkProviderService;
 
+    /**
+     * Constructs the command.
+     *
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     */
     @Autowired
     public ConfigWizardVkProviderBackCommand(DiscordProviderFromVkService vkProviderService) {
         this.vkProviderService = vkProviderService;
@@ -29,7 +38,7 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProvider
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 

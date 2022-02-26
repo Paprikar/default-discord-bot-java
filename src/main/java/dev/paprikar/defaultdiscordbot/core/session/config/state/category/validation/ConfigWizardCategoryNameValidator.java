@@ -1,7 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -14,17 +14,35 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
-
+/**
+ * The category name validator in a configuration session.
+ */
 @Component
 public class ConfigWizardCategoryNameValidator {
 
     private final DiscordCategoryService categoryService;
 
+    /**
+     * Constructs a validator.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     */
     @Autowired
     public ConfigWizardCategoryNameValidator(DiscordCategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
+    /**
+     * Performs initial processing of the value.
+     *
+     * @param value
+     *         the value to be processed
+     * @param category
+     *         the category for processing
+     *
+     * @return the validator processing response
+     */
     public ConfigWizardValidatorProcessingResponse<String> process(@Nonnull String value,
                                                                    @Nonnull DiscordCategory category) {
         if (value.isEmpty()) {

@@ -1,7 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The service for handling discord commands.
+ */
 @Service
 public class DiscordCommandHandler {
 
@@ -24,6 +27,14 @@ public class DiscordCommandHandler {
 
     private final Map<String, DiscordCommand> commands = new HashMap<>();
 
+    /**
+     * Constructs a discord command handler.
+     *
+     * @param guildService
+     *         an instance of {@link DiscordGuildService}
+     * @param commands
+     *         a {@link List} of instances of {@link DiscordCommand}
+     */
     @Autowired
     public DiscordCommandHandler(DiscordGuildService guildService, List<DiscordCommand> commands) {
         this.guildService = guildService;
@@ -31,6 +42,12 @@ public class DiscordCommandHandler {
         commands.forEach(command -> this.commands.put(command.getName(), command));
     }
 
+    /**
+     * Handles events of type {@link GuildMessageReceivedEvent}.
+     *
+     * @param event
+     *         the event of type {@link GuildMessageReceivedEvent} for handling
+     */
     public void handleGuildMessageReceivedEvent(@Nonnull GuildMessageReceivedEvent event) {
         long guildId = event.getGuild().getIdLong();
         String message = event.getMessage().getContentRaw();
@@ -59,7 +76,7 @@ public class DiscordCommandHandler {
 
         DiscordCommand command = commands.get(commandName);
         if (command != null) {
-            command.execute(argsString, event);
+            command.execute(event, argsString);
         }
     }
 }

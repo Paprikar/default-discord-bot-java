@@ -1,9 +1,9 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.command;
 
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -19,6 +19,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The command for disabling a discord provider.
+ */
 @Component
 public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDiscordProviderCommand {
 
@@ -29,6 +32,14 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDi
     private final DiscordProviderFromDiscordService discordProviderService;
     private final MediaActionService mediaActionService;
 
+    /**
+     * Constructs the command.
+     *
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     * @param mediaActionService
+     *         an instance of {@link MediaActionService}
+     */
     @Autowired
     public ConfigWizardDiscordProviderDisableCommand(
             DiscordProviderFromDiscordService discordProviderService,
@@ -39,7 +50,7 @@ public class ConfigWizardDiscordProviderDisableCommand implements ConfigWizardDi
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 

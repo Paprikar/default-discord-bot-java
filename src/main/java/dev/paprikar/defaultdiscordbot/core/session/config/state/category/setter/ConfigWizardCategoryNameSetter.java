@@ -1,7 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation.ConfigWizardCategoryNameValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -16,6 +16,9 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * The category name setter in a configuration session.
+ */
 @Component
 public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySetter {
 
@@ -26,6 +29,14 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
     private final DiscordCategoryService categoryService;
     private final ConfigWizardCategoryNameValidator validator;
 
+    /**
+     * Constructs a setter.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param validator
+     *         an instance of {@link ConfigWizardCategoryNameValidator}
+     */
     @Autowired
     public ConfigWizardCategoryNameSetter(DiscordCategoryService categoryService,
                                           ConfigWizardCategoryNameValidator validator) {

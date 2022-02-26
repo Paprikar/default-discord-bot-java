@@ -1,7 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -14,16 +14,35 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The vk provider name validator in a configuration session.
+ */
 @Component
 public class ConfigWizardVkProviderNameValidator {
 
     private final DiscordProviderFromVkService vkProviderService;
 
+    /**
+     * Constructs a validator.
+     *
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     */
     @Autowired
     public ConfigWizardVkProviderNameValidator(DiscordProviderFromVkService vkProviderService) {
         this.vkProviderService = vkProviderService;
     }
 
+    /**
+     * Performs initial processing of the value.
+     *
+     * @param value
+     *         the value to be processed
+     * @param provider
+     *         the vk provider for processing
+     *
+     * @return the validator processing response
+     */
     public ConfigWizardValidatorProcessingResponse<String> process(@Nonnull String value,
                                                                    @Nonnull DiscordProviderFromVk provider) {
         if (value.isEmpty()) {

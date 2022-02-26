@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.setter.ConfigWizardVkProviderSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The command for setting vk provider variables.
+ */
 @Component
 public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderCommand {
 
@@ -34,6 +37,14 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardVkProviderSetter> setters = new HashMap<>();
 
+    /**
+     * Constructs the command.
+     *
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     * @param setters
+     *         a {@link List} of instances of {@link ConfigWizardVkProviderSetter}
+     */
     @Autowired
     public ConfigWizardVkProviderSetCommand(DiscordProviderFromVkService vkProviderService,
                                             List<ConfigWizardVkProviderSetter> setters) {
@@ -44,7 +55,7 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         Long entityId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();

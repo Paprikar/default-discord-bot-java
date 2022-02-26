@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -16,6 +16,9 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * The command for switching to a discord provider.
+ */
 @Component
 public class ConfigWizardDiscordProvidersOpenCommand implements ConfigWizardDiscordProvidersCommand {
 
@@ -25,6 +28,12 @@ public class ConfigWizardDiscordProvidersOpenCommand implements ConfigWizardDisc
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
+    /**
+     * Constructs the command.
+     *
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     */
     @Autowired
     public ConfigWizardDiscordProvidersOpenCommand(DiscordProviderFromDiscordService discordProviderService) {
         this.discordProviderService = discordProviderService;
@@ -32,7 +41,7 @@ public class ConfigWizardDiscordProvidersOpenCommand implements ConfigWizardDisc
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         List<DiscordProviderFromDiscord> providers = discordProviderService.findAllByCategoryId(session.getEntityId());
         DiscordProviderFromDiscord targetProvider = providers.stream()

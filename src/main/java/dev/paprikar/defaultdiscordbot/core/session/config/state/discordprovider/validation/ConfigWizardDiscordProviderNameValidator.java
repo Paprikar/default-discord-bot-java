@@ -1,7 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.validation;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -14,16 +14,35 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The discord provider name validator in a configuration session.
+ */
 @Component
 public class ConfigWizardDiscordProviderNameValidator {
 
     private final DiscordProviderFromDiscordService discordProviderService;
 
+    /**
+     * Constructs a validator.
+     *
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     */
     @Autowired
     public ConfigWizardDiscordProviderNameValidator(DiscordProviderFromDiscordService discordProviderService) {
         this.discordProviderService = discordProviderService;
     }
 
+    /**
+     * Performs initial processing of the value.
+     *
+     * @param value
+     *         the value to be processed
+     * @param provider
+     *         the discord provider for processing
+     *
+     * @return the validator processing response
+     */
     public ConfigWizardValidatorProcessingResponse<String> process(@Nonnull String value,
                                                                    @Nonnull DiscordProviderFromDiscord provider) {
         if (value.isEmpty()) {

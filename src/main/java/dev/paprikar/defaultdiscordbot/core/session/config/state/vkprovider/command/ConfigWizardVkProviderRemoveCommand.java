@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -18,6 +18,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The command for removing a vk provider.
+ */
 @Component
 public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProviderCommand {
 
@@ -27,6 +30,12 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
 
     private final DiscordProviderFromVkService vkProviderService;
 
+    /**
+     * Constructs the command.
+     *
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     */
     @Autowired
     public ConfigWizardVkProviderRemoveCommand(DiscordProviderFromVkService vkProviderService) {
         this.vkProviderService = vkProviderService;
@@ -34,7 +43,7 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 

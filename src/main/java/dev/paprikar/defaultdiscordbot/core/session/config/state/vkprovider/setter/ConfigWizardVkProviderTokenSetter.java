@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.sett
 
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.VkSuggestionService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderCredsValidator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -18,6 +18,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The vk provider token setter in a configuration session.
+ */
 @Component
 public class ConfigWizardVkProviderTokenSetter implements ConfigWizardVkProviderSetter {
 
@@ -30,6 +33,18 @@ public class ConfigWizardVkProviderTokenSetter implements ConfigWizardVkProvider
     private final VkSuggestionService vkSuggestionService;
     private final ConfigWizardVkProviderCredsValidator credsValidator;
 
+    /**
+     * Constructs a setter.
+     *
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     * @param mediaActionService
+     *         an instance of {@link MediaActionService}
+     * @param vkSuggestionService
+     *         an instance of {@link VkSuggestionService}
+     * @param credsValidator
+     *         an instance of {@link ConfigWizardVkProviderCredsValidator}
+     */
     @Autowired
     public ConfigWizardVkProviderTokenSetter(DiscordProviderFromVkService vkProviderService,
                                              MediaActionService mediaActionService,

@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter.ConfigWizardCategorySetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The command for setting category variables.
+ */
 @Component
 public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryCommand {
 
@@ -34,6 +37,14 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardCategorySetter> setters = new HashMap<>();
 
+    /**
+     * Constructs the command.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param setters
+     *         a {@link List} of instances of {@link ConfigWizardCategorySetter}
+     */
     @Autowired
     public ConfigWizardCategorySetCommand(DiscordCategoryService categoryService,
                                           List<ConfigWizardCategorySetter> setters) {
@@ -44,7 +55,7 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         Long entityId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();

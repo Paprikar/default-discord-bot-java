@@ -3,8 +3,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider
 import dev.paprikar.defaultdiscordbot.core.JDAService;
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardDiscordTextChannelIdValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,6 +21,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The discord provider suggestion channel id setter in a configuration session.
+ */
 @Component
 public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements ConfigWizardDiscordProviderSetter {
 
@@ -34,6 +37,18 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
     private final DiscordSuggestionService discordSuggestionService;
     private final ConfigWizardDiscordTextChannelIdValidator validator;
 
+    /**
+     * Constructs a setter.
+     *
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     * @param mediaActionService
+     *         an instance of {@link MediaActionService}
+     * @param discordSuggestionService
+     *         an instance of {@link DiscordSuggestionService}
+     * @param validator
+     *         an instance of {@link ConfigWizardDiscordTextChannelIdValidator}
+     */
     @Autowired
     public ConfigWizardDiscordProviderSuggestionChannelIdSetter(
             DiscordProviderFromDiscordService discordProviderService,
@@ -66,6 +81,7 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
         if (error != null) {
             return List.of(error);
         }
+        assert channelId != null;
 
         List<MessageEmbed> responses = new ArrayList<>();
         boolean enabledResponse = false;

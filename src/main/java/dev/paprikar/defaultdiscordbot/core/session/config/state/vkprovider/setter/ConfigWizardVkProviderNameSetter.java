@@ -1,7 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.setter;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderNameValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -16,6 +16,9 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * The vk provider name setter in a configuration session.
+ */
 @Component
 public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderSetter {
 
@@ -26,6 +29,14 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
     private final DiscordProviderFromVkService vkProviderService;
     private final ConfigWizardVkProviderNameValidator validator;
 
+    /**
+     * Constructs a setter.
+     *
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     * @param validator
+     *         an instance of {@link ConfigWizardVkProviderNameValidator}
+     */
     @Autowired
     public ConfigWizardVkProviderNameSetter(DiscordProviderFromVkService vkProviderService,
                                             ConfigWizardVkProviderNameValidator validator) {

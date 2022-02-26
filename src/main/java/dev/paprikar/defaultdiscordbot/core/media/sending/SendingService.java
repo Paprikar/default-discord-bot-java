@@ -3,9 +3,9 @@ package dev.paprikar.defaultdiscordbot.core.media.sending;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordMediaRequestService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import org.slf4j.Logger;
@@ -18,6 +18,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service for sending category suggestions.
+ */
 @Service
 public class SendingService {
 
@@ -33,6 +36,16 @@ public class SendingService {
     // Map<SendingChannelId, CategoryId>
     private final Map<Long, Long> categories = new ConcurrentHashMap<>();
 
+    /**
+     * Constructs a sending service.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param mediaRequestService
+     *         an instance of {@link DiscordMediaRequestService}
+     * @param monitorService
+     *         an instance of {@link MonitorService}
+     */
     @Autowired
     public SendingService(DiscordCategoryService categoryService,
                           DiscordMediaRequestService mediaRequestService,
@@ -42,6 +55,12 @@ public class SendingService {
         this.monitorService = monitorService;
     }
 
+    /**
+     * Handles events of type {@link TextChannelDeleteEvent}.
+     *
+     * @param event
+     *         the event of type {@link TextChannelDeleteEvent} for handling
+     */
     public void handleTextChannelDeleteEvent(@Nonnull TextChannelDeleteEvent event) {
         Long channelId = event.getChannel().getIdLong();
         Long categoryId = categories.get(channelId);
@@ -70,6 +89,14 @@ public class SendingService {
                 + "due to the deletion of the required text channel with id={}", categoryId, channelId);
     }
 
+    /**
+     * Adds the category to sending processing context.
+     *
+     * @param category
+     *         the category
+     * @param jda
+     *         an instance of {@link JDA}
+     */
     public void add(@Nonnull DiscordCategory category, @Nonnull JDA jda) {
         Long categoryId = category.getId();
 
@@ -91,6 +118,12 @@ public class SendingService {
         }
     }
 
+    /**
+     * Removes the category from sending processing context.
+     *
+     * @param category
+     *         the category
+     */
     public void remove(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
 
@@ -112,6 +145,12 @@ public class SendingService {
         }
     }
 
+    /**
+     * Updates the category in sending processing context.
+     *
+     * @param category
+     *         the category
+     */
     public void update(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
 
@@ -142,6 +181,14 @@ public class SendingService {
         }
     }
 
+    /**
+     * Does the category exists in sending processing context?
+     *
+     * @param category
+     *         the category
+     *
+     * @return {@code true} if the category exists in sending processing context
+     */
     public boolean contains(@Nonnull DiscordCategory category) {
         return senders.containsKey(category.getId());
     }

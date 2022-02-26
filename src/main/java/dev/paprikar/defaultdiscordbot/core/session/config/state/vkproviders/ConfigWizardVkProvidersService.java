@@ -1,10 +1,10 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command.ConfigWizardVkProvidersCommand;
@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service for the configuration state of vk providers directory.
+ */
 @Service
 public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
 
@@ -32,6 +35,16 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
     private final DiscordCategoryService categoryService;
     private final DiscordProviderFromVkService vkProviderService;
 
+    /**
+     * Constructs a configuration state service.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     * @param commands
+     *         a {@link List} of instances of {@link ConfigWizardVkProvidersCommand}
+     */
     @Autowired
     public ConfigWizardVkProvidersService(DiscordCategoryService categoryService,
                                           DiscordProviderFromVkService vkProviderService,
@@ -46,7 +59,7 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
 
     @Transactional
     @Override
-    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
+    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull ConfigWizardSession session) {
         logger.trace("handle(): privateSession={}", session);
 
         return super.handle(event, session);
@@ -54,7 +67,7 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
 
     @Transactional
     @Override
-    public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
+    public void print(@Nonnull ConfigWizardSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
 
         if (addStateEmbed) {

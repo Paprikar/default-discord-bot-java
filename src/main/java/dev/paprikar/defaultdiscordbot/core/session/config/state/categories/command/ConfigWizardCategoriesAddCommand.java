@@ -2,11 +2,11 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.categories.comm
 
 import dev.paprikar.defaultdiscordbot.config.DdbConfig;
 import dev.paprikar.defaultdiscordbot.config.DdbDefaults;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation.ConfigWizardCategoryNameValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
@@ -21,6 +21,9 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The command to add categories.
+ */
 @Component
 public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesCommand {
 
@@ -33,6 +36,18 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
     private final ConfigWizardCategoryNameValidator validator;
     private final DdbConfig config;
 
+    /**
+     * Constructs the command.
+     *
+     * @param guildService
+     *         an instance of {@link DiscordGuildService}
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param validator
+     *         an instance of {@link ConfigWizardCategoryNameValidator}
+     * @param config
+     *         an instance of {@link DdbConfig}
+     */
     @Autowired
     public ConfigWizardCategoriesAddCommand(DiscordGuildService guildService,
                                             DiscordCategoryService categoryService,
@@ -46,7 +61,7 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         List<MessageEmbed> responses = session.getResponses();
 

@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command;
 
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 
+/**
+ * The command for switching from vk providers directory to category directory.
+ */
 @Component
 public class ConfigWizardVkProvidersBackCommand implements ConfigWizardVkProvidersCommand {
 
@@ -17,13 +20,16 @@ public class ConfigWizardVkProvidersBackCommand implements ConfigWizardVkProvide
 
     private static final String NAME = "back";
 
+    /**
+     * Constructs the command.
+     */
     @Autowired
     public ConfigWizardVkProvidersBackCommand() {
     }
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 

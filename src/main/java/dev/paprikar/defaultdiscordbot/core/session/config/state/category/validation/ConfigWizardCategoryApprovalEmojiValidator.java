@@ -11,9 +11,20 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * The category approval emoji validator in a configuration session.
+ */
 @Component
 public class ConfigWizardCategoryApprovalEmojiValidator {
 
+    /**
+     * Performs initial processing of the value.
+     *
+     * @param value
+     *         the value to be processed
+     *
+     * @return the validator processing response
+     */
     public ConfigWizardValidatorProcessingResponse<Character> process(@Nonnull String value) {
         if (value.length() > 1) {
             MessageEmbed error = new EmbedBuilder()

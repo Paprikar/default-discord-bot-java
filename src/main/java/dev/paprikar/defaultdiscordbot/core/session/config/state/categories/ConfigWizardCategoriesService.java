@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.categories;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesCommand;
@@ -21,6 +21,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service for the configuration state of categories directory.
+ */
 @Service
 public class ConfigWizardCategoriesService extends AbstractConfigWizard {
 
@@ -28,6 +31,14 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
 
     private final DiscordCategoryService categoryService;
 
+    /**
+     * Constructs a configuration state service.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param commands
+     *         a {@link List} of instances of {@link ConfigWizardCategoriesCommand}
+     */
     @Autowired
     public ConfigWizardCategoriesService(DiscordCategoryService categoryService,
                                          List<ConfigWizardCategoriesCommand> commands) {
@@ -40,7 +51,7 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
 
     @Transactional
     @Override
-    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
+    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull ConfigWizardSession session) {
         logger.trace("handle(): privateSession={}", session);
 
         return super.handle(event, session);
@@ -48,7 +59,7 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
 
     @Transactional
     @Override
-    public void print(@Nonnull PrivateSession session, boolean addStateEmbed) {
+    public void print(@Nonnull ConfigWizardSession session, boolean addStateEmbed) {
         List<MessageEmbed> responses = session.getResponses();
 
         if (addStateEmbed) {

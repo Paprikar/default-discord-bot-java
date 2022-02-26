@@ -3,8 +3,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter
 import dev.paprikar.defaultdiscordbot.core.JDAService;
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation.ConfigWizardCategoryReserveDaysValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,6 +21,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The category reserve days setter in a configuration session.
+ */
 @Component
 public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCategorySetter {
 
@@ -33,6 +36,18 @@ public class ConfigWizardCategoryReserveDaysSetter implements ConfigWizardCatego
     private final SendingService sendingService;
     private final ConfigWizardCategoryReserveDaysValidator validator;
 
+    /**
+     * Constructs a setter.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param mediaActionService
+     *         an instance of {@link MediaActionService}
+     * @param sendingService
+     *         an instance of {@link SendingService}
+     * @param validator
+     *         an instance of {@link ConfigWizardCategoryReserveDaysValidator}
+     */
     @Autowired
     public ConfigWizardCategoryReserveDaysSetter(DiscordCategoryService categoryService,
                                                  MediaActionService mediaActionService,

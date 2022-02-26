@@ -3,8 +3,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter
 import dev.paprikar.defaultdiscordbot.core.JDAService;
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation.ConfigWizardCategoryApprovalEmojiValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,6 +21,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The category negative approval emoji setter in a configuration session.
+ */
 @Component
 public class ConfigWizardCategoryNegativeApprovalEmojiSetter implements ConfigWizardCategorySetter {
 
@@ -33,6 +36,18 @@ public class ConfigWizardCategoryNegativeApprovalEmojiSetter implements ConfigWi
     private final ApproveService approveService;
     private final ConfigWizardCategoryApprovalEmojiValidator validator;
 
+    /**
+     * Constructs a setter.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param mediaActionService
+     *         an instance of {@link MediaActionService}
+     * @param approveService
+     *         an instance of {@link ApproveService}
+     * @param validator
+     *         an instance of {@link ConfigWizardCategoryApprovalEmojiValidator}
+     */
     @Autowired
     public ConfigWizardCategoryNegativeApprovalEmojiSetter(DiscordCategoryService categoryService,
                                                            MediaActionService mediaActionService,

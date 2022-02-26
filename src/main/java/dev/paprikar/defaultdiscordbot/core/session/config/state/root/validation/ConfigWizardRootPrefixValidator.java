@@ -9,9 +9,20 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 
+/**
+ * The guild prefix validator in a configuration session.
+ */
 @Component
 public class ConfigWizardRootPrefixValidator {
 
+    /**
+     * Performs initial processing of the value.
+     *
+     * @param value
+     *         the value to be processed
+     *
+     * @return the validator processing response
+     */
     public ConfigWizardValidatorProcessingResponse<String> process(@Nonnull String value) {
         if (value.length() > 32) {
             MessageEmbed error = new EmbedBuilder()

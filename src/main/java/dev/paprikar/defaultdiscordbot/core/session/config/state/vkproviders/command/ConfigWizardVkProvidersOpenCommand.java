@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -16,6 +16,9 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * The command for switching to a vk provider.
+ */
 @Component
 public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvidersCommand {
 
@@ -25,6 +28,12 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvide
 
     private final DiscordProviderFromVkService vkProviderService;
 
+    /**
+     * Constructs the command.
+     *
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     */
     @Autowired
     public ConfigWizardVkProvidersOpenCommand(DiscordProviderFromVkService vkProviderService) {
         this.vkProviderService = vkProviderService;
@@ -32,7 +41,7 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvide
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         List<DiscordProviderFromVk> providers = vkProviderService.findAllByCategoryId(session.getEntityId());
         DiscordProviderFromVk targetProvider = providers.stream()

@@ -1,9 +1,14 @@
-package dev.paprikar.defaultdiscordbot.core.persistence.entity;
+package dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest;
+
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+/**
+ * An entity containing information about the media request.
+ */
 @Entity
 @Table(name = "discord_media_request", indexes = {
         @Index(name = "creation_timestamp_idx", columnList = "creation_timestamp")
@@ -30,43 +35,82 @@ public class DiscordMediaRequest {
     @Column(name = "creation_timestamp", nullable = false)
     private Timestamp creationTimestamp;
 
+    /**
+     * Constructs the entity.
+     */
     public DiscordMediaRequest() {
     }
 
+    /**
+     * Constructs the entity.
+     *
+     * @param category
+     *         the category
+     * @param content
+     *         the content
+     */
     public DiscordMediaRequest(DiscordCategory category, String content) {
         this.category = category;
         this.content = content;
         this.creationTimestamp = Timestamp.from(Instant.now());
     }
 
+    /**
+     * @return the id of the media request
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * @param id
+     *         the id of the media request
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * @return the category to which this media request is attached
+     */
     public DiscordCategory getCategory() {
         return category;
     }
 
+    /**
+     * @param category
+     *         the category to which this media request is attached
+     */
     public void setCategory(DiscordCategory category) {
         this.category = category;
     }
 
+    /**
+     * @return the content of the media request
+     */
     public String getContent() {
         return content;
     }
 
+    /**
+     * @param content
+     *         the content of the media request
+     */
     public void setContent(String content) {
         this.content = content;
     }
 
+    /**
+     * @return the time of creation of the media request
+     */
     public Timestamp getCreationTimestamp() {
         return creationTimestamp;
     }
 
+    /**
+     * @param creationTimestamp
+     *         the time of creation of the media request
+     */
     public void setCreationTimestamp(Timestamp creationTimestamp) {
         this.creationTimestamp = creationTimestamp;
     }

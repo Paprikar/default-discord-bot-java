@@ -8,12 +8,29 @@ import org.slf4j.LoggerFactory;
 
 import static dev.paprikar.defaultdiscordbot.utils.VkUtils.executeRequest;
 
+/**
+ * Handles vk group long poll api events.
+ */
 public class GroupLongPollApiHandler extends GroupLongPollApi {
 
     private static final Logger logger = LoggerFactory.getLogger(GroupLongPollApiHandler.class);
 
     private final VkSuggestionHandler suggestionHandler;
 
+    /**
+     * Constructs the handler.
+     *
+     * @param actor
+     *         the {@link GroupActor}
+     * @param maxReconnectDelay
+     *         the maximum reconnection delay of the handler in seconds
+     * @param suggestionService
+     *         an instance of {@link VkSuggestionService}
+     * @param suggestionHandler
+     *         an instance of {@link VkSuggestionHandler}
+     * @param monitorService
+     *         an instance of {@link MonitorService}
+     */
     public GroupLongPollApiHandler(GroupActor actor,
                                    int maxReconnectDelay,
                                    VkSuggestionService suggestionService,
@@ -24,6 +41,23 @@ public class GroupLongPollApiHandler extends GroupLongPollApi {
         this.suggestionHandler = suggestionHandler;
     }
 
+    /**
+     * Constructs the handler.
+     *
+     * @param actor
+     *         the {@link GroupActor}
+     * @param maxReconnectDelay
+     *         the maximum reconnection delay of the handler in seconds
+     * @param waitTime
+     *         the time for which the event request connection is kept. After it expires,
+     *         the connection will be closed and the handler will try to create a new request
+     * @param suggestionService
+     *         an instance of {@link VkSuggestionService}
+     * @param suggestionHandler
+     *         an instance of {@link VkSuggestionHandler}
+     * @param monitorService
+     *         an instance of {@link MonitorService}
+     */
     public GroupLongPollApiHandler(GroupActor actor,
                                    int maxReconnectDelay,
                                    int waitTime,

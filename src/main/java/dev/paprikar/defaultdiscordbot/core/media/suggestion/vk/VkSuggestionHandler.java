@@ -11,7 +11,7 @@ import com.vk.api.sdk.objects.wall.WallpostAttachment;
 import com.vk.api.sdk.objects.wall.WallpostAttachmentType;
 import com.vk.api.sdk.objects.wall.WallpostFull;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +23,9 @@ import java.util.*;
 
 import static dev.paprikar.defaultdiscordbot.utils.VkUtils.executeRequest;
 
+/**
+ * The service for handling vk suggestions.
+ */
 @Service
 public class VkSuggestionHandler {
 
@@ -38,6 +41,12 @@ public class VkSuggestionHandler {
 
     private final RequestErrorHandler suggestionSubmittingErrorHandler;
 
+    /**
+     * Constructs the service.
+     *
+     * @param approveService
+     *         an instance of {@link ApproveService}
+     */
     @Autowired
     public VkSuggestionHandler(ApproveService approveService) {
         this.approveService = approveService;
@@ -61,6 +70,16 @@ public class VkSuggestionHandler {
                 .build();
     }
 
+    /**
+     * Handles new vk messages.
+     *
+     * @param message
+     *         the {@link Message}
+     * @param actor
+     *         the {@link GroupActor}
+     * @param provider
+     *         the vk provider
+     */
     public void handleMessageNewEvent(@Nonnull Message message,
                                       @Nonnull GroupActor actor,
                                       @Nonnull DiscordProviderFromVk provider) {

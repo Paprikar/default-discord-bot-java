@@ -1,6 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.session.config;
 
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardExitCommand;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
@@ -11,13 +10,25 @@ import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * An abstract class for configuration state services.
+ */
 public abstract class AbstractConfigWizard implements ConfigWizard {
 
+    /**
+     * Map to get configuration commands by their aliases.
+     */
     // Map<CommandName, Command>
     protected final Map<String, ConfigWizardCommand> commands = new HashMap<>();
 
+    /**
+     * Error handler for sending responses.
+     */
     protected final RequestErrorHandler printingErrorHandler;
 
+    /**
+     * Constructs a configuration state service.
+     */
     protected AbstractConfigWizard() {
         setupCommands();
 
@@ -27,7 +38,7 @@ public abstract class AbstractConfigWizard implements ConfigWizard {
     }
 
     @Override
-    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull PrivateSession session) {
+    public ConfigWizardState handle(@Nonnull PrivateMessageReceivedEvent event, @Nonnull ConfigWizardSession session) {
         String message = event.getMessage().getContentRaw();
         FirstWordAndOther parts = new FirstWordAndOther(message);
         String commandName = parts.getFirstWord().toLowerCase();

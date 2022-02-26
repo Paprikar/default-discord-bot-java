@@ -1,9 +1,7 @@
-package dev.paprikar.defaultdiscordbot.core.session;
+package dev.paprikar.defaultdiscordbot.core.session.config;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
-import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -22,25 +20,36 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service for managing configuration sessions.
+ */
 @Service
-public class SessionService {
+public class ConfigWizardSessionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardSessionService.class);
 
     private final DiscordGuildService guildService;
 
     private final Map<ConfigWizardState, ConfigWizard> configWizardServices = new HashMap<>();
 
     // Map<InitiatorUserId, Session>
-    private final Map<Long, PrivateSession> activePrivateSessions = new ConcurrentHashMap<>();
+    private final Map<Long, ConfigWizardSession> activePrivateSessions = new ConcurrentHashMap<>();
 
     // Set<GuildDiscordId>
     private final Set<Long> activeGuilds = ConcurrentHashMap.newKeySet();
 
     private final RequestErrorHandler executionErrorHandler;
 
+    /**
+     * Constructs the service.
+     *
+     * @param guildService
+     *         an instance of {@link DiscordGuildService}
+     * @param configWizards
+     *         a {@link List} of instances of {@link ConfigWizard}
+     */
     @Autowired
-    public SessionService(DiscordGuildService guildService, List<ConfigWizard> configWizards) {
+    public ConfigWizardSessionService(DiscordGuildService guildService, List<ConfigWizard> configWizards) {
         this.guildService = guildService;
 
         configWizards.forEach(service -> this.configWizardServices.put(service.getState(), service));
@@ -50,9 +59,15 @@ public class SessionService {
                 .build();
     }
 
+    /**
+     * Handles events of type {@link PrivateMessageReceivedEvent}.
+     *
+     * @param event
+     *         the event of type {@link PrivateMessageReceivedEvent} for handling
+     */
     public void handlePrivateMessageReceivedEvent(PrivateMessageReceivedEvent event) {
         long userId = event.getAuthor().getIdLong();
-        PrivateSession session = activePrivateSessions.get(userId);
+        ConfigWizardSession session = activePrivateSessions.get(userId);
         if (session == null) {
             return;
         }
@@ -86,6 +101,12 @@ public class SessionService {
         }
     }
 
+    /**
+     * Handles events of type {@link GuildMessageReceivedEvent}.
+     *
+     * @param event
+     *         the event of type {@link GuildMessageReceivedEvent} for handling
+     */
     public void handleGuildMessageReceivedEvent(GuildMessageReceivedEvent event) {
         Member member = event.getMember();
         if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) {
@@ -93,7 +114,7 @@ public class SessionService {
         }
 
         long userId = event.getAuthor().getIdLong();
-        PrivateSession session = activePrivateSessions.get(userId);
+        ConfigWizardSession session = activePrivateSessions.get(userId);
         if (session != null) {
             session.getResponses().add(new EmbedBuilder()
                     .setColor(Color.GRAY)
@@ -135,7 +156,7 @@ public class SessionService {
         ConfigWizard initialService = configWizardServices.get(ConfigWizardState.ROOT);
 
         try {
-            session = new PrivateSession(event.getAuthor(), guildDiscordId, initialService, guildId);
+            session = new ConfigWizardSession(event.getAuthor(), guildDiscordId, initialService, guildId);
         } catch (RuntimeException e) {
             return;
         }

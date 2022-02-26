@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.root.command;
 
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -15,6 +15,9 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The command for switching to the directory in the initial directory.
+ */
 @Component
 public class ConfigWizardRootOpenCommand implements ConfigWizardRootCommand {
 
@@ -25,6 +28,9 @@ public class ConfigWizardRootOpenCommand implements ConfigWizardRootCommand {
     // Map<Directory, State>
     private final Map<String, ConfigWizardState> targets = new HashMap<>();
 
+    /**
+     * Constructs the command.
+     */
     @Autowired
     public ConfigWizardRootOpenCommand() {
         setupTargets();
@@ -32,7 +38,7 @@ public class ConfigWizardRootOpenCommand implements ConfigWizardRootCommand {
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         if (argsString == null) {
             logger.error("Required argument 'argsString' is missing for privateSession={}", session);

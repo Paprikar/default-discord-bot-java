@@ -10,14 +10,29 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 
+/**
+ * The vk provider credentials validator in a configuration session.
+ */
 @Component
 public class ConfigWizardVkProviderCredsValidator {
 
     private final VkApiClient client = VkSuggestionService.CLIENT;
 
+    /**
+     * Performs testing of credentials.
+     *
+     * @param groupId
+     *         the group id to be tested
+     * @param token
+     *         the token to be tested
+     *
+     * @return error of testing the credentials, or {@code null} if the test was successful
+     */
+    @Nullable
     public MessageEmbed test(@Nonnull Integer groupId, @Nonnull String token) {
         try {
             client.groupsLongPoll().getLongPollServer(new GroupActor(groupId, token), groupId).execute();

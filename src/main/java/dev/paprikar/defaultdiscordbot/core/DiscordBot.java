@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core;
 
 import dev.paprikar.defaultdiscordbot.config.DdbConfig;
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.LoginException;
 
+/**
+ * Component for launching a discord bot.
+ */
 @Component
 public class DiscordBot {
 
@@ -23,6 +26,18 @@ public class DiscordBot {
     private final DiscordEventListener eventListener;
     private final DdbConfig config;
 
+    /**
+     * Constructs the component.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param mediaActionService
+     *         an instance of {@link MediaActionService}
+     * @param eventListener
+     *         an instance of {@link DiscordEventListener}
+     * @param config
+     *         an instance of {@link DdbConfig}
+     */
     @Autowired
     public DiscordBot(DiscordCategoryService categoryService,
                       MediaActionService mediaActionService,
@@ -35,7 +50,7 @@ public class DiscordBot {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void init() {
+    private void init() {
         try {
             JDAService
                     .build(config.getToken(), config.getDiscordEventPoolSize(), config.getDiscordMaxReconnectDelay(),

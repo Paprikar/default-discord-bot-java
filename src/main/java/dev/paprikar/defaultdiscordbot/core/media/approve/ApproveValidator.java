@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.media.approve;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardDiscordTextChannelIdValidator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -14,16 +14,33 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The component for validating approval module variables.
+ */
 @Component
 public class ApproveValidator {
 
     private final ConfigWizardDiscordTextChannelIdValidator textChannelIdValidator;
 
+    /**
+     * Constructs an approval validator.
+     *
+     * @param textChannelIdValidator
+     *         an instance of {@link ConfigWizardDiscordTextChannelIdValidator}
+     */
     @Autowired
     public ApproveValidator(ConfigWizardDiscordTextChannelIdValidator textChannelIdValidator) {
         this.textChannelIdValidator = textChannelIdValidator;
     }
 
+    /**
+     * Performs a preliminary validation of module variables. In most cases a nullability check is performed.
+     *
+     * @param category
+     *         the category to validate
+     *
+     * @return the {@link List} of detected validation errors
+     */
     public List<MessageEmbed> validateInitially(@Nonnull DiscordCategory category) {
         List<MessageEmbed> errors = new ArrayList<>();
 
@@ -61,6 +78,16 @@ public class ApproveValidator {
         return errors;
     }
 
+    /**
+     * Performs the final validation of the module variables.
+     *
+     * @param category
+     *         the category to validate
+     * @param jda
+     *         an instance of {@link JDA}
+     *
+     * @return the {@link List} of detected validation errors
+     */
     public List<MessageEmbed> validateFinally(@Nonnull DiscordCategory category, @Nonnull JDA jda) {
         List<MessageEmbed> errors = new ArrayList<>();
 

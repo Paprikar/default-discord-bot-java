@@ -11,6 +11,9 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotBlank;
 
+/**
+ * Component for storing the application configuration.
+ */
 @Component
 @ConfigurationProperties("ddb")
 @Validated
@@ -28,45 +31,77 @@ public class DdbConfig implements Validator {
 
     private Integer vkMaxReconnectDelay = 64;
 
-    public DdbConfig() {
-    }
-
+    /**
+     * @return the token of the discord bot
+     */
     public String getToken() {
         return token;
     }
 
+    /**
+     * @param token
+     *         the token of the discord bot
+     */
     public void setToken(String token) {
         this.token = token;
     }
 
+    /**
+     * @return the default values
+     */
     public DdbDefaults getDefaults() {
         return defaults;
     }
 
+    /**
+     * @param defaults
+     *         the default values
+     */
     public void setDefaults(DdbDefaults defaults) {
         this.defaults = defaults;
     }
 
+    /**
+     * @return the event pool size of the discord bot
+     */
     public Integer getDiscordEventPoolSize() {
         return discordEventPoolSize;
     }
 
+    /**
+     * @param discordEventPoolSize
+     *         the event pool size of the discord bot
+     */
     public void setDiscordEventPoolSize(Integer discordEventPoolSize) {
         this.discordEventPoolSize = discordEventPoolSize;
     }
 
+    /**
+     * @return the maximum reconnection delay of the discord bot in seconds
+     */
     public Integer getDiscordMaxReconnectDelay() {
         return discordMaxReconnectDelay;
     }
 
+    /**
+     * @param maxDiscordReconnectDelay
+     *         the maximum reconnection delay of the discord bot in seconds
+     */
     public void setDiscordMaxReconnectDelay(Integer maxDiscordReconnectDelay) {
         this.discordMaxReconnectDelay = maxDiscordReconnectDelay;
     }
 
+    /**
+     * @return the maximum reconnection delay of the vk bot in seconds
+     */
     public Integer getVkMaxReconnectDelay() {
         return vkMaxReconnectDelay;
     }
 
+    /**
+     * @param maxVkReconnectDelay
+     *         the maximum reconnection delay of the vk bot in seconds
+     */
     public void setVkMaxReconnectDelay(Integer maxVkReconnectDelay) {
         this.vkMaxReconnectDelay = maxVkReconnectDelay;
     }
@@ -121,7 +156,7 @@ public class DdbConfig implements Validator {
         }
     }
 
-    static class PropertyFieldName {
+    private static class PropertyFieldName {
 
         public static final String DISCORD_EVENT_POOL_SIZE = "discord-event-pool-size";
 

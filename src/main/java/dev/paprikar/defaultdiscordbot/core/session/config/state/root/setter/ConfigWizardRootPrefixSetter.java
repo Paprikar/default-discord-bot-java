@@ -1,7 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.root.setter;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.validation.ConfigWizardRootPrefixValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,7 +14,11 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
+import java.util.List;
 
+/**
+ * The guild prefix setter in a configuration session.
+ */
 @Component
 public class ConfigWizardRootPrefixSetter implements ConfigWizardRootSetter {
 
@@ -25,6 +29,14 @@ public class ConfigWizardRootPrefixSetter implements ConfigWizardRootSetter {
     private final DiscordGuildService guildService;
     private final ConfigWizardRootPrefixValidator validator;
 
+    /**
+     * Constructs a setter.
+     *
+     * @param guildService
+     *         an instance of {@link DiscordGuildService}
+     * @param validator
+     *         an instance of {@link ConfigWizardRootPrefixValidator}
+     */
     @Autowired
     public ConfigWizardRootPrefixSetter(DiscordGuildService guildService, ConfigWizardRootPrefixValidator validator) {
         this.guildService = guildService;
@@ -32,13 +44,13 @@ public class ConfigWizardRootPrefixSetter implements ConfigWizardRootSetter {
     }
 
     @Override
-    public MessageEmbed set(@Nonnull String value, @Nonnull DiscordGuild guild) {
+    public List<MessageEmbed> set(@Nonnull String value, @Nonnull DiscordGuild guild) {
         ConfigWizardValidatorProcessingResponse<String> response = validator.process(value);
         String prefix = response.getValue();
         MessageEmbed error = response.getError();
 
         if (error != null) {
-            return error;
+            return List.of(error);
         }
 
         guild.setPrefix(prefix);
@@ -46,12 +58,12 @@ public class ConfigWizardRootPrefixSetter implements ConfigWizardRootSetter {
 
         logger.debug("The guild={id={}} value '{}' is set to '{}'", guild.getId(), VARIABLE_NAME, value);
 
-        return new EmbedBuilder()
+        return List.of(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
                 .appendDescription("The value `" + VARIABLE_NAME + "` has been set to `" + value + "`")
-                .build();
+                .build());
     }
 
     @Override

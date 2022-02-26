@@ -9,9 +9,20 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 
+/**
+ * The vk provider group id validator in a configuration session.
+ */
 @Component
 public class ConfigWizardVkProviderGroupIdValidator {
 
+    /**
+     * Performs initial processing of the value.
+     *
+     * @param value
+     *         the value to be processed
+     *
+     * @return the validator processing response
+     */
     public ConfigWizardValidatorProcessingResponse<Integer> process(@Nonnull String value) {
         int id;
 

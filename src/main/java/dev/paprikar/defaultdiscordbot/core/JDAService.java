@@ -9,6 +9,9 @@ import javax.annotation.Nullable;
 import javax.security.auth.login.LoginException;
 import java.util.concurrent.Executors;
 
+/**
+ * Service for working with an instance of {@link JDA}.
+ */
 public class JDAService {
 
     private static final CustomizableThreadFactory eventPoolThreadFactory = new CustomizableThreadFactory();
@@ -19,6 +22,26 @@ public class JDAService {
         eventPoolThreadFactory.setThreadNamePrefix("JDA-EventPool-");
     }
 
+    /**
+     * Builds an instance of {@link JDA}.
+     *
+     * @param token
+     *         the token of the discord bot
+     * @param eventPoolSize
+     *         the event pool size of the discord bot
+     * @param maxReconnectDelay
+     *         the maximum reconnection delay of the discord bot in seconds
+     * @param eventListener
+     *         the event listener of the discord bot
+     *
+     * @return the built instance of {@link JDA}
+     *
+     * @throws LoginException
+     *         in case of any {@link JDA} instance building errors.
+     *         See {@link JDABuilder#build()} for more details
+     * @see JDABuilder#build()
+     * @see LoginException
+     */
     public static JDA build(@Nonnull String token,
                             Integer eventPoolSize,
                             Integer maxReconnectDelay,
@@ -50,6 +73,11 @@ public class JDAService {
         return jda;
     }
 
+    /**
+     * Returns the instance of {@link JDA}.
+     *
+     * @return the instance of {@link JDA}
+     */
     @Nullable
     public static JDA get() {
         return jda;

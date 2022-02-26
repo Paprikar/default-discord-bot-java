@@ -1,10 +1,10 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderNameValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
@@ -19,6 +19,9 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The command to add vk providers.
+ */
 @Component
 public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvidersCommand {
 
@@ -30,6 +33,16 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvider
     private final DiscordProviderFromVkService vkProviderService;
     private final ConfigWizardVkProviderNameValidator validator;
 
+    /**
+     * Constructs the command.
+     *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     * @param validator
+     *         an instance of {@link ConfigWizardVkProviderNameValidator}
+     */
     @Autowired
     public ConfigWizardVkProvidersAddCommand(DiscordCategoryService categoryService,
                                              DiscordProviderFromVkService vkProviderService,
@@ -41,7 +54,7 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvider
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         List<MessageEmbed> responses = session.getResponses();
 

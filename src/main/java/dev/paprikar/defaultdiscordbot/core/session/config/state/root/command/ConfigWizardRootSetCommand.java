@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.root.command;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordGuild;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.core.session.PrivateSession;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.setter.ConfigWizardRootSetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The command for setting guild variables.
+ */
 @Component
 public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
 
@@ -34,6 +37,14 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
     // Map<VariableName, Setter>
     private final Map<String, ConfigWizardRootSetter> setters = new HashMap<>();
 
+    /**
+     * Constructs the command.
+     *
+     * @param guildService
+     *         an instance of {@link DiscordGuildService}
+     * @param setters
+     *         a {@link List} of instances of {@link ConfigWizardRootSetter}
+     */
     @Autowired
     public ConfigWizardRootSetCommand(DiscordGuildService guildService,
                                       List<ConfigWizardRootSetter> setters) {
@@ -44,7 +55,7 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
 
     @Override
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
-                                     @Nonnull PrivateSession session,
+                                     @Nonnull ConfigWizardSession session,
                                      String argsString) {
         Long entityId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
@@ -89,8 +100,8 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
         DiscordGuild guild = guildOptional.get();
 
         String value = parts.getOther();
-        MessageEmbed response = setter.set(value, guild);
-        responses.add(response);
+        List<MessageEmbed> setResponses = setter.set(value, guild);
+        responses.addAll(setResponses);
 
         return ConfigWizardState.KEEP;
     }

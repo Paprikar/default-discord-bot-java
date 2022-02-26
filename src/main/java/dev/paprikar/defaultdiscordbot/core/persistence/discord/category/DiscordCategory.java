@@ -1,5 +1,6 @@
-package dev.paprikar.defaultdiscordbot.core.persistence.entity;
+package dev.paprikar.defaultdiscordbot.core.persistence.discord.category;
 
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +9,9 @@ import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;
 
+/**
+ * An entity containing information about the category.
+ */
 @Entity
 @Table(name = "discord_category", indexes = {
         @Index(name = "discord_guild_id_idx", columnList = "discord_guild_id")
@@ -60,119 +64,221 @@ public class DiscordCategory {
     @Column(name = "last_send_timestamp")
     private Timestamp lastSendTimestamp;
 
+    /**
+     * Constructs the entity.
+     */
     public DiscordCategory() {
     }
 
+    /**
+     * @return the id of the category
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * @param id
+     *         the id of the category
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * @return the guild to which this category is attached
+     */
     public DiscordGuild getGuild() {
         return guild;
     }
 
+    /**
+     * @param guild
+     *         the guild to which this category is attached
+     */
     public void setGuild(DiscordGuild guild) {
         this.guild = guild;
     }
 
+    /**
+     * @return the name of the category
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @param name
+     *         the name of the category
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * @return the sending channel id of the category
+     */
     public Long getSendingChannelId() {
         return sendingChannelId;
     }
 
+    /**
+     * @param sendingChannelId
+     *         the sending channel id of the category
+     */
     public void setSendingChannelId(Long sendingChannelId) {
         this.sendingChannelId = sendingChannelId;
     }
 
+    /**
+     * @return the approval channel id of the category
+     */
     public Long getApprovalChannelId() {
         return approvalChannelId;
     }
 
+    /**
+     * @param approvalChannelId
+     *         the approval channel id of the category
+     */
     public void setApprovalChannelId(Long approvalChannelId) {
         this.approvalChannelId = approvalChannelId;
     }
 
+    /**
+     * @return the start time for sending of the category
+     */
     public Time getStartTime() {
         return startTime;
     }
 
+    /**
+     * @param startTime
+     *         the start time for sending of the category
+     */
     public void setStartTime(Time startTime) {
         this.startTime = startTime;
     }
 
+    /**
+     * @return the end time for sending of the category
+     */
     public Time getEndTime() {
         return endTime;
     }
 
+    /**
+     * @param endTime
+     *         the end time for sending of the category
+     */
     public void setEndTime(Time endTime) {
         this.endTime = endTime;
     }
 
+    /**
+     * @return the number of reserve days for sending of the category
+     */
     public Integer getReserveDays() {
         return reserveDays;
     }
 
+    /**
+     * @param reserveDays
+     *         the number of reserve days for sending of the category
+     */
     public void setReserveDays(Integer reserveDays) {
         this.reserveDays = reserveDays;
     }
 
+    /**
+     * @return the positive approval emoji of the category
+     */
     public Character getPositiveApprovalEmoji() {
         return positiveApprovalEmoji;
     }
 
+    /**
+     * @param positiveApprovalEmoji
+     *         the positive approval emoji of the category
+     */
     public void setPositiveApprovalEmoji(Character positiveApprovalEmoji) {
         this.positiveApprovalEmoji = positiveApprovalEmoji;
     }
 
+    /**
+     * @return the negative approval emoji of the category
+     */
     public Character getNegativeApprovalEmoji() {
         return negativeApprovalEmoji;
     }
 
+    /**
+     * @param negativeApprovalEmoji
+     *         the negative approval emoji of the category
+     */
     public void setNegativeApprovalEmoji(Character negativeApprovalEmoji) {
         this.negativeApprovalEmoji = negativeApprovalEmoji;
     }
 
+    /**
+     * @return {@code true} if the category is enabled, otherwise {@code false}
+     */
     public Boolean isEnabled() {
         return enabled;
     }
 
+    /**
+     * @param enabled
+     *         {@code true} if the category should be enabled, otherwise {@code false}
+     */
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 
+    /**
+     * @return the last suggestion sending time of the category
+     */
     public Timestamp getLastSendTimestamp() {
         return lastSendTimestamp;
     }
 
+    /**
+     * @param lastSendTimestamp
+     *         the last suggestion sending time of the category
+     */
     public void setLastSendTimestamp(Timestamp lastSendTimestamp) {
         this.lastSendTimestamp = lastSendTimestamp;
     }
 
+    /**
+     * Attaches the category to the specified guild.
+     *
+     * @param guild
+     *         the guild
+     *
+     * @throws IllegalStateException
+     *         if the category is already attached to the guild
+     */
     public void attach(@Nonnull DiscordGuild guild) {
         if (this.guild != null) {
             String message = "The category is already attached to the guild";
             logger.error(message);
-            throw new IllegalArgumentException(message);
+            throw new IllegalStateException(message);
         }
         this.guild = guild;
     }
 
+    /**
+     * Detaches the category from its guild.
+     *
+     * @throws IllegalStateException
+     *         if the category is already detached from the guild
+     */
     public void detach() {
         if (guild == null) {
             String message = "The category not attached to the guild cannot be detached from the guild";
             logger.error(message);
-            throw new IllegalArgumentException(message);
+            throw new IllegalStateException(message);
         }
         guild = null;
     }

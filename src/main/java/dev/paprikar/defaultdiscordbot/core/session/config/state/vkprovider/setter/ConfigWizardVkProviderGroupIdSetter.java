@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.sett
 
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.VkSuggestionService;
-import dev.paprikar.defaultdiscordbot.core.persistence.entity.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.core.persistence.service.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderCredsValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderGroupIdValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
@@ -20,6 +20,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The vk provider group id setter in a configuration session.
+ */
 @Component
 public class ConfigWizardVkProviderGroupIdSetter implements ConfigWizardVkProviderSetter {
 
@@ -33,6 +36,20 @@ public class ConfigWizardVkProviderGroupIdSetter implements ConfigWizardVkProvid
     private final ConfigWizardVkProviderGroupIdValidator validator;
     private final ConfigWizardVkProviderCredsValidator credsValidator;
 
+    /**
+     * Constructs a setter.
+     *
+     * @param vkProviderService
+     *         an instance of {@link DiscordProviderFromVkService}
+     * @param mediaActionService
+     *         an instance of {@link MediaActionService}
+     * @param vkSuggestionService
+     *         an instance of {@link VkSuggestionService}
+     * @param validator
+     *         an instance of {@link ConfigWizardVkProviderGroupIdValidator}
+     * @param credsValidator
+     *         an instance of {@link ConfigWizardVkProviderCredsValidator}
+     */
     @Autowired
     public ConfigWizardVkProviderGroupIdSetter(DiscordProviderFromVkService vkProviderService,
                                                MediaActionService mediaActionService,
@@ -55,6 +72,7 @@ public class ConfigWizardVkProviderGroupIdSetter implements ConfigWizardVkProvid
         if (error != null) {
             return List.of(error);
         }
+        assert groupId != null;
 
         List<MessageEmbed> responses = new ArrayList<>();
         boolean enabledResponse = false;
