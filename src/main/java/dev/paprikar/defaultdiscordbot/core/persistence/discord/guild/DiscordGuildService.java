@@ -33,7 +33,7 @@ public class DiscordGuildService {
      *
      * @return the {@link List} with all found guilds
      *
-     * @see org.springframework.data.repository.CrudRepository#findAll()
+     * @see org.springframework.data.repository.CrudRepository#findAll() CrudRepository#findAll()
      */
     public List<DiscordGuild> findAll() {
         return repository.findAll();
@@ -47,7 +47,7 @@ public class DiscordGuildService {
      *
      * @return the found guild
      *
-     * @see org.springframework.data.repository.CrudRepository#findById(Object) CrudRepository.findById()
+     * @see org.springframework.data.repository.CrudRepository#findById(Object) CrudRepository#findById(Object)
      */
     public Optional<DiscordGuild> findById(long id) {
         return repository.findById(id);
@@ -62,9 +62,9 @@ public class DiscordGuildService {
      * @return the found guild
      *
      * @throws EntityNotFoundException
-     *         see {@link EntityManager#getReference(Class, Object) EntityManager#getReference()} for more details
-     * @see org.springframework.data.jpa.repository.JpaRepository#getById(Object) JpaRepository#getById()
-     * @see EntityManager#getReference(Class, Object) EntityManager#getReference()
+     *         see {@link EntityManager#getReference(Class, Object)} for more details
+     * @see org.springframework.data.jpa.repository.JpaRepository#getById(Object) JpaRepository#getById(Object)
+     * @see EntityManager#getReference(Class, Object)
      */
     public DiscordGuild getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
@@ -78,7 +78,7 @@ public class DiscordGuildService {
      *
      * @return the found guild
      *
-     * @see org.springframework.data.repository.CrudRepository#findById(Object) CrudRepository.findById()
+     * @see org.springframework.data.repository.CrudRepository#findById(Object) CrudRepository#findById(Object)
      */
     public Optional<DiscordGuild> findByDiscordId(long id) {
         return repository.findByDiscordId(id);

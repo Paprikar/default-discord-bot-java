@@ -1,0 +1,13 @@
+# logging
+logging.level:
+  root: warn
+  dev.paprikar.defaultdiscordbot: info
+  net.dv8tion.jda: info
+  com.vk.api.sdk: info
+
+# persistence
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate.ddl-auto: update
+    open-in-view: false

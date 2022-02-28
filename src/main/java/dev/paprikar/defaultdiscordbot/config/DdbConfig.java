@@ -126,7 +126,11 @@ public class DdbConfig implements Validator {
     public void validate(@Nonnull Object target, @Nonnull Errors errors) {
         DdbConfig config = (DdbConfig) target;
 
-        config.defaults.validate(errors);
+        if (defaults == null) {
+            defaults = new DdbDefaults();
+        } else {
+            config.defaults.validate(errors);
+        }
 
         validateDiscordEventPoolSize(errors);
 

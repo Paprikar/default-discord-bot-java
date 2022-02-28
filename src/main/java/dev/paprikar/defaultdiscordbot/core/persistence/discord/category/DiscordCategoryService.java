@@ -34,7 +34,7 @@ public class DiscordCategoryService {
      *
      * @return the {@link List} with all found categories
      *
-     * @see org.springframework.data.repository.CrudRepository#findAll()
+     * @see org.springframework.data.repository.CrudRepository#findAll() CrudRepository#findAll()
      */
     public List<DiscordCategory> findAll() {
         return repository.findAll();
@@ -48,7 +48,7 @@ public class DiscordCategoryService {
      *
      * @return the found category
      *
-     * @see org.springframework.data.repository.CrudRepository#findById(Object) CrudRepository.findById()
+     * @see org.springframework.data.repository.CrudRepository#findById(Object) CrudRepository#findById(Object)
      */
     public Optional<DiscordCategory> findById(long id) {
         return repository.findById(id);
@@ -63,9 +63,9 @@ public class DiscordCategoryService {
      * @return the found category
      *
      * @throws EntityNotFoundException
-     *         see {@link EntityManager#getReference(Class, Object) EntityManager#getReference()} for more details
-     * @see org.springframework.data.jpa.repository.JpaRepository#getById(Object) JpaRepository#getById()
-     * @see EntityManager#getReference(Class, Object) EntityManager#getReference()
+     *         see {@link EntityManager#getReference(Class, Object)} for more details
+     * @see org.springframework.data.jpa.repository.JpaRepository#getById(Object) JpaRepository#getById(Object)
+     * @see EntityManager#getReference(Class, Object)
      */
     public DiscordCategory getById(long id) throws EntityNotFoundException {
         return repository.getById(id);

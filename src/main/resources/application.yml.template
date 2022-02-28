@@ -1,0 +1,28 @@
+# logging
+logging.level:
+  root: warn
+  dev.paprikar.defaultdiscordbot: info
+  net.dv8tion.jda: info
+  com.vk.api.sdk: info
+
+# persistence
+spring:
+  datasource:
+    url: <URL>
+    username: <USERNAME>
+    password: <PASSWORD>
+  jpa:
+    generate-ddl: true
+    hibernate.ddl-auto: update
+    open-in-view: false
+
+# ddb
+ddb:
+  token: <DISCORD_BOT_TOKEN>
+  defaults:
+    prefix: !
+    positive-approval-emoji: ✅
+    negative-approval-emoji: ❎
+  discord-event-pool-size: 0
+  max-discord-reconnect-delay: 64
+  max-vk-reconnect-delay: 64

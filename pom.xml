@@ -5,14 +5,14 @@
 
     <groupId>dev.paprikar</groupId>
     <artifactId>default-discord-bot</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.3.0</version>
     <name>default-discord-bot</name>
     <description>Discord bot aimed at working with media content written in JAVA</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.2</version>
+        <version>2.6.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -94,6 +94,23 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <to>
+                        <image>${project.name}</image>
+                        <tags>
+                            <tag>${project.version}</tag>
+                        </tags>
+                    </to>
+                    <container>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                    </container>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
