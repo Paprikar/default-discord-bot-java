@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command.ConfigWizardDiscordProvidersCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -28,7 +28,7 @@ import java.util.Optional;
  * Service for the configuration state of discord providers directory.
  */
 @Service
-public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
+public class ConfigWizardDiscordProvidersService extends ConfigWizard {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersService.class);
 
@@ -77,9 +77,9 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
                 logger.error("print(): Unable to get category={id={}} for privateSession={}", categoryId, session);
                 return;
             }
+            DiscordCategory category = categoryOptional.get();
 
-            MessageEmbed embed = getDescription(
-                    categoryOptional.get(), discordProviderService.findAllByCategoryId(categoryId));
+            MessageEmbed embed = getDescription(category, discordProviderService.findAllByCategoryId(categoryId));
             responses.add(embed);
         }
 
@@ -96,8 +96,7 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
         return ConfigWizardState.DISCORD_PROVIDERS;
     }
 
-    private MessageEmbed getDescription(@Nonnull DiscordCategory category,
-                                        @Nonnull List<DiscordProviderFromDiscord> providers) {
+    private MessageEmbed getDescription(DiscordCategory category, List<DiscordProviderFromDiscord> providers) {
         EmbedBuilder builder = new EmbedBuilder();
         builder
                 .setColor(Color.GRAY)
@@ -117,6 +116,7 @@ public class ConfigWizardDiscordProvidersService extends AbstractConfigWizard {
         builder.appendDescription("Available commands:\n");
         builder.appendDescription("`open` `<name>`\n");
         builder.appendDescription("`add` `<name>`\n");
+        builder.appendDescription("`remove` `<name>`\n");
         builder.appendDescription("`back`\n");
         builder.appendDescription("`exit`");
 

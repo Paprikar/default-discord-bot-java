@@ -4,8 +4,8 @@ import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.VkSuggestionServi
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.command.ConfigWizardVkProviderCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -28,7 +28,7 @@ import java.util.Optional;
  * Service for the configuration state of vk provider directory.
  */
 @Service
-public class ConfigWizardVkProviderService extends AbstractConfigWizard {
+public class ConfigWizardVkProviderService extends ConfigWizard {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderService.class);
 
@@ -77,8 +77,9 @@ public class ConfigWizardVkProviderService extends AbstractConfigWizard {
                 logger.error("print(): Unable to get vkProvider={id={}} for privateSession={}", providerId, session);
                 return;
             }
+            DiscordProviderFromVk provider = categoryOptional.get();
 
-            MessageEmbed embed = getDescription(categoryOptional.get());
+            MessageEmbed embed = getDescription(provider);
             responses.add(embed);
         }
 
@@ -95,7 +96,7 @@ public class ConfigWizardVkProviderService extends AbstractConfigWizard {
         return ConfigWizardState.VK_PROVIDER;
     }
 
-    private MessageEmbed getDescription(@Nonnull DiscordProviderFromVk provider) {
+    private MessageEmbed getDescription(DiscordProviderFromVk provider) {
         DiscordCategory category = provider.getCategory();
         EmbedBuilder builder = new EmbedBuilder();
         builder
@@ -121,7 +122,6 @@ public class ConfigWizardVkProviderService extends AbstractConfigWizard {
         builder.appendDescription("`set` `<variable>` `<value>`\n");
         builder.appendDescription("`enable`\n");
         builder.appendDescription("`disable`\n");
-        builder.appendDescription("`remove`\n");
         builder.appendDescription("`back`\n");
         builder.appendDescription("`exit`");
 

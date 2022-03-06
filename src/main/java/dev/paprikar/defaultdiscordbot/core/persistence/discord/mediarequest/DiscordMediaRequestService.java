@@ -29,17 +29,6 @@ public class DiscordMediaRequestService {
     }
 
     /**
-     * Finds all media requests.
-     *
-     * @return the {@link List} with all found media requests
-     *
-     * @see org.springframework.data.repository.CrudRepository#findAll() CrudRepository#findAll()
-     */
-    public List<DiscordMediaRequest> findAll() {
-        return repository.findAll();
-    }
-
-    /**
      * Finds the media request by its id.
      *
      * @param id
@@ -51,6 +40,18 @@ public class DiscordMediaRequestService {
      */
     public Optional<DiscordMediaRequest> findById(long id) {
         return repository.findById(id);
+    }
+
+    /**
+     * Finds the oldest media request by its category id.
+     *
+     * @param id
+     *         the category id of the media request
+     *
+     * @return the found media request
+     */
+    public Optional<DiscordMediaRequest> findFirstByCategoryId(long id) {
+        return repository.findFirstByCategoryIdOrderByCreationTimestampAsc(id);
     }
 
     /**
@@ -68,6 +69,29 @@ public class DiscordMediaRequestService {
      */
     public DiscordMediaRequest getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
+    }
+
+    /**
+     * Counts all media requests with the specified id of their category.
+     *
+     * @param id
+     *         the category id of the media requests
+     *
+     * @return the number of found media requests
+     */
+    public long countByCategoryId(long id) {
+        return repository.countByCategoryId(id);
+    }
+
+    /**
+     * Finds all media requests.
+     *
+     * @return the {@link List} with all found media requests
+     *
+     * @see org.springframework.data.repository.CrudRepository#findAll() CrudRepository#findAll()
+     */
+    public List<DiscordMediaRequest> findAll() {
+        return repository.findAll();
     }
 
     /**
@@ -112,29 +136,5 @@ public class DiscordMediaRequestService {
      */
     public void deleteByCategoryId(long id) {
         repository.deleteByCategoryId(id);
-    }
-
-    /**
-     * Finds the oldest media request by its category id.
-     *
-     * @param id
-     *         the category id of the media request
-     *
-     * @return the found media request
-     */
-    public Optional<DiscordMediaRequest> findFirstByCategoryId(long id) {
-        return repository.findFirstByCategoryIdOrderByCreationTimestampAsc(id);
-    }
-
-    /**
-     * Counts all media requests with the specified id of their category.
-     *
-     * @param id
-     *         the category id of the media requests
-     *
-     * @return the number of found media requests
-     */
-    public long countByCategoryId(long id) {
-        return repository.countByCategoryId(id);
     }
 }

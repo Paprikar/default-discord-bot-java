@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The command for switching to a discord provider.
@@ -45,7 +46,7 @@ public class ConfigWizardDiscordProvidersOpenCommand implements ConfigWizardDisc
                                      String argsString) {
         List<DiscordProviderFromDiscord> providers = discordProviderService.findAllByCategoryId(session.getEntityId());
         DiscordProviderFromDiscord targetProvider = providers.stream()
-                .filter(provider -> argsString.equals(provider.getName()))
+                .filter(provider -> Objects.equals(provider.getName(), argsString))
                 .findFirst()
                 .orElse(null);
         if (targetProvider == null) {
@@ -63,7 +64,6 @@ public class ConfigWizardDiscordProvidersOpenCommand implements ConfigWizardDisc
         session.setEntityId(targetProvider.getId());
 
         logger.debug("Open at DISCORD_PROVIDERS: privateSession={}, target='{}'", session, argsString);
-
         return ConfigWizardState.DISCORD_PROVIDER;
     }
 

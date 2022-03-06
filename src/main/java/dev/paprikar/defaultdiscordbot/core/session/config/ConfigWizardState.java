@@ -31,6 +31,11 @@ public enum ConfigWizardState {
     CATEGORIES,
 
     /**
+     * The state of the session in trusted suggesters directory.
+     */
+    TRUSTED_SUGGESTERS,
+
+    /**
      * The state of the session in category directory.
      */
     CATEGORY,

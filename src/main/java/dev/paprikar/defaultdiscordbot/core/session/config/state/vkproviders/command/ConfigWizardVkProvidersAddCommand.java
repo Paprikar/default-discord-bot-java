@@ -1,13 +1,14 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderNameValidator;
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import java.awt.*;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,9 +76,9 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvider
 
         DiscordProviderFromVk provider = new DiscordProviderFromVk();
 
-        provider.attach(category);
+        provider.setCategory(category);
 
-        ConfigWizardValidatorProcessingResponse<String> response = validator.process(argsString, provider);
+        DiscordValidatorProcessingResponse<String> response = validator.process(argsString, provider);
         String name = response.getValue();
         MessageEmbed error = response.getError();
 
@@ -83,15 +86,27 @@ public class ConfigWizardVkProvidersAddCommand implements ConfigWizardVkProvider
             responses.add(error);
             return ConfigWizardState.KEEP;
         }
+        assert name != null;
+
+        error = validator.test(name, categoryId);
+        if (error != null) {
+            responses.add(error);
+            return ConfigWizardState.KEEP;
+        }
 
         provider.setName(name);
-        provider = vkProviderService.save(provider);
+        vkProviderService.save(provider);
 
-        session.setEntityId(provider.getId());
+        responses.add(new EmbedBuilder()
+                .setColor(Color.GRAY)
+                .setTitle("Configuration Wizard")
+                .setTimestamp(Instant.now())
+                .appendDescription("The provider `" + argsString + "` has been added")
+                .build()
+        );
 
         logger.debug("Add at VK_PROVIDERS: privateSession={}, name='{}'", session, name);
-
-        return ConfigWizardState.VK_PROVIDER;
+        return ConfigWizardState.KEEP;
     }
 
     @Override

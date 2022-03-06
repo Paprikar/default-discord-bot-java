@@ -6,12 +6,11 @@ import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequest;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
 import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -37,7 +36,6 @@ public class ApproveService {
     private static final Logger logger = LoggerFactory.getLogger(ApproveService.class);
 
     private final DiscordCategoryService categoryService;
-    private final DiscordMediaRequestService mediaRequestService;
     private final SendingService sendingService;
     private final MonitorService monitorService;
 
@@ -54,8 +52,6 @@ public class ApproveService {
      *
      * @param categoryService
      *         an instance of {@link DiscordCategoryService}
-     * @param mediaRequestService
-     *         an instance of {@link DiscordMediaRequestService}
      * @param sendingService
      *         an instance of {@link SendingService}
      * @param monitorService
@@ -63,11 +59,9 @@ public class ApproveService {
      */
     @Autowired
     public ApproveService(DiscordCategoryService categoryService,
-                          DiscordMediaRequestService mediaRequestService,
                           SendingService sendingService,
                           MonitorService monitorService) {
         this.categoryService = categoryService;
-        this.mediaRequestService = mediaRequestService;
         this.sendingService = sendingService;
         this.monitorService = monitorService;
 
@@ -142,10 +136,11 @@ public class ApproveService {
                 String positiveEmoji = category.getPositiveApprovalEmoji().toString();
                 String negativeEmoji = category.getNegativeApprovalEmoji().toString();
 
-                // todo suggester info
                 if (emoji.equals(positiveEmoji)) {
                     message.delete().complete();
-                    approve(category, message.getContentRaw());
+
+                    String url = Objects.requireNonNull(message.getEmbeds().get(0).getImage()).getUrl();
+                    sendingService.submit(category, url);
                 } else if (emoji.equals(negativeEmoji)) {
                     message.delete().complete();
                 }
@@ -160,13 +155,14 @@ public class ApproveService {
      *
      * @param category
      *         the suggestion category
-     * @param url
-     *         the suggestion URL
+     * @param suggestion
+     *         suggestion embed, which includes information about the suggestion and
+     *         the suggester, allowing it to be tracked within a particular provider
      * @param onSubmitError
      *         the handler for errors during submission
      */
     public void submit(@Nonnull DiscordCategory category,
-                       @Nonnull String url,
+                       @Nonnull MessageEmbed suggestion,
                        Consumer<Throwable> onSubmitError) {
         Long approvalChannelId = category.getApprovalChannelId();
 
@@ -178,31 +174,15 @@ public class ApproveService {
         String positiveEmoji = category.getPositiveApprovalEmoji().toString();
         String negativeEmoji = category.getNegativeApprovalEmoji().toString();
 
-        logger.debug("submit(): Submitting the suggestion with url={} to text channel with id={}",
-                url, approvalChannelId);
+        Consumer<Void> onSubmitSuccess = unused -> logger.debug("submit(): The suggestion={timestamp={}} "
+                        + "was successfully submitted to text channel with id={}",
+                suggestion.getTimestamp(), approvalChannelId);
 
-        Consumer<Void> onSubmitSuccess = unused -> logger.debug("submit(): The suggestion with url={} "
-                + "was successfully submitted to text channel with id={}", url, approvalChannelId);
-
-        // todo add suggester info
-        approvalChannel.sendMessage(url)
+        approvalChannel.sendMessageEmbeds(suggestion)
                 .flatMap(message -> message
                         .addReaction(positiveEmoji)
                         .and(message.addReaction(negativeEmoji)))
                 .queue(onSubmitSuccess, onSubmitError);
-    }
-
-    /**
-     * Approves the suggestion and adds it to the queue.
-     *
-     * @param category
-     *         the suggestion category
-     * @param content
-     *         the suggestion content
-     */
-    public void approve(DiscordCategory category, String content) {
-        mediaRequestService.save(new DiscordMediaRequest(category, content));
-        sendingService.update(category);
     }
 
     /**

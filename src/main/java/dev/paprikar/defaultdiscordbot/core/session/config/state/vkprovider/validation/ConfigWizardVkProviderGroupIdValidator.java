@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation;
 
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ public class ConfigWizardVkProviderGroupIdValidator {
      *
      * @return the validator processing response
      */
-    public ConfigWizardValidatorProcessingResponse<Integer> process(@Nonnull String value) {
+    public DiscordValidatorProcessingResponse<Integer> process(@Nonnull String value) {
         int id;
 
         try {
@@ -35,9 +35,9 @@ public class ConfigWizardVkProviderGroupIdValidator {
                     .setTimestamp(Instant.now())
                     .appendDescription("The value has an invalid format")
                     .build();
-            return new ConfigWizardValidatorProcessingResponse<>(null, error);
+            return new DiscordValidatorProcessingResponse<>(null, error);
         }
 
-        return new ConfigWizardValidatorProcessingResponse<>(id, null);
+        return new DiscordValidatorProcessingResponse<>(id, null);
     }
 }

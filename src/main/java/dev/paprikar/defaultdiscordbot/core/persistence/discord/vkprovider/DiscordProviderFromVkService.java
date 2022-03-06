@@ -1,6 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,17 +26,6 @@ public class DiscordProviderFromVkService {
     @Autowired
     public DiscordProviderFromVkService(DiscordProviderFromVkRepository repository) {
         this.repository = repository;
-    }
-
-    /**
-     * Finds all vk providers.
-     *
-     * @return the {@link List} with all found vk providers
-     *
-     * @see org.springframework.data.repository.CrudRepository#findAll() CrudRepository#findAll()
-     */
-    public List<DiscordProviderFromVk> findAll() {
-        return repository.findAll();
     }
 
     /**
@@ -69,6 +57,17 @@ public class DiscordProviderFromVkService {
      */
     public DiscordProviderFromVk getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
+    }
+
+    /**
+     * Finds all vk providers.
+     *
+     * @return the {@link List} with all found vk providers
+     *
+     * @see org.springframework.data.repository.CrudRepository#findAll() CrudRepository#findAll()
+     */
+    public List<DiscordProviderFromVk> findAll() {
+        return repository.findAll();
     }
 
     /**
@@ -113,31 +112,5 @@ public class DiscordProviderFromVkService {
      */
     public void deleteByCategoryId(long id) {
         repository.deleteByCategoryId(id);
-    }
-
-    /**
-     * Attaches the vk provider to the specified category and saves it.
-     *
-     * @param provider
-     *         the vk provider
-     * @param category
-     *         the category
-     *
-     * @return the saved vk provider with all its changes
-     */
-    public DiscordProviderFromVk attach(@Nonnull DiscordProviderFromVk provider, @Nonnull DiscordCategory category) {
-        provider.attach(category);
-        return repository.save(provider);
-    }
-
-    /**
-     * Detaches the vk provider from its category and deletes it.
-     *
-     * @param provider
-     *         the vk provider
-     */
-    public void detach(@Nonnull DiscordProviderFromVk provider) {
-        provider.detach();
-        repository.delete(provider);
     }
 }

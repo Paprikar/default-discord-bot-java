@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation;
 
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.stereotype.Component;
@@ -10,6 +10,7 @@ import java.awt.*;
 import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
@@ -26,10 +27,11 @@ public class ConfigWizardCategoryTimeValidator {
      *
      * @return the validator processing response
      */
-    public ConfigWizardValidatorProcessingResponse<Time> process(@Nonnull String value) {
+    public DiscordValidatorProcessingResponse<Time> process(@Nonnull String value) {
         Time time;
+
         try {
-            time = Time.valueOf(LocalTime.parse(value));
+            time = Time.valueOf(LocalTime.parse(value, DateTimeFormatter.ISO_LOCAL_TIME));
         } catch (DateTimeParseException e) {
             MessageEmbed error = new EmbedBuilder()
                     .setColor(Color.RED)
@@ -37,9 +39,9 @@ public class ConfigWizardCategoryTimeValidator {
                     .setTimestamp(Instant.now())
                     .appendDescription("The value has an invalid format")
                     .build();
-            return new ConfigWizardValidatorProcessingResponse<>(null, error);
+            return new DiscordValidatorProcessingResponse<>(null, error);
         }
 
-        return new ConfigWizardValidatorProcessingResponse<>(time, null);
+        return new DiscordValidatorProcessingResponse<>(time, null);
     }
 }

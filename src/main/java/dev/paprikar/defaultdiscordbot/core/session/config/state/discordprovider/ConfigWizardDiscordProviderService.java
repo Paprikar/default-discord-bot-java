@@ -4,8 +4,8 @@ import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSugge
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.command.ConfigWizardDiscordProviderCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -28,7 +28,7 @@ import java.util.Optional;
  * Service for the configuration state of discord provider directory.
  */
 @Service
-public class ConfigWizardDiscordProviderService extends AbstractConfigWizard {
+public class ConfigWizardDiscordProviderService extends ConfigWizard {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderService.class);
 
@@ -78,8 +78,9 @@ public class ConfigWizardDiscordProviderService extends AbstractConfigWizard {
                         providerId, session);
                 return;
             }
+            DiscordProviderFromDiscord provider = discordProviderOptional.get();
 
-            MessageEmbed embed = getDescription(discordProviderOptional.get());
+            MessageEmbed embed = getDescription(provider);
             responses.add(embed);
         }
 
@@ -96,7 +97,7 @@ public class ConfigWizardDiscordProviderService extends AbstractConfigWizard {
         return ConfigWizardState.DISCORD_PROVIDER;
     }
 
-    private MessageEmbed getDescription(@Nonnull DiscordProviderFromDiscord provider) {
+    private MessageEmbed getDescription(DiscordProviderFromDiscord provider) {
         DiscordCategory category = provider.getCategory();
         EmbedBuilder builder = new EmbedBuilder();
         builder
@@ -121,7 +122,6 @@ public class ConfigWizardDiscordProviderService extends AbstractConfigWizard {
         builder.appendDescription("`set` `<variable>` `<value>`\n");
         builder.appendDescription("`enable`\n");
         builder.appendDescription("`disable`\n");
-        builder.appendDescription("`remove`\n");
         builder.appendDescription("`back`\n");
         builder.appendDescription("`exit`");
 

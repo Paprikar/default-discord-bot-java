@@ -57,7 +57,7 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull ConfigWizardSession session,
                                      String argsString) {
-        Long entityId = session.getEntityId();
+        Long categoryId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
 
         if (argsString == null) {
@@ -92,9 +92,9 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
             return ConfigWizardState.KEEP;
         }
 
-        Optional<DiscordCategory> categoryOptional = categoryService.findById(entityId);
+        Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
         if (categoryOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get category={id={}} for privateSession={}", entityId, session);
+            logger.warn("execute(): Unable to get category={id={}} for privateSession={}", categoryId, session);
             return ConfigWizardState.IGNORE;
         }
         DiscordCategory category = categoryOptional.get();

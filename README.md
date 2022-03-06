@@ -116,6 +116,12 @@ respond to the command, it must be preceded by a prefix.
   List the names of the required categories separated by a space to send information about the corresponding categories,
   otherwise send information about all of them.
 
+- connections
+
+  Initiates a connections session in the DM's with the bot.
+
+  Connections are used for additional features within other services (e.g. vk, telegram, twitter, etc.).
+
 - config
 
   > The user typing this command must have administrator rights on the corresponding discord server.

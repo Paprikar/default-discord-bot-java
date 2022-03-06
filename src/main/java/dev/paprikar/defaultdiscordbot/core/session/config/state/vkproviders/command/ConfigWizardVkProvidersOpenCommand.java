@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The command for switching to a vk provider.
@@ -45,7 +46,7 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvide
                                      String argsString) {
         List<DiscordProviderFromVk> providers = vkProviderService.findAllByCategoryId(session.getEntityId());
         DiscordProviderFromVk targetProvider = providers.stream()
-                .filter(provider -> argsString.equals(provider.getName()))
+                .filter(provider -> Objects.equals(provider.getName(), argsString))
                 .findFirst()
                 .orElse(null);
         if (targetProvider == null) {
@@ -63,7 +64,6 @@ public class ConfigWizardVkProvidersOpenCommand implements ConfigWizardVkProvide
         session.setEntityId(targetProvider.getId());
 
         logger.debug("Open at VK_PROVIDERS: privateSession={}, target='{}'", session, argsString);
-
         return ConfigWizardState.VK_PROVIDER;
     }
 

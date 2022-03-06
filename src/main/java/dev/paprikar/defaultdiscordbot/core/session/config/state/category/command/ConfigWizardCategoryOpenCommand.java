@@ -65,6 +65,7 @@ public class ConfigWizardCategoryOpenCommand implements ConfigWizardCategoryComm
     private void setupTargets() {
         targets.put("discord providers", ConfigWizardState.DISCORD_PROVIDERS);
         targets.put("vk providers", ConfigWizardState.VK_PROVIDERS);
+        targets.put("trusted suggesters", ConfigWizardState.TRUSTED_SUGGESTERS);
     }
 
     @Override

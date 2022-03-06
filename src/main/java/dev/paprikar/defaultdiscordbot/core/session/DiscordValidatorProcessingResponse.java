@@ -1,4 +1,4 @@
-package dev.paprikar.defaultdiscordbot.core.session.config.validation;
+package dev.paprikar.defaultdiscordbot.core.session;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
  * @param <T>
  *         the type of value processed by the validator
  */
-public class ConfigWizardValidatorProcessingResponse<T> {
+public class DiscordValidatorProcessingResponse<T> {
 
     private final T value;
 
@@ -25,7 +25,7 @@ public class ConfigWizardValidatorProcessingResponse<T> {
      * @param error
      *         the validator processing error
      */
-    public ConfigWizardValidatorProcessingResponse(T value, MessageEmbed error) {
+    public DiscordValidatorProcessingResponse(T value, MessageEmbed error) {
         this.value = value;
         this.error = error;
     }

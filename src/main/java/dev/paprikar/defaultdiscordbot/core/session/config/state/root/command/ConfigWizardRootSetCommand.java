@@ -57,7 +57,7 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull ConfigWizardSession session,
                                      String argsString) {
-        Long entityId = session.getEntityId();
+        Long guildId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
 
         if (argsString == null) {
@@ -92,9 +92,9 @@ public class ConfigWizardRootSetCommand implements ConfigWizardRootCommand {
             return ConfigWizardState.KEEP;
         }
 
-        Optional<DiscordGuild> guildOptional = guildService.findById(entityId);
+        Optional<DiscordGuild> guildOptional = guildService.findById(guildId);
         if (guildOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get guild={id={}} for privateSession={}", entityId, session);
+            logger.warn("execute(): Unable to get guild={id={}} for privateSession={}", guildId, session);
             return ConfigWizardState.IGNORE;
         }
         DiscordGuild guild = guildOptional.get();

@@ -53,12 +53,12 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
-        Long entityId = session.getEntityId();
+        Long providerId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
 
-        Optional<DiscordProviderFromVk> providerOptional = vkProviderService.findById(entityId);
+        Optional<DiscordProviderFromVk> providerOptional = vkProviderService.findById(providerId);
         if (providerOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", entityId, session);
+            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", providerId, session);
             return ConfigWizardState.IGNORE;
         }
         DiscordProviderFromVk provider = providerOptional.get();

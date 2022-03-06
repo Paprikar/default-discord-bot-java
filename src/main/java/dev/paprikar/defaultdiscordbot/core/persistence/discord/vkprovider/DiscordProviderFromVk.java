@@ -1,10 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.persistence.*;
 
 /**
@@ -13,8 +10,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "discord_provider_from_vk")
 public class DiscordProviderFromVk {
-
-    private static final Logger logger = LoggerFactory.getLogger(DiscordProviderFromVk.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
@@ -25,8 +20,8 @@ public class DiscordProviderFromVk {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "discord_category_id",
-            foreignKey = @ForeignKey(name = "discord_category_id_fkey"),
+    @JoinColumn(name = "category_id",
+            foreignKey = @ForeignKey(name = "category_id_fkey"),
             nullable = false)
     private DiscordCategory category;
 
@@ -41,9 +36,6 @@ public class DiscordProviderFromVk {
 
     @Column(nullable = false)
     private Boolean enabled = false;
-
-    // todo vip list
-
 
     /**
      * Constructs the entity.
@@ -139,39 +131,6 @@ public class DiscordProviderFromVk {
      */
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
-    }
-
-    /**
-     * Attaches the vk provider to the specified category.
-     *
-     * @param category
-     *         the category
-     *
-     * @throws IllegalStateException
-     *         if the vk provider is already attached to the category
-     */
-    public void attach(@Nonnull DiscordCategory category) {
-        if (this.category != null) {
-            String message = "The provider is already attached to the category";
-            logger.error(message);
-            throw new IllegalStateException(message);
-        }
-        this.category = category;
-    }
-
-    /**
-     * Detaches the vk provider from its category.
-     *
-     * @throws IllegalStateException
-     *         if the vk provider is already detached from the category
-     */
-    public void detach() {
-        if (category == null) {
-            String message = "The provider not attached to the category cannot be detached from it";
-            logger.error(message);
-            throw new IllegalStateException(message);
-        }
-        category = null;
     }
 
     @Override

@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.root;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.command.ConfigWizardRootCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -26,7 +26,7 @@ import java.util.Optional;
  * Service for the configuration state of initial directory.
  */
 @Service
-public class ConfigWizardRootService extends AbstractConfigWizard {
+public class ConfigWizardRootService extends ConfigWizard {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardRootService.class);
 
@@ -70,8 +70,9 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
                 logger.error("print(): Unable to get guild={id={}} for privateSession={}", guildId, session);
                 return;
             }
+            DiscordGuild guild = guildOptional.get();
 
-            MessageEmbed embed = getDescription(guildOptional.get());
+            MessageEmbed embed = getDescription(guild);
             responses.add(embed);
         }
 
@@ -88,7 +89,7 @@ public class ConfigWizardRootService extends AbstractConfigWizard {
         return ConfigWizardState.ROOT;
     }
 
-    private MessageEmbed getDescription(@Nonnull DiscordGuild guild) {
+    private MessageEmbed getDescription(DiscordGuild guild) {
         EmbedBuilder builder = new EmbedBuilder();
 
         builder

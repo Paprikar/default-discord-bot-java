@@ -57,7 +57,7 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull ConfigWizardSession session,
                                      String argsString) {
-        Long entityId = session.getEntityId();
+        Long providerId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
 
         if (argsString == null) {
@@ -92,9 +92,9 @@ public class ConfigWizardVkProviderSetCommand implements ConfigWizardVkProviderC
             return ConfigWizardState.KEEP;
         }
 
-        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(entityId);
+        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(providerId);
         if (vkProviderOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get vkProvider={id={}} for privateSession={}", entityId, session);
+            logger.warn("execute(): Unable to get vkProvider={id={}} for privateSession={}", providerId, session);
             return ConfigWizardState.IGNORE;
         }
         DiscordProviderFromVk provider = vkProviderOptional.get();

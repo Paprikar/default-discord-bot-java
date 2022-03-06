@@ -13,16 +13,6 @@ import java.util.Optional;
 public interface DiscordMediaRequestRepository extends JpaRepository<DiscordMediaRequest, Long> {
 
     /**
-     * Finds all media requests by the id of the category they are attached to.
-     *
-     * @param id
-     *         the id of the category
-     *
-     * @return the {@link List} of found media requests
-     */
-    List<DiscordMediaRequest> findAllByCategoryId(Long id);
-
-    /**
      * Finds the oldest media request by its category id.
      *
      * @param id
@@ -33,14 +23,6 @@ public interface DiscordMediaRequestRepository extends JpaRepository<DiscordMedi
     Optional<DiscordMediaRequest> findFirstByCategoryIdOrderByCreationTimestampAsc(Long id);
 
     /**
-     * Deletes all media requests by the id of the category they are attached to.
-     *
-     * @param id
-     *         the id of the category
-     */
-    void deleteByCategoryId(Long id);
-
-    /**
      * Counts all media requests with the specified id of their category.
      *
      * @param id
@@ -49,4 +31,22 @@ public interface DiscordMediaRequestRepository extends JpaRepository<DiscordMedi
      * @return the number of found media requests
      */
     long countByCategoryId(Long id);
+
+    /**
+     * Finds all media requests by the id of the category they are attached to.
+     *
+     * @param id
+     *         the id of the category
+     *
+     * @return the {@link List} of found media requests
+     */
+    List<DiscordMediaRequest> findAllByCategoryId(Long id);
+
+    /**
+     * Deletes all media requests by the id of the category they are attached to.
+     *
+     * @param id
+     *         the id of the category
+     */
+    void deleteByCategoryId(Long id);
 }

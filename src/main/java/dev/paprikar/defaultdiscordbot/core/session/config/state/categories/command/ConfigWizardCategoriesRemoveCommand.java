@@ -1,4 +1,4 @@
-package dev.paprikar.defaultdiscordbot.core.session.config.state.category.command;
+package dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
@@ -16,15 +16,15 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
- * The command for removing a category.
+ * The command to remove categories.
  */
 @Component
-public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCommand {
+public class ConfigWizardCategoriesRemoveCommand implements ConfigWizardCategoriesCommand {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryRemoveCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesRemoveCommand.class);
 
     private static final String NAME = "remove";
 
@@ -37,7 +37,7 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
      *         an instance of {@link DiscordCategoryService}
      */
     @Autowired
-    public ConfigWizardCategoryRemoveCommand(DiscordCategoryService categoryService) {
+    public ConfigWizardCategoriesRemoveCommand(DiscordCategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
@@ -47,17 +47,27 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
-        Long entityId = session.getEntityId();
+        Long guildId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
 
-        Optional<DiscordCategory> categoryOptional = categoryService.findById(entityId);
-        if (categoryOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get category={id={}} for privateSession={}", entityId, session);
-            return ConfigWizardState.IGNORE;
-        }
-        DiscordCategory category = categoryOptional.get();
+        List<DiscordCategory> categories = categoryService.findAllByGuildId(guildId);
+        DiscordCategory targetCategory = categories.stream()
+                .filter(category -> Objects.equals(category.getName(), argsString))
+                .findFirst()
+                .orElse(null);
+        if (targetCategory == null) {
+            session.getResponses().add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The category with the name `" + argsString + "` does not exist")
+                    .build()
+            );
 
-        if (category.isEnabled()) {
+            return ConfigWizardState.KEEP;
+        }
+
+        if (targetCategory.isEnabled()) {
             responses.add(new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
@@ -68,19 +78,18 @@ public class ConfigWizardCategoryRemoveCommand implements ConfigWizardCategoryCo
             return ConfigWizardState.KEEP;
         }
 
-        session.setEntityId(category.getGuild().getId());
-        categoryService.detach(category);
+        categoryService.delete(targetCategory);
 
         responses.add(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The category `" + category.getName() + "` has been successfully deleted")
+                .appendDescription("The category `" + targetCategory.getName() + "` has been successfully removed")
                 .build()
         );
 
-        logger.debug("The category={id={}} was deleted", category.getId());
-        return ConfigWizardState.CATEGORIES;
+        logger.debug("The category={id={}} was deleted", targetCategory.getId());
+        return ConfigWizardState.KEEP;
     }
 
     @Override

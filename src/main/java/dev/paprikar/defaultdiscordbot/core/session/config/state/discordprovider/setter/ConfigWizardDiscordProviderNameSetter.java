@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.validation.ConfigWizardDiscordProviderNameValidator;
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
@@ -46,10 +46,16 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
 
     @Override
     public List<MessageEmbed> set(@Nonnull String value, @Nonnull DiscordProviderFromDiscord provider) {
-        ConfigWizardValidatorProcessingResponse<String> response = validator.process(value, provider);
+        DiscordValidatorProcessingResponse<String> response = validator.process(value, provider);
         String name = response.getValue();
         MessageEmbed error = response.getError();
 
+        if (error != null) {
+            return List.of(error);
+        }
+        assert name != null;
+
+        error = validator.test(name, provider.getCategory().getId());
         if (error != null) {
             return List.of(error);
         }

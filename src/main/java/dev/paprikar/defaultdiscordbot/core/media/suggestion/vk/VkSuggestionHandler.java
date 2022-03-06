@@ -7,19 +7,32 @@ import com.vk.api.sdk.objects.messages.MessageAttachment;
 import com.vk.api.sdk.objects.photos.Photo;
 import com.vk.api.sdk.objects.photos.PhotoSizes;
 import com.vk.api.sdk.objects.photos.PhotoSizesType;
+import com.vk.api.sdk.objects.users.Fields;
+import com.vk.api.sdk.objects.users.responses.GetResponse;
 import com.vk.api.sdk.objects.wall.WallpostAttachment;
 import com.vk.api.sdk.objects.wall.WallpostAttachmentType;
 import com.vk.api.sdk.objects.wall.WallpostFull;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
+import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.DiscordTrustedSuggesterService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection.DiscordUserVkConnection.ProjectionDiscordUserId;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection.DiscordUserVkConnectionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
+import java.awt.*;
+import java.time.Instant;
+import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static dev.paprikar.defaultdiscordbot.utils.VkUtils.executeRequest;
 
@@ -31,7 +44,10 @@ public class VkSuggestionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(VkSuggestionHandler.class);
 
+    private final DiscordTrustedSuggesterService trustedSuggesterService;
+    private final DiscordUserVkConnectionService vkConnectionService;
     private final ApproveService approveService;
+    private final SendingService sendingService;
 
     private final VkApiClient client = VkSuggestionService.CLIENT;
 
@@ -44,12 +60,24 @@ public class VkSuggestionHandler {
     /**
      * Constructs the service.
      *
+     * @param trustedSuggesterService
+     *         an instance of {@link DiscordTrustedSuggesterService}
+     * @param vkConnectionService
+     *         an instance of {@link DiscordUserVkConnectionService}
      * @param approveService
      *         an instance of {@link ApproveService}
+     * @param sendingService
+     *         an instance of {@link SendingService}
      */
     @Autowired
-    public VkSuggestionHandler(ApproveService approveService) {
+    public VkSuggestionHandler(DiscordTrustedSuggesterService trustedSuggesterService,
+                               DiscordUserVkConnectionService vkConnectionService,
+                               ApproveService approveService,
+                               SendingService sendingService) {
+        this.trustedSuggesterService = trustedSuggesterService;
+        this.vkConnectionService = vkConnectionService;
         this.approveService = approveService;
+        this.sendingService = sendingService;
 
         // bigger value - bigger size
         // uncropped
@@ -113,12 +141,43 @@ public class VkSuggestionHandler {
             return;
         }
 
-        // todo thrust list
+        Integer vkUserId = message.getFromId();
+        List<Long> discordUserIds = vkConnectionService.findAllByVkUserId(vkUserId).stream()
+                .map(ProjectionDiscordUserId::getDiscordUserId)
+                .collect(Collectors.toList());
+
+        DiscordCategory category = provider.getCategory();
+        Long categoryId = category.getId();
+        boolean isTrusted = trustedSuggesterService.existsByCategoryIdAndUserIdIn(categoryId, discordUserIds);
 
         // todo transaction-like batch submit
         urls.forEach(url -> {
-            logger.debug("handleMessagePhotos(): Submitting the suggestion with url={}", url);
-            approveService.submit(provider.getCategory(), url, suggestionSubmittingErrorHandler);
+            if (isTrusted) {
+                sendingService.submit(category, url);
+            } else {
+                String userIdStr = message.getFromId().toString();
+
+                List<GetResponse> responses = executeRequest(client.users().get(actor)
+                        .userIds(userIdStr)
+                        .fields(Fields.SCREEN_NAME));
+                String userName = responses == null ? null : responses.get(0).getScreenName();
+
+                MessageEmbed suggestion = new EmbedBuilder()
+                        .setColor(Color.GRAY)
+                        .setTimestamp(Instant.now())
+                        .appendDescription("Provider type: `VK`\n")
+                        .appendDescription(String.format("Provider name: `%s`\n", provider.getName()))
+                        .appendDescription(
+                                String.format("Author: [%s](https://vk.com/id%s)", userName, userIdStr))
+                        .setImage(url)
+                        .build();
+
+                logger.debug("handleMessagePhotos(): Submitting the suggestion: "
+                                + "provider={id={}}, userId={}, url={}, suggestion={timestamp={}}",
+                        provider.getId(), userIdStr, url, suggestion.getTimestamp());
+
+                approveService.submit(category, suggestion, suggestionSubmittingErrorHandler);
+            }
         });
 
         executeRequest(client.messages().send(actor)

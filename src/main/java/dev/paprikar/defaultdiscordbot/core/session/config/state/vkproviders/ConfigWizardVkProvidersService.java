@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command.ConfigWizardVkProvidersCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -28,7 +28,7 @@ import java.util.Optional;
  * Service for the configuration state of vk providers directory.
  */
 @Service
-public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
+public class ConfigWizardVkProvidersService extends ConfigWizard {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersService.class);
 
@@ -77,9 +77,9 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
                 logger.error("print(): Unable to get category={id={}} for privateSession={}", categoryId, session);
                 return;
             }
+            DiscordCategory category = categoryOptional.get();
 
-            MessageEmbed embed = getDescription(
-                    categoryOptional.get(), vkProviderService.findAllByCategoryId(categoryId));
+            MessageEmbed embed = getDescription(category, vkProviderService.findAllByCategoryId(categoryId));
             responses.add(embed);
         }
 
@@ -96,8 +96,7 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
         return ConfigWizardState.VK_PROVIDERS;
     }
 
-    private MessageEmbed getDescription(@Nonnull DiscordCategory category,
-                                        @Nonnull List<DiscordProviderFromVk> providers) {
+    private MessageEmbed getDescription(DiscordCategory category, List<DiscordProviderFromVk> providers) {
         EmbedBuilder builder = new EmbedBuilder();
         builder
                 .setColor(Color.GRAY)
@@ -117,6 +116,7 @@ public class ConfigWizardVkProvidersService extends AbstractConfigWizard {
         builder.appendDescription("Available commands:\n");
         builder.appendDescription("`open` `<name>`\n");
         builder.appendDescription("`add` `<name>`\n");
+        builder.appendDescription("`remove` `<name>`\n");
         builder.appendDescription("`back`\n");
         builder.appendDescription("`exit`");
 

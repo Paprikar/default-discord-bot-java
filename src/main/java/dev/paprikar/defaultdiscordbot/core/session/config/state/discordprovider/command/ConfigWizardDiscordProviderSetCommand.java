@@ -57,7 +57,7 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
     public ConfigWizardState execute(@Nonnull PrivateMessageReceivedEvent event,
                                      @Nonnull ConfigWizardSession session,
                                      String argsString) {
-        Long entityId = session.getEntityId();
+        Long providerId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
 
         if (argsString == null) {
@@ -92,9 +92,9 @@ public class ConfigWizardDiscordProviderSetCommand implements ConfigWizardDiscor
             return ConfigWizardState.KEEP;
         }
 
-        Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService.findById(entityId);
+        Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService.findById(providerId);
         if (discordProviderOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", entityId, session);
+            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", providerId, session);
             return ConfigWizardState.IGNORE;
         }
         DiscordProviderFromDiscord provider = discordProviderOptional.get();

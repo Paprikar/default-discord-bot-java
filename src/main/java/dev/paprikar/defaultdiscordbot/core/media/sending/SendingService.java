@@ -5,6 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequest;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -87,6 +88,21 @@ public class SendingService {
 
         logger.debug("handleTextChannelDeleteEvent(): Media sending for category={id={}} is disabled "
                 + "due to the deletion of the required text channel with id={}", categoryId, channelId);
+    }
+
+    /**
+     * Submits a suggestion to the queue.
+     *
+     * @param category
+     *         the suggestion category
+     * @param url
+     *         the suggestion url
+     */
+    public void submit(DiscordCategory category, String url) {
+        logger.debug("submit(): Submitting the suggestion: category={id={}}, url={}", category.getId(), url);
+
+        mediaRequestService.save(new DiscordMediaRequest(category, url));
+        update(category);
     }
 
     /**

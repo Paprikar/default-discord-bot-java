@@ -3,13 +3,14 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.categories.comm
 import dev.paprikar.defaultdiscordbot.config.DdbConfig;
 import dev.paprikar.defaultdiscordbot.config.DdbDefaults;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation.ConfigWizardCategoryNameValidator;
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import java.awt.*;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,11 +84,11 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
         DiscordCategory category = new DiscordCategory();
         DdbDefaults defaults = config.getDefaults();
 
-        category.attach(guild);
+        category.setGuild(guild);
         category.setPositiveApprovalEmoji(defaults.getPositiveApprovalEmoji());
         category.setNegativeApprovalEmoji(defaults.getNegativeApprovalEmoji());
 
-        ConfigWizardValidatorProcessingResponse<String> response = validator.process(argsString, category);
+        DiscordValidatorProcessingResponse<String> response = validator.process(argsString, category);
         String name = response.getValue();
         MessageEmbed error = response.getError();
 
@@ -93,15 +96,27 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
             responses.add(error);
             return ConfigWizardState.KEEP;
         }
+        assert name != null;
+
+        error = validator.test(name, guildId);
+        if (error != null) {
+            responses.add(error);
+            return ConfigWizardState.KEEP;
+        }
 
         category.setName(name);
-        category = categoryService.save(category);
+        categoryService.save(category);
 
-        session.setEntityId(category.getId());
+        responses.add(new EmbedBuilder()
+                .setColor(Color.GRAY)
+                .setTitle("Configuration Wizard")
+                .setTimestamp(Instant.now())
+                .appendDescription("The category `" + argsString + "` has been added")
+                .build()
+        );
 
         logger.debug("Add at CATEGORIES: privateSession={}, name='{}'", session, name);
-
-        return ConfigWizardState.CATEGORY;
+        return ConfigWizardState.KEEP;
     }
 
     @Override

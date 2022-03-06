@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.categories;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.categories.command.ConfigWizardCategoriesCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -25,7 +25,7 @@ import java.util.List;
  * Service for the configuration state of categories directory.
  */
 @Service
-public class ConfigWizardCategoriesService extends AbstractConfigWizard {
+public class ConfigWizardCategoriesService extends ConfigWizard {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoriesService.class);
 
@@ -63,7 +63,8 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
         List<MessageEmbed> responses = session.getResponses();
 
         if (addStateEmbed) {
-            MessageEmbed embed = getDescription(categoryService.findAllByGuildId(session.getEntityId()));
+            Long guildId = session.getEntityId();
+            MessageEmbed embed = getDescription(categoryService.findAllByGuildId(guildId));
             responses.add(embed);
         }
 
@@ -80,7 +81,7 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
         return ConfigWizardState.CATEGORIES;
     }
 
-    private MessageEmbed getDescription(@Nonnull List<DiscordCategory> categories) {
+    private MessageEmbed getDescription(List<DiscordCategory> categories) {
         EmbedBuilder builder = new EmbedBuilder();
         builder
                 .setColor(Color.GRAY)
@@ -100,6 +101,7 @@ public class ConfigWizardCategoriesService extends AbstractConfigWizard {
         builder.appendDescription("Available commands:\n");
         builder.appendDescription("`open` `<name>`\n");
         builder.appendDescription("`add` `<name>`\n");
+        builder.appendDescription("`remove` `<name>`\n");
         builder.appendDescription("`back`\n");
         builder.appendDescription("`exit`");
 

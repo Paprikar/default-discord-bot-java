@@ -1,4 +1,4 @@
-package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.command;
+package dev.paprikar.defaultdiscordbot.core.session.config.state.discordproviders.command;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
@@ -16,15 +16,15 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
- * The command for removing a discord provider.
+ * The command to remove discord providers.
  */
 @Component
-public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDiscordProviderCommand {
+public class ConfigWizardDiscordProvidersRemoveCommand implements ConfigWizardDiscordProvidersCommand {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProviderRemoveCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardDiscordProvidersRemoveCommand.class);
 
     private static final String NAME = "remove";
 
@@ -37,7 +37,7 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
      *         an instance of {@link DiscordProviderFromDiscordService}
      */
     @Autowired
-    public ConfigWizardDiscordProviderRemoveCommand(DiscordProviderFromDiscordService discordProviderService) {
+    public ConfigWizardDiscordProvidersRemoveCommand(DiscordProviderFromDiscordService discordProviderService) {
         this.discordProviderService = discordProviderService;
     }
 
@@ -47,15 +47,25 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
-        Long entityId = session.getEntityId();
+        Long categoryId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
 
-        Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService.findById(entityId);
-        if (discordProviderOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get discordProvider={id={} for privateSession={}", entityId, session);
-            return ConfigWizardState.IGNORE;
+        List<DiscordProviderFromDiscord> providers = discordProviderService.findAllByCategoryId(categoryId);
+        DiscordProviderFromDiscord provider = providers.stream()
+                .filter(p -> Objects.equals(p.getName(), argsString))
+                .findFirst()
+                .orElse(null);
+        if (provider == null) {
+            session.getResponses().add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The provider with the name `" + argsString + "` does not exist")
+                    .build()
+            );
+
+            return ConfigWizardState.KEEP;
         }
-        DiscordProviderFromDiscord provider = discordProviderOptional.get();
 
         if (provider.isEnabled()) {
             responses.add(new EmbedBuilder()
@@ -68,20 +78,18 @@ public class ConfigWizardDiscordProviderRemoveCommand implements ConfigWizardDis
             return ConfigWizardState.KEEP;
         }
 
-        session.setEntityId(provider.getCategory().getId());
         discordProviderService.delete(provider);
 
         responses.add(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The provider `" + provider.getName() + "` has been successfully deleted")
+                .appendDescription("The provider `" + provider.getName() + "` has been successfully removed")
                 .build()
         );
 
         logger.debug("The discordProvider={id={}} was deleted", provider.getId());
-
-        return ConfigWizardState.DISCORD_PROVIDERS;
+        return ConfigWizardState.KEEP;
     }
 
     @Override

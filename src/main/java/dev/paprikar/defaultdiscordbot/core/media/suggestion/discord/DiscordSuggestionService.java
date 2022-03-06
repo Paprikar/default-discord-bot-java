@@ -4,14 +4,17 @@ import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
+import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.DiscordTrustedSuggesterService;
 import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -35,8 +38,10 @@ public class DiscordSuggestionService {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscordSuggestionService.class);
 
-    private final DiscordCategoryService categoryService;
+    private final DiscordProviderFromDiscordService discordProviderService;
+    private final DiscordTrustedSuggesterService trustedSuggesterService;
     private final ApproveService approveService;
+    private final SendingService sendingService;
     private final MonitorService monitorService;
 
     // Map<ProviderId, CategoryId>
@@ -55,19 +60,27 @@ public class DiscordSuggestionService {
     /**
      * Constructs the service.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
+     * @param discordProviderService
+     *         an instance of {@link DiscordProviderFromDiscordService}
+     * @param trustedSuggesterService
+     *         an instance of {@link DiscordTrustedSuggesterService}
      * @param approveService
      *         an instance of {@link ApproveService}
+     * @param sendingService
+     *         an instance of {@link SendingService}
      * @param monitorService
      *         an instance of {@link MonitorService}
      */
     @Autowired
-    public DiscordSuggestionService(DiscordCategoryService categoryService,
+    public DiscordSuggestionService(DiscordProviderFromDiscordService discordProviderService,
+                                    DiscordTrustedSuggesterService trustedSuggesterService,
                                     ApproveService approveService,
+                                    SendingService sendingService,
                                     MonitorService monitorService) {
-        this.categoryService = categoryService;
+        this.discordProviderService = discordProviderService;
+        this.trustedSuggesterService = trustedSuggesterService;
         this.approveService = approveService;
+        this.sendingService = sendingService;
         this.monitorService = monitorService;
 
         this.suggestionHandlingErrorHandler = RequestErrorHandler.createBuilder()
@@ -126,16 +139,15 @@ public class DiscordSuggestionService {
             return;
         }
 
-        Long categoryId = categories.get(providerId);
-        Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
-        if (categoryOptional.isEmpty()) {
+        Optional<DiscordProviderFromDiscord> providerOptional = discordProviderService.findById(providerId);
+        if (providerOptional.isEmpty()) {
             return;
         }
-        DiscordCategory category = categoryOptional.get();
+        DiscordProviderFromDiscord provider = providerOptional.get();
 
         try {
             message.delete().complete();
-            handleMessageImages(message, category);
+            handleMessageImages(message, provider);
         } catch (RuntimeException e) {
             suggestionHandlingErrorHandler.accept(e);
         }
@@ -231,10 +243,11 @@ public class DiscordSuggestionService {
         return categories.containsKey(provider.getId());
     }
 
-    private void handleMessageImages(Message message, DiscordCategory category) {
+    private void handleMessageImages(Message message, DiscordProviderFromDiscord provider) {
         List<String> urls = new ArrayList<>();
         List<Message.Attachment> attachments = message.getAttachments();
-        RestAction<PrivateChannel> privateChannel = message.getAuthor().openPrivateChannel();
+        User author = message.getAuthor();
+        RestAction<PrivateChannel> privateChannel = author.openPrivateChannel();
 
         if (attachments.isEmpty()) {
             MessageEmbed embed = new EmbedBuilder()
@@ -270,12 +283,29 @@ public class DiscordSuggestionService {
             urls.add(attachment.getUrl());
         }
 
-        // todo thrust list
+        DiscordCategory category = provider.getCategory();
+        boolean isTrusted = trustedSuggesterService.existsByCategoryIdAndUserId(category.getId(), author.getIdLong());
 
         // todo transaction-like batch submit
         urls.forEach(url -> {
-            logger.debug("handleMessagePhotos(): Submitting the suggestion with url={}", url);
-            approveService.submit(category, url, suggestionSubmittingErrorHandler);
+            if (isTrusted) {
+                sendingService.submit(category, url);
+            } else {
+                MessageEmbed suggestion = new EmbedBuilder()
+                        .setColor(Color.GRAY)
+                        .setTimestamp(Instant.now())
+                        .appendDescription("Provider type: `Discord`\n")
+                        .appendDescription(String.format("Provider name: `%s`\n", provider.getName()))
+                        .appendDescription(String.format("Author: %s", author.getAsMention()))
+                        .setImage(url)
+                        .build();
+
+                logger.debug("handleMessagePhotos(): Submitting the suggestion: "
+                                + "provider={id={}}, author={}, url={}, suggestion={timestamp={}}",
+                        provider.getId(), author.getAsTag(), url, suggestion.getTimestamp());
+
+                approveService.submit(category, suggestion, suggestionSubmittingErrorHandler);
+            }
         });
 
         MessageEmbed embed = new EmbedBuilder()

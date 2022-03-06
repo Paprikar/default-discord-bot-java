@@ -11,7 +11,7 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "discord_media_request", indexes = {
-        @Index(name = "creation_timestamp_idx", columnList = "creation_timestamp")
+        @Index(name = "discord_media_request_creation_timestamp_idx", columnList = "creation_timestamp")
 })
 public class DiscordMediaRequest {
 
@@ -24,8 +24,8 @@ public class DiscordMediaRequest {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "discord_category_id",
-            foreignKey = @ForeignKey(name = "discord_category_id_fkey"),
+    @JoinColumn(name = "category_id",
+            foreignKey = @ForeignKey(name = "category_id_fkey"),
             nullable = false)
     private DiscordCategory category;
 

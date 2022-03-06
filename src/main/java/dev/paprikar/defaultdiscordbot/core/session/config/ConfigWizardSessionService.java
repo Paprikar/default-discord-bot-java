@@ -2,7 +2,7 @@ package dev.paprikar.defaultdiscordbot.core.session.config;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordPrivateSession;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Service for managing configuration sessions.
  */
 @Service
-public class ConfigWizardSessionService {
+public class ConfigWizardSessionService extends DiscordPrivateSession {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardSessionService.class);
 
@@ -32,13 +32,11 @@ public class ConfigWizardSessionService {
 
     private final Map<ConfigWizardState, ConfigWizard> configWizardServices = new HashMap<>();
 
-    // Map<InitiatorUserId, Session>
+    // Map<UserId, PrivateSession>
     private final Map<Long, ConfigWizardSession> activePrivateSessions = new ConcurrentHashMap<>();
 
     // Set<GuildDiscordId>
     private final Set<Long> activeGuilds = ConcurrentHashMap.newKeySet();
-
-    private final RequestErrorHandler executionErrorHandler;
 
     /**
      * Constructs the service.
@@ -53,10 +51,6 @@ public class ConfigWizardSessionService {
         this.guildService = guildService;
 
         configWizards.forEach(service -> this.configWizardServices.put(service.getState(), service));
-
-        this.executionErrorHandler = RequestErrorHandler.createBuilder()
-                .setMessage("An error occurred while executing the JDA request")
-                .build();
     }
 
     /**
@@ -84,6 +78,7 @@ public class ConfigWizardSessionService {
             case END:
                 service.print(session, false);
 
+                activeUsers.remove(userId);
                 activePrivateSessions.remove(userId);
                 activeGuilds.remove(session.getGuildDiscordId());
 
@@ -92,7 +87,7 @@ public class ConfigWizardSessionService {
                         .queue(null, executionErrorHandler);
 
                 logger.debug("handlePrivateMessageReceivedEvent(): "
-                        + "Configuration session is ended: privateSession={}", session);
+                        + "Configuration session is finished: privateSession={}", session);
                 break;
             default:
                 service = configWizardServices.get(targetState);
@@ -128,8 +123,26 @@ public class ConfigWizardSessionService {
             return;
         }
 
+        if (activeUsers.contains(userId)) {
+            MessageEmbed embed = new EmbedBuilder()
+                    .setColor(Color.GRAY)
+                    .setTitle("Configuration Wizard")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("Another session is already started")
+                    .build();
+
+            event.getAuthor().openPrivateChannel()
+                    .flatMap(channel -> channel
+                            .sendMessageEmbeds(embed)
+                            .reference(event.getMessage())
+                            .and(channel.close()))
+                    .queue(null, executionErrorHandler);
+
+            return;
+        }
+
         long guildDiscordId = event.getGuild().getIdLong();
-        if (!activeGuilds.add(guildDiscordId)) {
+        if (activeGuilds.contains(guildDiscordId)) {
             MessageEmbed embed = new EmbedBuilder()
                     .setColor(Color.GRAY)
                     .setTitle("Configuration Wizard")
@@ -156,12 +169,14 @@ public class ConfigWizardSessionService {
         ConfigWizard initialService = configWizardServices.get(ConfigWizardState.ROOT);
 
         try {
-            session = new ConfigWizardSession(event.getAuthor(), guildDiscordId, initialService, guildId);
+            session = new ConfigWizardSession(event.getMember(), initialService, guildId);
         } catch (RuntimeException e) {
             return;
         }
 
+        activeUsers.add(userId);
         activePrivateSessions.put(userId, session);
+        activeGuilds.add(guildDiscordId);
 
         initialService.print(session, true);
     }

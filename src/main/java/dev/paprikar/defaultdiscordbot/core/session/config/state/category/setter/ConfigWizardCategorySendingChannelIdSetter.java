@@ -5,8 +5,8 @@ import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardDiscordTextChannelIdValidator;
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -72,7 +72,7 @@ public class ConfigWizardCategorySendingChannelIdSetter implements ConfigWizardC
                     .build());
         }
 
-        ConfigWizardValidatorProcessingResponse<Long> response = validator.process(value);
+        DiscordValidatorProcessingResponse<Long> response = validator.process(value);
         Long channelId = response.getValue();
         MessageEmbed error = response.getError();
 

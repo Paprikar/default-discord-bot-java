@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation;
 
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.stereotype.Component;
@@ -23,8 +23,9 @@ public class ConfigWizardCategoryReserveDaysValidator {
      *
      * @return the validator processing response
      */
-    public ConfigWizardValidatorProcessingResponse<Integer> process(@Nonnull String value) {
+    public DiscordValidatorProcessingResponse<Integer> process(@Nonnull String value) {
         int reserveDays;
+
         try {
             reserveDays = Integer.parseInt(value);
         } catch (NumberFormatException e) {
@@ -34,7 +35,7 @@ public class ConfigWizardCategoryReserveDaysValidator {
                     .setTimestamp(Instant.now())
                     .appendDescription("The value has an invalid format")
                     .build();
-            return new ConfigWizardValidatorProcessingResponse<>(null, error);
+            return new DiscordValidatorProcessingResponse<>(null, error);
         }
 
         if (reserveDays < 1) {
@@ -44,9 +45,9 @@ public class ConfigWizardCategoryReserveDaysValidator {
                     .setTimestamp(Instant.now())
                     .appendDescription("The value can only be positive")
                     .build();
-            return new ConfigWizardValidatorProcessingResponse<>(null, error);
+            return new DiscordValidatorProcessingResponse<>(null, error);
         }
 
-        return new ConfigWizardValidatorProcessingResponse<>(reserveDays, null);
+        return new DiscordValidatorProcessingResponse<>(reserveDays, null);
     }
 }

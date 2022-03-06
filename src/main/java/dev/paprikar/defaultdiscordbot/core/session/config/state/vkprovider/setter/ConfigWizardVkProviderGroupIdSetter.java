@@ -4,9 +4,9 @@ import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.VkSuggestionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderCredsValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderGroupIdValidator;
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
@@ -65,7 +65,7 @@ public class ConfigWizardVkProviderGroupIdSetter implements ConfigWizardVkProvid
 
     @Override
     public List<MessageEmbed> set(@Nonnull String value, @Nonnull DiscordProviderFromVk provider) {
-        ConfigWizardValidatorProcessingResponse<Integer> response = validator.process(value);
+        DiscordValidatorProcessingResponse<Integer> response = validator.process(value);
         Integer groupId = response.getValue();
         MessageEmbed error = response.getError();
 

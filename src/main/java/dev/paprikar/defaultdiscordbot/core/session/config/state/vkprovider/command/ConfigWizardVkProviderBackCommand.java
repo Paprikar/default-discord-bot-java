@@ -42,11 +42,11 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProvider
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
-        Long entityId = session.getEntityId();
+        Long providerId = session.getEntityId();
 
-        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(entityId);
+        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(providerId);
         if (vkProviderOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get vkProvider={id={}} for privateSession={}", entityId, session);
+            logger.warn("execute(): Unable to get vkProvider={id={}} for privateSession={}", providerId, session);
             return ConfigWizardState.IGNORE;
         }
 

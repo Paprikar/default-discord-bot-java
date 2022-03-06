@@ -30,7 +30,7 @@ public class ConfigWizardVkProviderCredsValidator {
      * @param token
      *         the token to be tested
      *
-     * @return error of testing the credentials, or {@code null} if the test was successful
+     * @return the validator testing response
      */
     @Nullable
     public MessageEmbed test(@Nonnull Integer groupId, @Nonnull String token) {

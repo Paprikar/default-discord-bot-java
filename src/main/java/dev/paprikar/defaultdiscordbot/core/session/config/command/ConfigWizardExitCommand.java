@@ -29,7 +29,7 @@ public class ConfigWizardExitCommand implements ConfigWizardCommand {
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("Configuration session is ended")
+                .appendDescription("Configuration session is finished")
                 .build()
         );
 

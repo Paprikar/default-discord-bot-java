@@ -1,4 +1,4 @@
-package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.command;
+package dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.command;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
@@ -16,15 +16,15 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
- * The command for removing a vk provider.
+ * The command to remove vk providers.
  */
 @Component
-public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProviderCommand {
+public class ConfigWizardVkProvidersRemoveCommand implements ConfigWizardVkProvidersCommand {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProviderRemoveCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigWizardVkProvidersRemoveCommand.class);
 
     private static final String NAME = "remove";
 
@@ -37,7 +37,7 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
      *         an instance of {@link DiscordProviderFromVkService}
      */
     @Autowired
-    public ConfigWizardVkProviderRemoveCommand(DiscordProviderFromVkService vkProviderService) {
+    public ConfigWizardVkProvidersRemoveCommand(DiscordProviderFromVkService vkProviderService) {
         this.vkProviderService = vkProviderService;
     }
 
@@ -47,15 +47,25 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
-        Long entityId = session.getEntityId();
+        Long categoryId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
 
-        Optional<DiscordProviderFromVk> vkProviderOptional = vkProviderService.findById(entityId);
-        if (vkProviderOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get vkProvider={id={} for privateSession={}", entityId, session);
-            return ConfigWizardState.IGNORE;
+        List<DiscordProviderFromVk> providers = vkProviderService.findAllByCategoryId(categoryId);
+        DiscordProviderFromVk provider = providers.stream()
+                .filter(p -> Objects.equals(p.getName(), argsString))
+                .findFirst()
+                .orElse(null);
+        if (provider == null) {
+            session.getResponses().add(new EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("Configuration Wizard Error")
+                    .setTimestamp(Instant.now())
+                    .appendDescription("The provider with the name `" + argsString + "` does not exist")
+                    .build()
+            );
+
+            return ConfigWizardState.KEEP;
         }
-        DiscordProviderFromVk provider = vkProviderOptional.get();
 
         if (provider.isEnabled()) {
             responses.add(new EmbedBuilder()
@@ -65,24 +75,21 @@ public class ConfigWizardVkProviderRemoveCommand implements ConfigWizardVkProvid
                     .appendDescription("The provider that is enabled cannot be deleted")
                     .build()
             );
-
             return ConfigWizardState.KEEP;
         }
 
-        session.setEntityId(provider.getCategory().getId());
         vkProviderService.delete(provider);
 
         responses.add(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The provider `" + provider.getName() + "` has been successfully deleted")
+                .appendDescription("The provider `" + provider.getName() + "` has been successfully removed")
                 .build()
         );
 
         logger.debug("The vkProvider={id={}} was deleted", provider.getId());
-
-        return ConfigWizardState.VK_PROVIDERS;
+        return ConfigWizardState.KEEP;
     }
 
     @Override

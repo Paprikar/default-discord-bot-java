@@ -29,17 +29,6 @@ public class DiscordGuildService {
     }
 
     /**
-     * Finds all guilds.
-     *
-     * @return the {@link List} with all found guilds
-     *
-     * @see org.springframework.data.repository.CrudRepository#findAll() CrudRepository#findAll()
-     */
-    public List<DiscordGuild> findAll() {
-        return repository.findAll();
-    }
-
-    /**
      * Finds the guild by its id.
      *
      * @param id
@@ -51,6 +40,20 @@ public class DiscordGuildService {
      */
     public Optional<DiscordGuild> findById(long id) {
         return repository.findById(id);
+    }
+
+    /**
+     * Finds the guild by its discord id.
+     *
+     * @param id
+     *         the discord id of the guild
+     *
+     * @return the found guild
+     *
+     * @see org.springframework.data.repository.CrudRepository#findById(Object) CrudRepository#findById(Object)
+     */
+    public Optional<DiscordGuild> findByDiscordId(long id) {
+        return repository.findByDiscordId(id);
     }
 
     /**
@@ -71,17 +74,14 @@ public class DiscordGuildService {
     }
 
     /**
-     * Finds the guild by its discord id.
+     * Finds all guilds.
      *
-     * @param id
-     *         the discord id of the guild
+     * @return the {@link List} with all found guilds
      *
-     * @return the found guild
-     *
-     * @see org.springframework.data.repository.CrudRepository#findById(Object) CrudRepository#findById(Object)
+     * @see org.springframework.data.repository.CrudRepository#findAll() CrudRepository#findAll()
      */
-    public Optional<DiscordGuild> findByDiscordId(long id) {
-        return repository.findByDiscordId(id);
+    public List<DiscordGuild> findAll() {
+        return repository.findAll();
     }
 
     /**

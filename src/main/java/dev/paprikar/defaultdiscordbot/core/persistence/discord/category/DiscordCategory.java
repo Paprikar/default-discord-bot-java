@@ -1,10 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.category;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -14,11 +11,9 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "discord_category", indexes = {
-        @Index(name = "discord_guild_id_idx", columnList = "discord_guild_id")
+        @Index(name = "discord_category_guild_id_idx", columnList = "guild_id")
 })
 public class DiscordCategory {
-
-    private static final Logger logger = LoggerFactory.getLogger(DiscordCategory.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
@@ -29,8 +24,8 @@ public class DiscordCategory {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "discord_guild_id",
-            foreignKey = @ForeignKey(name = "discord_guild_id_fkey"),
+    @JoinColumn(name = "guild_id",
+            foreignKey = @ForeignKey(name = "guild_id_fkey"),
             nullable = false)
     private DiscordGuild guild;
 
@@ -248,39 +243,6 @@ public class DiscordCategory {
      */
     public void setLastSendTimestamp(Timestamp lastSendTimestamp) {
         this.lastSendTimestamp = lastSendTimestamp;
-    }
-
-    /**
-     * Attaches the category to the specified guild.
-     *
-     * @param guild
-     *         the guild
-     *
-     * @throws IllegalStateException
-     *         if the category is already attached to the guild
-     */
-    public void attach(@Nonnull DiscordGuild guild) {
-        if (this.guild != null) {
-            String message = "The category is already attached to the guild";
-            logger.error(message);
-            throw new IllegalStateException(message);
-        }
-        this.guild = guild;
-    }
-
-    /**
-     * Detaches the category from its guild.
-     *
-     * @throws IllegalStateException
-     *         if the category is already detached from the guild
-     */
-    public void detach() {
-        if (guild == null) {
-            String message = "The category not attached to the guild cannot be detached from the guild";
-            logger.error(message);
-            throw new IllegalStateException(message);
-        }
-        guild = null;
     }
 
     @Override

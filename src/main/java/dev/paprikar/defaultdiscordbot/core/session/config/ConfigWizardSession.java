@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.session.config;
 
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.RestAction;
 
 import javax.annotation.Nonnull;
@@ -27,10 +27,8 @@ public class ConfigWizardSession {
     /**
      * Constructs the container.
      *
-     * @param user
+     * @param member
      *         the user of the session
-     * @param guildDiscordId
-     *         the guild discord id for which the session is created
      * @param service
      *         the state instance of {@link ConfigWizard} the session is in
      * @param entityId
@@ -41,13 +39,12 @@ public class ConfigWizardSession {
      *         See {@link RestAction#complete()} for more details
      * @see RestAction#complete()
      */
-    public ConfigWizardSession(@Nonnull User user,
-                               @Nonnull Long guildDiscordId,
+    public ConfigWizardSession(@Nonnull Member member,
                                @Nonnull ConfigWizard service,
                                @Nonnull Long entityId)
             throws RuntimeException {
-        this.channel = user.openPrivateChannel().complete();
-        this.guildDiscordId = guildDiscordId;
+        this.channel = member.getUser().openPrivateChannel().complete();
+        this.guildDiscordId = member.getGuild().getIdLong();
         this.service = service;
         this.entityId = entityId;
     }

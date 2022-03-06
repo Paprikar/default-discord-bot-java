@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.category;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
-import dev.paprikar.defaultdiscordbot.core.session.config.AbstractConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.command.ConfigWizardCategoryCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -26,7 +26,7 @@ import java.util.Optional;
  * Service for the configuration state of category directory.
  */
 @Service
-public class ConfigWizardCategoryService extends AbstractConfigWizard {
+public class ConfigWizardCategoryService extends ConfigWizard {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardCategoryService.class);
 
@@ -70,8 +70,9 @@ public class ConfigWizardCategoryService extends AbstractConfigWizard {
                 logger.warn("print(): Unable to get category={id={}} for privateSession={}", categoryId, session);
                 return;
             }
+            DiscordCategory category = categoryOptional.get();
 
-            MessageEmbed embed = getDescription(categoryOptional.get());
+            MessageEmbed embed = getDescription(category);
             responses.add(embed);
         }
 
@@ -88,7 +89,7 @@ public class ConfigWizardCategoryService extends AbstractConfigWizard {
         return ConfigWizardState.CATEGORY;
     }
 
-    private MessageEmbed getDescription(@Nonnull DiscordCategory category) {
+    private MessageEmbed getDescription(DiscordCategory category) {
         EmbedBuilder builder = new EmbedBuilder();
         builder
                 .setColor(Color.GRAY)
@@ -112,14 +113,14 @@ public class ConfigWizardCategoryService extends AbstractConfigWizard {
 
         builder.appendDescription("Directories:\n");
         builder.appendDescription("`discord providers`\n");
-        builder.appendDescription("`vk providers`\n\n");
+        builder.appendDescription("`vk providers`\n");
+        builder.appendDescription("`trusted suggesters`\n\n");
 
         builder.appendDescription("Available commands:\n");
         builder.appendDescription("`set` `<variable>` `<value>`\n");
         builder.appendDescription("`open` `<directory>`\n");
         builder.appendDescription("`enable`\n");
         builder.appendDescription("`disable`\n");
-        builder.appendDescription("`remove`\n");
         builder.appendDescription("`back`\n");
         builder.appendDescription("`exit`");
 

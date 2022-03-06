@@ -42,15 +42,16 @@ public class ConfigWizardCategoryBackCommand implements ConfigWizardCategoryComm
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
-        Long entityId = session.getEntityId();
+        Long categoryId = session.getEntityId();
 
-        Optional<DiscordCategory> categoryOptional = categoryService.findById(entityId);
+        Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
         if (categoryOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get category={id={}} for privateSession={}", entityId, session);
+            logger.warn("execute(): Unable to get category={id={}} for privateSession={}", categoryId, session);
             return ConfigWizardState.IGNORE;
         }
+        DiscordCategory category = categoryOptional.get();
 
-        session.setEntityId(categoryOptional.get().getGuild().getId());
+        session.setEntityId(category.getGuild().getId());
         return ConfigWizardState.CATEGORIES;
     }
 

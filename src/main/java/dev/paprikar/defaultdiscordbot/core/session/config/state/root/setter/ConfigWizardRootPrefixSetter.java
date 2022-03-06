@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.root.setter;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.validation.ConfigWizardRootPrefixValidator;
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class ConfigWizardRootPrefixSetter implements ConfigWizardRootSetter {
 
     @Override
     public List<MessageEmbed> set(@Nonnull String value, @Nonnull DiscordGuild guild) {
-        ConfigWizardValidatorProcessingResponse<String> response = validator.process(value);
+        DiscordValidatorProcessingResponse<String> response = validator.process(value);
         String prefix = response.getValue();
         MessageEmbed error = response.getError();
 

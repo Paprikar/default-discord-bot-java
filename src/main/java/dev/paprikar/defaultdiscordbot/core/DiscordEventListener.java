@@ -1,19 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core;
 
-import dev.paprikar.defaultdiscordbot.config.DdbConfig;
-import dev.paprikar.defaultdiscordbot.config.DdbDefaults;
 import dev.paprikar.defaultdiscordbot.core.command.DiscordCommandHandler;
-import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSessionService;
+import dev.paprikar.defaultdiscordbot.core.session.connections.ConnectionsWizardSessionService;
 import net.dv8tion.jda.api.events.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -40,32 +32,19 @@ public class DiscordEventListener extends ListenerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscordEventListener.class);
 
-    private final DiscordGuildService guildService;
-    private final DiscordCategoryService categoryService;
-    private final DiscordMediaRequestService mediaRequestService;
-    private final DiscordProviderFromDiscordService discordProviderService;
-    private final DiscordProviderFromVkService vkProviderService;
+    private final DiscordBotService discordBotService;
     private final DiscordCommandHandler commandHandler;
     private final DiscordSuggestionService discordSuggestionService;
     private final ApproveService approveService;
     private final SendingService sendingService;
-    private final MediaActionService mediaActionService;
     private final ConfigWizardSessionService configWizardSessionService;
-    private final DdbConfig config;
+    private final ConnectionsWizardSessionService connectionsWizardSessionService;
 
     /**
      * Constructs the component.
      *
-     * @param guildService
-     *         an instance of {@link DiscordGuildService}
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param mediaRequestService
-     *         an instance of {@link DiscordMediaRequestService}
-     * @param discordProviderService
-     *         an instance of {@link DiscordProviderFromDiscordService}
-     * @param vkProviderService
-     *         an instance of {@link DiscordProviderFromVkService}
+     * @param discordBotService
+     *         an instance of {@link DiscordBotService}
      * @param commandHandler
      *         an instance of {@link DiscordCommandHandler}
      * @param discordSuggestionService
@@ -74,38 +53,26 @@ public class DiscordEventListener extends ListenerAdapter {
      *         an instance of {@link ApproveService}
      * @param sendingService
      *         an instance of {@link SendingService}
-     * @param mediaActionService
-     *         an instance of {@link MediaActionService}
      * @param configWizardSessionService
      *         an instance of {@link ConfigWizardSessionService}
-     * @param config
-     *         an instance of {@link DdbConfig}
+     * @param connectionsWizardSessionService
+     *         an instance of {@link ConnectionsWizardSessionService}
      */
     @Autowired
-    public DiscordEventListener(DiscordGuildService guildService,
-                                DiscordCategoryService categoryService,
-                                DiscordMediaRequestService mediaRequestService,
-                                DiscordProviderFromDiscordService discordProviderService,
-                                DiscordProviderFromVkService vkProviderService,
+    public DiscordEventListener(DiscordBotService discordBotService,
                                 DiscordCommandHandler commandHandler,
                                 DiscordSuggestionService discordSuggestionService,
                                 ApproveService approveService,
                                 SendingService sendingService,
-                                MediaActionService mediaActionService,
                                 ConfigWizardSessionService configWizardSessionService,
-                                DdbConfig config) {
-        this.guildService = guildService;
-        this.categoryService = categoryService;
-        this.mediaRequestService = mediaRequestService;
-        this.discordProviderService = discordProviderService;
-        this.vkProviderService = vkProviderService;
+                                ConnectionsWizardSessionService connectionsWizardSessionService) {
+        this.discordBotService = discordBotService;
         this.commandHandler = commandHandler;
         this.discordSuggestionService = discordSuggestionService;
         this.approveService = approveService;
         this.sendingService = sendingService;
-        this.mediaActionService = mediaActionService;
         this.configWizardSessionService = configWizardSessionService;
-        this.config = config;
+        this.connectionsWizardSessionService = connectionsWizardSessionService;
     }
 
     @Override
@@ -193,6 +160,7 @@ public class DiscordEventListener extends ListenerAdapter {
         }
 
         configWizardSessionService.handlePrivateMessageReceivedEvent(event);
+        connectionsWizardSessionService.handlePrivateMessageReceivedEvent(event);
     }
 
     @Override
@@ -216,46 +184,33 @@ public class DiscordEventListener extends ListenerAdapter {
 
     @Override
     public void onGuildJoin(@Nonnull GuildJoinEvent event) {
-        setupDiscordGuild(event.getGuild().getIdLong());
+        long guildId = event.getGuild().getIdLong();
+        logger.debug("onGuildJoin(): guild={id={}}", guildId);
+
+        discordBotService.setupDiscordGuild(guildId);
     }
 
     @Override
     public void onGuildLeave(@Nonnull GuildLeaveEvent event) {
-        removeDiscordGuild(event.getGuild().getIdLong());
+        long guildId = event.getGuild().getIdLong();
+        logger.debug("onGuildLeave(): guild={id={}}", guildId);
+
+        discordBotService.deleteDiscordGuild(guildId);
     }
 
     @Override
     public void onUnavailableGuildJoined(@Nonnull UnavailableGuildJoinedEvent event) {
-        setupDiscordGuild(event.getGuildIdLong());
+        long guildId = event.getGuildIdLong();
+        logger.debug("onUnavailableGuildJoined(): guild={id={}}", guildId);
+
+        discordBotService.setupDiscordGuild(guildId);
     }
 
     @Override
     public void onUnavailableGuildLeave(@Nonnull UnavailableGuildLeaveEvent event) {
-        removeDiscordGuild(event.getGuildIdLong());
-    }
+        long guildId = event.getGuildIdLong();
+        logger.debug("onUnavailableGuildLeave(): guild={id={}}", guildId);
 
-    private void setupDiscordGuild(long guildDiscordId) {
-        DiscordGuild guild = new DiscordGuild();
-        DdbDefaults defaults = config.getDefaults();
-
-        guild.setDiscordId(guildDiscordId);
-        guild.setPrefix(defaults.getPrefix());
-
-        guildService.save(guild);
-    }
-
-    private void removeDiscordGuild(long guildDiscordId) {
-        // todo delete timeout
-
-        categoryService.findAllByGuildDiscordId(guildDiscordId).forEach(category -> {
-            mediaActionService.disableCategory(category);
-            Long categoryId = category.getId();
-            categoryService.deleteById(categoryId);
-            mediaRequestService.deleteByCategoryId(categoryId);
-            discordProviderService.deleteByCategoryId(categoryId);
-            vkProviderService.deleteByCategoryId(categoryId);
-        });
-
-        guildService.deleteByDiscordId(guildDiscordId);
+        discordBotService.deleteDiscordGuild(guildId);
     }
 }

@@ -1,6 +1,5 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider;
 
-import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,17 +26,6 @@ public class DiscordProviderFromDiscordService {
     @Autowired
     public DiscordProviderFromDiscordService(DiscordProviderFromDiscordRepository repository) {
         this.repository = repository;
-    }
-
-    /**
-     * Finds all discord providers.
-     *
-     * @return the {@link List} with all found discord providers
-     *
-     * @see org.springframework.data.repository.CrudRepository#findAll() CrudRepository#findAll()
-     */
-    public List<DiscordProviderFromDiscord> findAll() {
-        return repository.findAll();
     }
 
     /**
@@ -69,6 +57,17 @@ public class DiscordProviderFromDiscordService {
      */
     public DiscordProviderFromDiscord getById(long id) throws EntityNotFoundException {
         return repository.getById(id);
+    }
+
+    /**
+     * Finds all discord providers.
+     *
+     * @return the {@link List} with all found discord providers
+     *
+     * @see org.springframework.data.repository.CrudRepository#findAll() CrudRepository#findAll()
+     */
+    public List<DiscordProviderFromDiscord> findAll() {
+        return repository.findAll();
     }
 
     /**
@@ -113,32 +112,5 @@ public class DiscordProviderFromDiscordService {
      */
     public void deleteByCategoryId(long id) {
         repository.deleteByCategoryId(id);
-    }
-
-    /**
-     * Attaches the discord provider to the specified category and saves it.
-     *
-     * @param provider
-     *         the discord provider
-     * @param category
-     *         the category
-     *
-     * @return the saved discord provider with all its changes
-     */
-    public DiscordProviderFromDiscord attach(@Nonnull DiscordProviderFromDiscord provider,
-                                             @Nonnull DiscordCategory category) {
-        provider.attach(category);
-        return repository.save(provider);
-    }
-
-    /**
-     * Detaches the discord provider from its category and deletes it.
-     *
-     * @param provider
-     *         the discord provider
-     */
-    public void detach(@Nonnull DiscordProviderFromDiscord provider) {
-        provider.detach();
-        repository.delete(provider);
     }
 }

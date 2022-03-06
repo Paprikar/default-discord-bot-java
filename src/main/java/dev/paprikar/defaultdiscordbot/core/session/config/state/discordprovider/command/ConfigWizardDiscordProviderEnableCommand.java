@@ -41,9 +41,8 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
      *         an instance of {@link MediaActionService}
      */
     @Autowired
-    public ConfigWizardDiscordProviderEnableCommand(
-            DiscordProviderFromDiscordService discordProviderService,
-            MediaActionService mediaActionService) {
+    public ConfigWizardDiscordProviderEnableCommand(DiscordProviderFromDiscordService discordProviderService,
+                                                    MediaActionService mediaActionService) {
         this.discordProviderService = discordProviderService;
         this.mediaActionService = mediaActionService;
     }
@@ -54,12 +53,12 @@ public class ConfigWizardDiscordProviderEnableCommand implements ConfigWizardDis
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
-        Long entityId = session.getEntityId();
+        Long providerId = session.getEntityId();
         List<MessageEmbed> responses = session.getResponses();
 
-        Optional<DiscordProviderFromDiscord> providerOptional = discordProviderService.findById(entityId);
+        Optional<DiscordProviderFromDiscord> providerOptional = discordProviderService.findById(providerId);
         if (providerOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", entityId, session);
+            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", providerId, session);
             return ConfigWizardState.IGNORE;
         }
         DiscordProviderFromDiscord provider = providerOptional.get();

@@ -1,5 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session.config.validation;
 
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -7,6 +8,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 
@@ -24,7 +26,7 @@ public class ConfigWizardDiscordTextChannelIdValidator {
      *
      * @return the validator processing response
      */
-    public ConfigWizardValidatorProcessingResponse<Long> process(@Nonnull String value) {
+    public DiscordValidatorProcessingResponse<Long> process(@Nonnull String value) {
         long id;
 
         try {
@@ -36,10 +38,10 @@ public class ConfigWizardDiscordTextChannelIdValidator {
                     .setTimestamp(Instant.now())
                     .appendDescription("The value has an invalid format")
                     .build();
-            return new ConfigWizardValidatorProcessingResponse<>(null, error);
+            return new DiscordValidatorProcessingResponse<>(null, error);
         }
 
-        return new ConfigWizardValidatorProcessingResponse<>(id, null);
+        return new DiscordValidatorProcessingResponse<>(id, null);
     }
 
     /**
@@ -52,8 +54,9 @@ public class ConfigWizardDiscordTextChannelIdValidator {
      * @param jda
      *         an instance of {@link JDA} for testing
      *
-     * @return error of testing the channel id within the guild, or {@code null} if the test was successful
+     * @return the validator testing response
      */
+    @Nullable
     public MessageEmbed test(@Nonnull Long channelId, @Nonnull Long guildId, @Nonnull JDA jda) {
         TextChannel channel = jda.getTextChannelById(channelId);
         if (channel == null || channel.getGuild().getIdLong() != guildId) {

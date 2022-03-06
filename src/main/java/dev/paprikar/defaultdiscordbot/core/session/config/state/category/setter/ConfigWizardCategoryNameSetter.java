@@ -2,8 +2,8 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation.ConfigWizardCategoryNameValidator;
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
@@ -46,10 +46,16 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
 
     @Override
     public List<MessageEmbed> set(@Nonnull String value, @Nonnull DiscordCategory category) {
-        ConfigWizardValidatorProcessingResponse<String> response = validator.process(value, category);
+        DiscordValidatorProcessingResponse<String> response = validator.process(value, category);
         String name = response.getValue();
         MessageEmbed error = response.getError();
 
+        if (error != null) {
+            return List.of(error);
+        }
+        assert name != null;
+
+        error = validator.test(name, category.getGuild().getId());
         if (error != null) {
             return List.of(error);
         }

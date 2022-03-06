@@ -42,11 +42,11 @@ public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDisco
                                      String argsString) {
         logger.trace("execute(): privateSession={}, argsString='{}'", session, argsString);
 
-        Long entityId = session.getEntityId();
+        Long providerId = session.getEntityId();
 
-        Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService.findById(entityId);
+        Optional<DiscordProviderFromDiscord> discordProviderOptional = discordProviderService.findById(providerId);
         if (discordProviderOptional.isEmpty()) {
-            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", entityId, session);
+            logger.warn("execute(): Unable to get discordProvider={id={}} for privateSession={}", providerId, session);
             return ConfigWizardState.IGNORE;
         }
 
