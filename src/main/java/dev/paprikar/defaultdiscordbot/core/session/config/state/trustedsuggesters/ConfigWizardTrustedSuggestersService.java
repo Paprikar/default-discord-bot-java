@@ -110,14 +110,17 @@ public class ConfigWizardTrustedSuggestersService extends ConfigWizard {
         if (!suggesters.isEmpty()) {
             builder.appendDescription("Trusted suggesters:\n");
             suggesters.stream()
-                    .map(suggester -> User.fromId(suggester.getUserId()).getAsMention() + "\n")
+                    .map(suggester -> {
+                        Long userId = suggester.getUserId();
+                        return User.fromId(userId).getAsMention() + " (id: `" + userId + "`)\n";
+                    })
                     .forEach(builder::appendDescription);
             builder.appendDescription("\n");
         }
 
         builder.appendDescription("Available commands:\n");
-        builder.appendDescription("`add` `<user mention>`\n");
-        builder.appendDescription("`remove` `<user mention>`\n");
+        builder.appendDescription("`add` `<user id>`\n");
+        builder.appendDescription("`remove` `<user id>`\n");
         builder.appendDescription("`back`\n");
         builder.appendDescription("`exit`");
 

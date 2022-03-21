@@ -84,7 +84,7 @@ public class ConfigWizardCategoriesRemoveCommand implements ConfigWizardCategori
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The category `" + targetCategory.getName() + "` has been successfully removed")
+                .appendDescription("The category `" + targetCategory.getName() + "` has been removed")
                 .build()
         );
 

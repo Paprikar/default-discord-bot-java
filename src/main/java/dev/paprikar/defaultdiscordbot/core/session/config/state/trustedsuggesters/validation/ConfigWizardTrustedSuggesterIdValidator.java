@@ -14,14 +14,13 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * The discord user mention validator in a configuration session.
  */
 @Component
-public class ConfigWizardTrustedSuggestersMentionValidator {
+public class ConfigWizardTrustedSuggesterIdValidator {
 
     private final DiscordTrustedSuggesterService trustedSuggesterService;
 
@@ -34,7 +33,7 @@ public class ConfigWizardTrustedSuggestersMentionValidator {
      *         an instance of {@link DiscordTrustedSuggesterService}
      */
     @Autowired
-    public ConfigWizardTrustedSuggestersMentionValidator(DiscordTrustedSuggesterService trustedSuggesterService) {
+    public ConfigWizardTrustedSuggesterIdValidator(DiscordTrustedSuggesterService trustedSuggesterService) {
         this.trustedSuggesterService = trustedSuggesterService;
     }
 
@@ -47,27 +46,19 @@ public class ConfigWizardTrustedSuggestersMentionValidator {
      * @return the validator processing response
      */
     public DiscordValidatorProcessingResponse<Long> process(@Nonnull String value) {
-        if (value.isEmpty()) {
-            MessageEmbed error = new EmbedBuilder()
-                    .setColor(Color.RED)
-                    .setTitle("Configuration Wizard Error")
-                    .setTimestamp(Instant.now())
-                    .appendDescription("The user mention cannot be empty")
-                    .build();
-            return new DiscordValidatorProcessingResponse<>(null, error);
-        }
+        long userId;
 
-        Matcher userMatcher = userPattern.matcher(value);
-        if (!userMatcher.find()) {
+        try {
+            userId = Long.parseLong(value);
+        } catch (NumberFormatException e) {
             MessageEmbed error = new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("The value is not an user mention")
+                    .appendDescription("The value has an invalid format")
                     .build();
             return new DiscordValidatorProcessingResponse<>(null, error);
         }
-        long userId = Long.parseLong(userMatcher.group(1));
 
         return new DiscordValidatorProcessingResponse<>(userId, null);
     }

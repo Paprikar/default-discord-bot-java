@@ -84,7 +84,7 @@ public class ConfigWizardDiscordProvidersRemoveCommand implements ConfigWizardDi
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The provider `" + provider.getName() + "` has been successfully removed")
+                .appendDescription("The provider `" + provider.getName() + "` has been removed")
                 .build()
         );
 

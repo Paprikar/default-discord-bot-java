@@ -69,7 +69,7 @@ public class ConnectionsWizardVkDisconnectCommand implements ConnectionsWizardVk
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The connection has been successfully removed")
+                .appendDescription("The connection has been removed")
                 .build()
         );
 

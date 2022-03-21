@@ -5,9 +5,10 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.trustedsuggesters.validation.ConfigWizardTrustedSuggestersMentionValidator;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.trustedsuggesters.validation.ConfigWizardTrustedSuggesterIdValidator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ public class ConfigWizardTrustedSuggestersRemoveCommand implements ConfigWizardT
     private static final String NAME = "remove";
 
     private final DiscordTrustedSuggesterService trustedSuggesterService;
-    private final ConfigWizardTrustedSuggestersMentionValidator validator;
+    private final ConfigWizardTrustedSuggesterIdValidator validator;
 
     /**
      * Constructs the command.
@@ -39,11 +40,11 @@ public class ConfigWizardTrustedSuggestersRemoveCommand implements ConfigWizardT
      * @param trustedSuggesterService
      *         an instance of {@link DiscordTrustedSuggesterService}
      * @param validator
-     *         an instance of {@link ConfigWizardTrustedSuggestersMentionValidator}
+     *         an instance of {@link ConfigWizardTrustedSuggesterIdValidator}
      */
     @Autowired
     public ConfigWizardTrustedSuggestersRemoveCommand(DiscordTrustedSuggesterService trustedSuggesterService,
-                                                      ConfigWizardTrustedSuggestersMentionValidator validator) {
+                                                      ConfigWizardTrustedSuggesterIdValidator validator) {
         this.trustedSuggesterService = trustedSuggesterService;
         this.validator = validator;
     }
@@ -79,7 +80,7 @@ public class ConfigWizardTrustedSuggestersRemoveCommand implements ConfigWizardT
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
                     .setTimestamp(Instant.now())
-                    .appendDescription("The suggester with the mention " + argsString + " does not exist")
+                    .appendDescription("The suggester with id `" + argsString + "` does not exist")
                     .build()
             );
 
@@ -93,7 +94,8 @@ public class ConfigWizardTrustedSuggestersRemoveCommand implements ConfigWizardT
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The suggester " + argsString + " has been successfully removed")
+                .appendDescription(
+                        "The suggester " + User.fromId(argsString).getAsMention() + " has been removed")
                 .build()
         );
 

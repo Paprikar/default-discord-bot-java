@@ -7,9 +7,10 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.trustedsuggesters.validation.ConfigWizardTrustedSuggestersMentionValidator;
+import dev.paprikar.defaultdiscordbot.core.session.config.state.trustedsuggesters.validation.ConfigWizardTrustedSuggesterIdValidator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class ConfigWizardTrustedSuggestersAddCommand implements ConfigWizardTrus
 
     private final DiscordCategoryService categoryService;
     private final DiscordTrustedSuggesterService trustedSuggesterService;
-    private final ConfigWizardTrustedSuggestersMentionValidator validator;
+    private final ConfigWizardTrustedSuggesterIdValidator validator;
 
     /**
      * Constructs the command.
@@ -44,12 +45,12 @@ public class ConfigWizardTrustedSuggestersAddCommand implements ConfigWizardTrus
      * @param trustedSuggesterService
      *         an instance of {@link DiscordTrustedSuggesterService}
      * @param validator
-     *         an instance of {@link ConfigWizardTrustedSuggestersMentionValidator}
+     *         an instance of {@link ConfigWizardTrustedSuggesterIdValidator}
      */
     @Autowired
     public ConfigWizardTrustedSuggestersAddCommand(DiscordCategoryService categoryService,
                                                    DiscordTrustedSuggesterService trustedSuggesterService,
-                                                   ConfigWizardTrustedSuggestersMentionValidator validator) {
+                                                   ConfigWizardTrustedSuggesterIdValidator validator) {
         this.categoryService = categoryService;
         this.trustedSuggesterService = trustedSuggesterService;
         this.validator = validator;
@@ -103,7 +104,7 @@ public class ConfigWizardTrustedSuggestersAddCommand implements ConfigWizardTrus
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The suggester " + argsString + " has been added")
+                .appendDescription("The suggester " + User.fromId(argsString).getAsMention() + " has been added")
                 .build()
         );
 
