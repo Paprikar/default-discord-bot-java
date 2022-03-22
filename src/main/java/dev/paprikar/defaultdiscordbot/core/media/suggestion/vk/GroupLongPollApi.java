@@ -7,6 +7,7 @@ import com.vk.api.sdk.events.EventsHandler;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ApiGroupAuthException;
 import com.vk.api.sdk.exceptions.ClientException;
+import com.vk.api.sdk.exceptions.LongPollServerKeyExpiredException;
 import com.vk.api.sdk.objects.callback.longpoll.responses.GetLongPollEventsResponse;
 import com.vk.api.sdk.objects.callback.messages.CallbackMessage;
 import com.vk.api.sdk.objects.groups.LongPollServer;
@@ -235,21 +236,31 @@ class GroupLongPollApi extends EventsHandler {
             String ts = lpServer.getTs();
             GetLongPollEventsResponse eventsResponse;
 
+            String errorMessage = "UpdaterTask#handleUpdates(): provider={id={}}. " +
+                    "An error occurred while running the Long Poll handler";
+            boolean toStop;
+            boolean toRetry = false;
+
             while (tryToRun()) {
                 try {
                     eventsResponse = client.longPoll()
                             .getEvents(lpServer.getServer(), lpServer.getKey(), ts)
                             .waitTime(waitTime)
                             .execute();
-                    boolean toStop = parseUpdates(eventsResponse.getUpdates());
+                    toStop = parseUpdates(eventsResponse.getUpdates());
                     if (toStop) {
                         return;
                     }
                     ts = eventsResponse.getTs();
+                } catch (LongPollServerKeyExpiredException e) {
+                    logger.debug(errorMessage, providerId, e);
+                    toRetry = true;
                 } catch (ApiException | ClientException e) {
-                    logger.debug("UpdaterTask#handleUpdates(): provider={id={}}. " +
-                            "An error occurred while running the Long Poll handler", providerId, e);
+                    logger.warn(errorMessage, providerId, e);
+                    toRetry = true;
+                }
 
+                if (toRetry) {
                     lpServer = getLongPollServer();
                     if (lpServer == null) {
                         return;
@@ -287,7 +298,7 @@ class GroupLongPollApi extends EventsHandler {
 
                 return lpServer;
             } catch (ApiException | ClientException e) {
-                logger.debug("UpdaterTask#getLongPollServer(): provider={id={}}. " +
+                logger.warn("UpdaterTask#getLongPollServer(): provider={id={}}. " +
                         "An error occurred while getting the Long Poll server", providerId, e);
 
                 // stop if creds is no longer valid
