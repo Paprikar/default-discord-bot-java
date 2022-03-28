@@ -5,15 +5,15 @@
 
     <groupId>dev.paprikar</groupId>
     <artifactId>default-discord-bot</artifactId>
-    <version>1.1.3.0</version>
+    <version>1.2.3.0</version>
     <name>default-discord-bot</name>
     <description>Discord bot aimed at working with media content written in JAVA</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.4</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>2.6.6</version>
+        <relativePath/>
     </parent>
 
     <properties>
@@ -42,6 +42,12 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>8.5.4</version>
         </dependency>
 
         <dependency>
@@ -94,6 +100,12 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>8.5.4</version>
+            </plugin>
+
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>

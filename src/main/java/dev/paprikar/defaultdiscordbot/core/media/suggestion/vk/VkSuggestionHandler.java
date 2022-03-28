@@ -15,11 +15,12 @@ import com.vk.api.sdk.objects.wall.WallpostFull;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.DiscordTrustedSuggesterService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection.DiscordUserVkConnection.ProjectionDiscordUserId;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection.DiscordUserVkConnectionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
-import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
+import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static dev.paprikar.defaultdiscordbot.utils.VkUtils.executeRequest;
+import static dev.paprikar.defaultdiscordbot.utils.VkRequests.executeRequest;
 
 /**
  * The service for handling vk suggestions.
@@ -44,6 +45,7 @@ public class VkSuggestionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(VkSuggestionHandler.class);
 
+    private final DiscordCategoryService categoryService;
     private final DiscordTrustedSuggesterService trustedSuggesterService;
     private final DiscordUserVkConnectionService vkConnectionService;
     private final ApproveService approveService;
@@ -60,6 +62,8 @@ public class VkSuggestionHandler {
     /**
      * Constructs the service.
      *
+     * @param categoryService
+     *         an instance of {@link DiscordCategoryService}
      * @param trustedSuggesterService
      *         an instance of {@link DiscordTrustedSuggesterService}
      * @param vkConnectionService
@@ -70,10 +74,12 @@ public class VkSuggestionHandler {
      *         an instance of {@link SendingService}
      */
     @Autowired
-    public VkSuggestionHandler(DiscordTrustedSuggesterService trustedSuggesterService,
+    public VkSuggestionHandler(DiscordCategoryService categoryService,
+                               DiscordTrustedSuggesterService trustedSuggesterService,
                                DiscordUserVkConnectionService vkConnectionService,
                                ApproveService approveService,
                                SendingService sendingService) {
+        this.categoryService = categoryService;
         this.trustedSuggesterService = trustedSuggesterService;
         this.vkConnectionService = vkConnectionService;
         this.approveService = approveService;
@@ -141,18 +147,25 @@ public class VkSuggestionHandler {
             return;
         }
 
+        Long categoryId = provider.getCategory().getId();
+        Optional<DiscordCategory> categoryOptional = categoryService.findById(categoryId);
+        if (categoryOptional.isEmpty()) {
+            return;
+        }
+        DiscordCategory category = categoryOptional.get();
+
         Integer vkUserId = message.getFromId();
         List<Long> discordUserIds = vkConnectionService.findAllByVkUserId(vkUserId).stream()
                 .map(ProjectionDiscordUserId::getDiscordUserId)
                 .collect(Collectors.toList());
 
-        DiscordCategory category = provider.getCategory();
-        Long categoryId = category.getId();
         boolean isTrusted = trustedSuggesterService.existsByCategoryIdAndUserIdIn(categoryId, discordUserIds);
+        boolean isBulkSubmit = category.isBulkSubmit();
+        boolean isSendingSubmit = isTrusted && (urls.size() == 1 || isBulkSubmit);
 
         // todo transaction-like batch submit
         urls.forEach(url -> {
-            if (isTrusted) {
+            if (isSendingSubmit) {
                 sendingService.submit(category, url);
             } else {
                 String userIdStr = message.getFromId().toString();
@@ -167,8 +180,7 @@ public class VkSuggestionHandler {
                         .setTimestamp(Instant.now())
                         .appendDescription("Provider type: `VK`\n")
                         .appendDescription(String.format("Provider name: `%s`\n", provider.getName()))
-                        .appendDescription(
-                                String.format("Author: [%s](https://vk.com/id%s)", userName, userIdStr))
+                        .appendDescription(String.format("Author: [%s](https://vk.com/id%s)", userName, userIdStr))
                         .setImage(url)
                         .build();
 

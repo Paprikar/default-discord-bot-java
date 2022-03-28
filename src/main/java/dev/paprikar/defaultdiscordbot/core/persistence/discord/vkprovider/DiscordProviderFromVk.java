@@ -25,7 +25,7 @@ public class DiscordProviderFromVk {
             nullable = false)
     private DiscordCategory category;
 
-    @Column(length = 32)
+    @Column(length = 32, nullable = false)
     private String name;
 
     @Column

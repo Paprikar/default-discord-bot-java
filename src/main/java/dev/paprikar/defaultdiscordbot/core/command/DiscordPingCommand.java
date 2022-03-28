@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.command;
 
-import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
+import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

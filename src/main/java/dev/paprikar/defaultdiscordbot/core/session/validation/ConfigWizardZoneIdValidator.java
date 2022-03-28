@@ -1,4 +1,4 @@
-package dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation;
+package dev.paprikar.defaultdiscordbot.core.session.validation;
 
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -7,17 +7,15 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
-import java.sql.Time;
+import java.time.DateTimeException;
 import java.time.Instant;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.time.ZoneId;
 
 /**
- * The category time validator in a configuration session.
+ * The zone id validator in a configuration session.
  */
 @Component
-public class ConfigWizardCategoryTimeValidator {
+public class ConfigWizardZoneIdValidator {
 
     /**
      * Performs initial processing of the value.
@@ -27,12 +25,12 @@ public class ConfigWizardCategoryTimeValidator {
      *
      * @return the validator processing response
      */
-    public DiscordValidatorProcessingResponse<Time> process(@Nonnull String value) {
-        Time time;
+    public DiscordValidatorProcessingResponse<ZoneId> process(@Nonnull String value) {
+        ZoneId zoneId;
 
         try {
-            time = Time.valueOf(LocalTime.parse(value, DateTimeFormatter.ISO_LOCAL_TIME));
-        } catch (DateTimeParseException e) {
+            zoneId = ZoneId.of(value);
+        } catch (DateTimeException e) {
             MessageEmbed error = new EmbedBuilder()
                     .setColor(Color.RED)
                     .setTitle("Configuration Wizard Error")
@@ -42,6 +40,6 @@ public class ConfigWizardCategoryTimeValidator {
             return new DiscordValidatorProcessingResponse<>(null, error);
         }
 
-        return new DiscordValidatorProcessingResponse<>(time, null);
+        return new DiscordValidatorProcessingResponse<>(zoneId, null);
     }
 }

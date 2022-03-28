@@ -6,6 +6,7 @@ import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.command.ConfigWizardCategoryCommand;
+import dev.paprikar.defaultdiscordbot.utils.DateTimeConversions;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -17,7 +18,11 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Nonnull;
 import javax.transaction.Transactional;
 import java.awt.*;
+import java.sql.Time;
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -101,12 +106,22 @@ public class ConfigWizardCategoryService extends ConfigWizard {
         String state = category.isEnabled() ? "enabled" : "disabled";
         builder.appendDescription("Current state: `" + state + "`\n\n");
 
+        ZoneId zoneId = category.getGuild().getZoneId();
+
+        Time startTime = category.getStartTime();
+        LocalTime startTimeLocal = startTime == null ? null : DateTimeConversions
+                .convertLocalTimeForZones(startTime.toLocalTime(), ZoneOffset.UTC, zoneId);
+
+        Time endTime = category.getEndTime();
+        LocalTime endTimeLocal = endTime == null ? null : DateTimeConversions
+                .convertLocalTimeForZones(endTime.toLocalTime(), ZoneOffset.UTC, zoneId);
+
         builder.appendDescription("Variables:\n");
         builder.appendDescription("`name` = `" + category.getName() + "`\n");
         builder.appendDescription("`sendingChannelId` = `" + category.getSendingChannelId() + "`\n");
         builder.appendDescription("`approvalChannelId` = `" + category.getApprovalChannelId() + "`\n");
-        builder.appendDescription("`startTime` = `" + category.getStartTime() + "`\n");
-        builder.appendDescription("`endTime` = `" + category.getEndTime() + "`\n");
+        builder.appendDescription("`startTime` = `" + startTimeLocal + "`\n");
+        builder.appendDescription("`endTime` = `" + endTimeLocal + "`\n");
         builder.appendDescription("`reserveDays` = `" + category.getReserveDays() + "`\n");
         builder.appendDescription("`positiveApprovalEmoji` = `" + category.getPositiveApprovalEmoji() + "`\n");
         builder.appendDescription("`negativeApprovalEmoji` = `" + category.getNegativeApprovalEmoji() + "`\n\n");

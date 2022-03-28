@@ -4,7 +4,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.DiscordTrustedSuggesterService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,17 +13,14 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.Instant;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
- * The discord user mention validator in a configuration session.
+ * The trusted suggester id validator in a configuration session.
  */
 @Component
 public class ConfigWizardTrustedSuggesterIdValidator {
 
     private final DiscordTrustedSuggesterService trustedSuggesterService;
-
-    private final Pattern userPattern = Pattern.compile("^" + Message.MentionType.USER.getPattern().pattern() + "$");
 
     /**
      * Constructs a validator.

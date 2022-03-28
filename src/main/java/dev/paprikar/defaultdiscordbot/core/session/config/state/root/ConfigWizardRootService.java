@@ -18,6 +18,9 @@ import javax.annotation.Nonnull;
 import javax.transaction.Transactional;
 import java.awt.*;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +34,8 @@ public class ConfigWizardRootService extends ConfigWizard {
     private static final Logger logger = LoggerFactory.getLogger(ConfigWizardRootService.class);
 
     private final DiscordGuildService guildService;
+
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm:ss");
 
     /**
      * Constructs a configuration state service.
@@ -97,8 +102,14 @@ public class ConfigWizardRootService extends ConfigWizard {
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now());
 
+        ZoneId zoneId = guild.getZoneId();
+        ZonedDateTime dateTime = ZonedDateTime.now(zoneId);
+
+        builder.appendDescription("Bot's current date and time: `" + dateTime.format(dateTimeFormatter) + "`\n\n");
+
         builder.appendDescription("Variables:\n");
-        builder.appendDescription("`prefix` = `" + guild.getPrefix() + "`\n\n");
+        builder.appendDescription("`prefix` = `" + guild.getPrefix() + "`\n");
+        builder.appendDescription("`timezone` = `" + zoneId + "`\n\n");
 
         builder.appendDescription("Directories:\n");
         builder.appendDescription("`categories`\n\n");

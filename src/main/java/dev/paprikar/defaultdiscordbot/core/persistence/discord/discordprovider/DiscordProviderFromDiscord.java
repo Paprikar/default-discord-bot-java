@@ -25,7 +25,7 @@ public class DiscordProviderFromDiscord {
             nullable = false)
     private DiscordCategory category;
 
-    @Column(length = 32)
+    @Column(length = 32, nullable = false)
     private String name;
 
     @Column(name = "suggestion_channel_id")

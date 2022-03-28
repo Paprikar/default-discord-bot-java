@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.session;
 
-import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
+import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

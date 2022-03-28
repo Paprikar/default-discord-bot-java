@@ -6,7 +6,7 @@ import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static dev.paprikar.defaultdiscordbot.utils.VkUtils.executeRequest;
+import static dev.paprikar.defaultdiscordbot.utils.VkRequests.executeRequest;
 
 /**
  * Handles vk group long poll api events.

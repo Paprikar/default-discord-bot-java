@@ -1,4 +1,4 @@
-package dev.paprikar.defaultdiscordbot.core.session.config.validation;
+package dev.paprikar.defaultdiscordbot.core.session.validation;
 
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import net.dv8tion.jda.api.EmbedBuilder;

@@ -6,7 +6,8 @@ import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
-import dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation.ConfigWizardCategoryTimeValidator;
+import dev.paprikar.defaultdiscordbot.core.session.validation.ConfigWizardTimeValidator;
+import dev.paprikar.defaultdiscordbot.utils.DateTimeConversions;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -19,6 +20,8 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.sql.Time;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +38,7 @@ public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategory
     private final DiscordCategoryService categoryService;
     private final MediaActionService mediaActionService;
     private final SendingService sendingService;
-    private final ConfigWizardCategoryTimeValidator validator;
+    private final ConfigWizardTimeValidator validator;
 
     /**
      * Constructs a setter.
@@ -47,13 +50,13 @@ public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategory
      * @param sendingService
      *         an instance of {@link SendingService}
      * @param validator
-     *         an instance of {@link ConfigWizardCategoryTimeValidator}
+     *         an instance of {@link ConfigWizardTimeValidator}
      */
     @Autowired
     public ConfigWizardCategoryStartTimeSetter(DiscordCategoryService categoryService,
                                                MediaActionService mediaActionService,
                                                SendingService sendingService,
-                                               ConfigWizardCategoryTimeValidator validator) {
+                                               ConfigWizardTimeValidator validator) {
         this.categoryService = categoryService;
         this.mediaActionService = mediaActionService;
         this.sendingService = sendingService;
@@ -74,14 +77,18 @@ public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategory
         }
 
         DiscordValidatorProcessingResponse<Time> response = validator.process(value);
-        Time time = response.getValue();
+        Time timeLocal = response.getValue();
         MessageEmbed error = response.getError();
 
         if (error != null) {
             return List.of(error);
         }
+        assert timeLocal != null;
 
-        category.setStartTime(time);
+        ZoneId zoneId = category.getGuild().getZoneId();
+        Time timeUtc = Time.valueOf(
+                DateTimeConversions.convertLocalTimeForZones(timeLocal.toLocalTime(), zoneId, ZoneOffset.UTC));
+        category.setStartTime(timeUtc);
         category = categoryService.save(category);
 
         List<MessageEmbed> responses = new ArrayList<>();
@@ -98,13 +105,13 @@ public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategory
             }
         }
 
-        logger.debug("The category={id={}} value '{}' is set to '{}'", category.getId(), VARIABLE_NAME, value);
+        logger.debug("The category={id={}} value '{}' is set to {}", category.getId(), VARIABLE_NAME, timeUtc);
 
         responses.add(new EmbedBuilder()
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription("The value `" + VARIABLE_NAME + "` has been set to `" + value + "`")
+                .appendDescription("The value `" + VARIABLE_NAME + "` has been set to `" + timeLocal + "`")
                 .build());
 
         if (enabledResponse) {

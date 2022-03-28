@@ -1,0 +1,1 @@
+ALTER TABLE discord_guild ADD zone_id VARCHAR(255) NOT NULL DEFAULT 'UTC';

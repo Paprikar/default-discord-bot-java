@@ -1,6 +1,10 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.guild;
 
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.ZoneIdConverter;
+
 import javax.persistence.*;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 /**
  * An entity containing information about the guild.
@@ -24,6 +28,10 @@ public class DiscordGuild {
 
     @Column(length = 32, nullable = false)
     private String prefix = "!";
+
+    @Convert(converter = ZoneIdConverter.class)
+    @Column(name = "zone_id", nullable = false)
+    private ZoneId zoneId = ZoneOffset.UTC;
 
     /**
      * Constructs the entity.
@@ -76,12 +84,28 @@ public class DiscordGuild {
         this.prefix = prefix;
     }
 
+    /**
+     * @return the zone id of the guild
+     */
+    public ZoneId getZoneId() {
+        return zoneId;
+    }
+
+    /**
+     * @param zoneId
+     *         the zone id of the guild
+     */
+    public void setZoneId(ZoneId zoneId) {
+        this.zoneId = zoneId;
+    }
+
     @Override
     public String toString() {
         return "DiscordGuild{" +
                 "id=" + id +
                 ", discordId=" + discordId +
                 ", prefix='" + prefix + '\'' +
+                ", zoneId=" + zoneId +
                 '}';
     }
 

@@ -3,7 +3,7 @@ package dev.paprikar.defaultdiscordbot.core.session.config;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCommand;
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardExitCommand;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
-import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
+import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
 import javax.annotation.Nonnull;

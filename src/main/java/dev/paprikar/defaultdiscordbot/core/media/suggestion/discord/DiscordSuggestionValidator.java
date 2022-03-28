@@ -1,7 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.media.suggestion.discord;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
-import dev.paprikar.defaultdiscordbot.core.session.config.validation.ConfigWizardDiscordTextChannelIdValidator;
+import dev.paprikar.defaultdiscordbot.core.session.validation.ConfigWizardDiscordTextChannelIdValidator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;

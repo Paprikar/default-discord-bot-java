@@ -107,6 +107,9 @@ public class ConfigWizardTrustedSuggestersService extends ConfigWizard {
 
         builder.appendDescription("Current directory: `/categories/" + category.getName() + "/trusted suggesters`\n\n");
 
+        builder.appendDescription("Variables:\n");
+        builder.appendDescription("`bulkSubmit` = `" + category.isBulkSubmit() + "`\n\n");
+
         if (!suggesters.isEmpty()) {
             builder.appendDescription("Trusted suggesters:\n");
             suggesters.stream()
@@ -119,6 +122,7 @@ public class ConfigWizardTrustedSuggestersService extends ConfigWizard {
         }
 
         builder.appendDescription("Available commands:\n");
+        builder.appendDescription("`set` `<variable>` `<value>`\n");
         builder.appendDescription("`add` `<user id>`\n");
         builder.appendDescription("`remove` `<user id>`\n");
         builder.appendDescription("`back`\n");

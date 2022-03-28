@@ -94,8 +94,7 @@ public class ConfigWizardTrustedSuggestersRemoveCommand implements ConfigWizardT
                 .setColor(Color.GRAY)
                 .setTitle("Configuration Wizard")
                 .setTimestamp(Instant.now())
-                .appendDescription(
-                        "The suggester " + User.fromId(argsString).getAsMention() + " has been removed")
+                .appendDescription("The suggester " + User.fromId(argsString).getAsMention() + " has been removed")
                 .build()
         );
 

@@ -29,7 +29,7 @@ public class DiscordCategory {
             nullable = false)
     private DiscordGuild guild;
 
-    @Column(length = 32)
+    @Column(length = 32, nullable = false)
     private String name;
 
     @Column(name = "sending_channel_id")
@@ -47,17 +47,20 @@ public class DiscordCategory {
     @Column(name = "reserve_days")
     private Integer reserveDays;
 
-    @Column(name = "positive_approval_emoji")
-    private Character positiveApprovalEmoji;
+    @Column(name = "positive_approval_emoji", nullable = false)
+    private Character positiveApprovalEmoji = 0x2705; // ✅
 
-    @Column(name = "negative_approval_emoji")
-    private Character negativeApprovalEmoji;
+    @Column(name = "negative_approval_emoji", nullable = false)
+    private Character negativeApprovalEmoji = 0x274E; // ❎
 
     @Column(nullable = false)
     private Boolean enabled = false;
 
     @Column(name = "last_send_timestamp")
     private Timestamp lastSendTimestamp;
+
+    @Column(name = "bulk_submit", nullable = false)
+    private Boolean bulkSubmit = false;
 
     /**
      * Constructs the entity.
@@ -245,6 +248,22 @@ public class DiscordCategory {
         this.lastSendTimestamp = lastSendTimestamp;
     }
 
+
+    /**
+     * @return {@code true} if the bulk submit is enabled for this category, otherwise {@code false}
+     */
+    public Boolean isBulkSubmit() {
+        return bulkSubmit;
+    }
+
+    /**
+     * @param bulkSubmit
+     *         {@code true} if the bulk submit is enabled for this category, otherwise {@code false}
+     */
+    public void setBulkSubmit(Boolean bulkSubmit) {
+        this.bulkSubmit = bulkSubmit;
+    }
+
     @Override
     public String toString() {
         return "DiscordCategory{" +
@@ -260,6 +279,7 @@ public class DiscordCategory {
                 ", negativeApprovalEmoji=" + negativeApprovalEmoji +
                 ", enabled=" + enabled +
                 ", lastSendTimestamp=" + lastSendTimestamp +
+                ", bulkSubmit=" + bulkSubmit +
                 '}';
     }
 

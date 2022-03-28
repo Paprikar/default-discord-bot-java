@@ -12,6 +12,7 @@ publication in the Discord text channel.
 - [Installation using Docker](#installation-using-docker)
 - [Build](#build)
 - [Configuration](#configuration)
+- [Possible problems](#possible-problems)
 - [Commands](#commands)
 
 ---
@@ -99,6 +100,20 @@ environment variables, an example of which can be found in [.env.template](.env.
   Default value is `64`.
 
   The maximum reconnection delay of the vk bot in seconds. Must be greater than or equal to `64`.
+
+## Possible problems
+
+### Found non-empty schema(s) but no schema history table:
+
+The problem occurs after upgrading from versions 1.0.3.0 and 1.1.3.0 to 1.2.3.0 and higher.
+Can be solved by setting an environment variable:
+
+```
+SPRING_FLYWAY_BASELINE_ON_MIGRATE=true
+```
+
+After the first successful start of the application, this environment variable can be removed.
+More can be found [here](https://flywaydb.org/documentation/configuration/parameters/baselineOnMigrate).
 
 ## Commands
 

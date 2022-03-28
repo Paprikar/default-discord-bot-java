@@ -35,5 +35,6 @@ build/
 logs/
 artifacts/
 src/main/docs
+.jpb/
 
 .env

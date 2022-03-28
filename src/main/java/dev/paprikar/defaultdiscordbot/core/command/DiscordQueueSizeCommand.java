@@ -3,7 +3,7 @@ package dev.paprikar.defaultdiscordbot.core.command;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
-import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
+import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -49,7 +49,6 @@ public class DiscordQueueSizeCommand implements DiscordCommand {
                 .setMessage("An error occurred while sending the command response")
                 .build();
     }
-
 
     @Override
     public void execute(@Nonnull GuildMessageReceivedEvent event, @Nonnull String argsString) {

@@ -10,11 +10,11 @@ import java.util.EnumSet;
 import java.util.function.Consumer;
 
 /**
- * Utilities for JDA.
+ * JDA request utilities.
  */
-public class JdaUtils {
+public class JdaRequests {
 
-    private static final Logger logger = LoggerFactory.getLogger(JdaUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(JdaRequests.class);
 
     /**
      * The request error handler.

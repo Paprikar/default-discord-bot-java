@@ -25,7 +25,7 @@ public class DiscordTrustedSuggester {
             nullable = false)
     private DiscordCategory category;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
     /**

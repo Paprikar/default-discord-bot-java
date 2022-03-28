@@ -9,7 +9,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordC
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.DiscordTrustedSuggesterService;
-import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
+import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -285,10 +285,12 @@ public class DiscordSuggestionService {
 
         DiscordCategory category = provider.getCategory();
         boolean isTrusted = trustedSuggesterService.existsByCategoryIdAndUserId(category.getId(), author.getIdLong());
+        boolean isBulkSubmit = category.isBulkSubmit();
+        boolean isSendingSubmit = isTrusted && (urls.size() == 1 || isBulkSubmit);
 
         // todo transaction-like batch submit
         urls.forEach(url -> {
-            if (isTrusted) {
+            if (isSendingSubmit) {
                 sendingService.submit(category, url);
             } else {
                 MessageEmbed suggestion = new EmbedBuilder()

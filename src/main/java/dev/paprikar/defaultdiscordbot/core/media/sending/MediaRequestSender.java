@@ -7,7 +7,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordC
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequest;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
-import dev.paprikar.defaultdiscordbot.utils.JdaUtils.RequestErrorHandler;
+import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -234,7 +234,7 @@ public class MediaRequestSender {
             LocalTime endTime = category.getEndTime().toLocalTime();
             int reserveDays = category.getReserveDays();
 
-            LocalDateTime currentDateTime = LocalDateTime.now();
+            LocalDateTime currentDateTime = LocalDateTime.now(ZoneOffset.UTC);
             LocalDateTime startDateTime = overrideTime(currentDateTime, startTime);
             LocalDateTime endDateTime = overrideTime(currentDateTime, endTime);
             boolean inTime = timeInRange(currentDateTime.toLocalTime(), startTime, endTime);

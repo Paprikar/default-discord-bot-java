@@ -15,7 +15,7 @@ public class DiscordUserVkConnection {
     @Column(name = "discord_user_id")
     private Long discordUserId;
 
-    @Column(name = "vk_user_id")
+    @Column(name = "vk_user_id", nullable = false)
     private Integer vkUserId;
 
     /**

@@ -7,11 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utilities for VK SDK.
+ * VK SDK request utilities.
  */
-public class VkUtils {
+public class VkRequests {
 
-    private static final Logger logger = LoggerFactory.getLogger(VkUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(VkRequests.class);
 
     /**
      * Executes the request and returns {@code null} in case of any errors.
