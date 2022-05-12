@@ -5,14 +5,14 @@
 
     <groupId>dev.paprikar</groupId>
     <artifactId>default-discord-bot</artifactId>
-    <version>1.2.3.0</version>
+    <version>1.2.3.1</version>
     <name>default-discord-bot</name>
     <description>Discord bot aimed at working with media content written in JAVA</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.6</version>
+        <version>2.6.7</version>
         <relativePath/>
     </parent>
 
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>8.5.4</version>
+            <version>8.5.10</version>
         </dependency>
 
         <dependency>

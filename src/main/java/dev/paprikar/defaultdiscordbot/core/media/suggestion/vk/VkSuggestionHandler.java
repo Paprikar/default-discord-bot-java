@@ -9,6 +9,7 @@ import com.vk.api.sdk.objects.photos.PhotoSizes;
 import com.vk.api.sdk.objects.photos.PhotoSizesType;
 import com.vk.api.sdk.objects.users.Fields;
 import com.vk.api.sdk.objects.users.responses.GetResponse;
+import com.vk.api.sdk.objects.wall.Wallpost;
 import com.vk.api.sdk.objects.wall.WallpostAttachment;
 import com.vk.api.sdk.objects.wall.WallpostAttachmentType;
 import com.vk.api.sdk.objects.wall.WallpostFull;
@@ -123,7 +124,7 @@ public class VkSuggestionHandler {
             boolean pass = true;
             switch (attachment.getType()) {
                 case WALL: {
-                    pass = handleWallpostPhotos(attachment.getWall(), urls, message, actor);
+                    pass = handleWallpostFullPhotos(attachment.getWall(), urls, message, actor);
                     break;
                 }
                 case PHOTO: {
@@ -199,11 +200,32 @@ public class VkSuggestionHandler {
                 .replyTo(message.getId()));
     }
 
-    private boolean handleWallpostPhotos(WallpostFull wallpost,
-                                         List<String> urls,
-                                         Message message,
-                                         GroupActor actor) {
-        for (WallpostAttachment attachment : wallpost.getAttachments()) {
+    private boolean handleWallpostFullPhotos(WallpostFull wallpostFull,
+                                             List<String> urls,
+                                             Message message,
+                                             GroupActor actor) {
+        List<Wallpost> copyHistory = wallpostFull.getCopyHistory();
+        if (copyHistory != null) {
+            for (Wallpost wallpost : copyHistory) {
+                boolean pass = handleWallpostAttachmentsPhotos(wallpost.getAttachments(), urls, message, actor);
+                if (!pass) {
+                    return false;
+                }
+            }
+        }
+
+        return handleWallpostAttachmentsPhotos(wallpostFull.getAttachments(), urls, message, actor);
+    }
+
+    private boolean handleWallpostAttachmentsPhotos(List<WallpostAttachment> attachments,
+                                                    List<String> urls,
+                                                    Message message,
+                                                    GroupActor actor) {
+        if (attachments == null) {
+            return true;
+        }
+
+        for (WallpostAttachment attachment : attachments) {
             if (attachment.getType() == WallpostAttachmentType.PHOTO) {
                 boolean pass = handlePhoto(attachment.getPhoto(), urls, message, actor);
                 if (!pass) {
@@ -211,6 +233,7 @@ public class VkSuggestionHandler {
                 }
             }
         }
+
         return true;
     }
 
