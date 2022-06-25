@@ -9,5 +9,5 @@ logging.level:
 spring:
   jpa:
     generate-ddl: true
-    hibernate.ddl-auto: update
+    hibernate.ddl-auto: validate
     open-in-view: false

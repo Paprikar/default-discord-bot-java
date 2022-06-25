@@ -84,17 +84,23 @@ public class DiscordEventListener extends ListenerAdapter {
     @Override
     public void onResumed(@Nonnull ResumedEvent event) {
         logger.debug("onResumed()");
+
+        discordBotService.initialize(event.getJDA());
     }
 
     @Override
     public void onReconnected(@Nonnull ReconnectedEvent event) {
         logger.debug("onReconnected()");
+
+        discordBotService.initialize(event.getJDA());
     }
 
     @Override
     public void onDisconnect(@Nonnull DisconnectEvent event) {
         logger.debug("onDisconnect(): event={timeDisconnected={}, closeCode={}}",
                 event.getTimeDisconnected(), event.getCloseCode());
+
+        discordBotService.shutdown();
     }
 
     @Override

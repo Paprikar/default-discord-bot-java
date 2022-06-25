@@ -121,6 +121,7 @@ public class SendingService {
 
         synchronized (monitor) {
             if (monitorService.putIfAbsent(monitorKey, monitor) != null) {
+                logger.debug("add(): Category is already added. Skipping");
                 return;
             }
 
@@ -146,17 +147,20 @@ public class SendingService {
         ConcurrencyKey monitorKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_SENDING_CONFIGURATION, categoryId);
         Object monitor = monitorService.get(monitorKey);
         if (monitor == null) {
+            logger.debug("remove(): Category is already removed. Skipping");
             return;
         }
 
         synchronized (monitor) {
             MediaRequestSender sender = senders.remove(categoryId);
-            if (sender != null) {
-                sender.stop();
+            if (sender == null) {
+                logger.debug("remove(): Category is already removed. Skipping");
+                return;
             }
 
-            categories.remove(category.getSendingChannelId());
+            sender.stop();
 
+            categories.remove(category.getSendingChannelId());
             monitorService.remove(monitorKey);
         }
     }

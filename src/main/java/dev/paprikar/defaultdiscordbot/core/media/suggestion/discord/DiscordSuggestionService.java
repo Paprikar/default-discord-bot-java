@@ -170,6 +170,7 @@ public class DiscordSuggestionService {
 
         synchronized (monitor) {
             if (monitorService.putIfAbsent(monitorKey, monitor) != null) {
+                logger.debug("add(): Provider is already added. Skipping");
                 return;
             }
 
@@ -193,6 +194,7 @@ public class DiscordSuggestionService {
                 .from(ConcurrencyScope.CATEGORY_PROVIDER_FROM_DISCORD_CONFIGURATION, providerId);
         Object monitor = monitorService.get(monitorKey);
         if (monitor == null) {
+            logger.debug("remove(): Provider is already removed. Skipping");
             return;
         }
 

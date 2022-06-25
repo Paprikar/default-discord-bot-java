@@ -200,6 +200,7 @@ public class ApproveService {
 
         synchronized (monitor) {
             if (monitorService.putIfAbsent(monitorKey, monitor) != null) {
+                logger.debug("add(): Category is already added. Skipping");
                 return;
             }
 
@@ -222,6 +223,7 @@ public class ApproveService {
         ConcurrencyKey monitorKey = ConcurrencyKey.from(ConcurrencyScope.CATEGORY_APPROVE_CONFIGURATION, categoryId);
         Object monitor = monitorService.get(monitorKey);
         if (monitor == null) {
+            logger.debug("remove(): Category is already removed. Skipping");
             return;
         }
 

@@ -5,14 +5,14 @@
 
     <groupId>dev.paprikar</groupId>
     <artifactId>default-discord-bot</artifactId>
-    <version>1.2.3.1</version>
+    <version>1.2.3.2</version>
     <name>default-discord-bot</name>
     <description>Discord bot aimed at working with media content written in JAVA</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.7</version>
+        <version>2.7.2</version>
         <relativePath/>
     </parent>
 
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>8.5.10</version>
+            <version>9.0.3</version>
         </dependency>
 
         <dependency>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.4.0_350</version>
+            <version>4.4.0_352</version>
         </dependency>
 
         <dependency>
@@ -103,13 +103,13 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>8.5.4</version>
+                <version>9.0.3</version>
             </plugin>
 
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.1</version>
                 <configuration>
                     <to>
                         <image>${project.name}</image>
@@ -126,7 +126,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>3.4.0</version>
                 <configuration>
                     <reportOutputDirectory>${basedir}/src/main/docs</reportOutputDirectory>
                     <destDir>.</destDir>

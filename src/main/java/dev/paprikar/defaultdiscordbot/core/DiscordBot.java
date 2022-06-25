@@ -49,7 +49,7 @@ public class DiscordBot {
                     config.getDiscordMaxReconnectDelay(), eventListener);
             jda.awaitReady();
 
-            discordBotService.initializeBot(jda);
+            discordBotService.initialize(jda);
         } catch (LoginException | InterruptedException e) {
             logger.error("An error occurred while starting the Discord bot", e);
             System.exit(1);

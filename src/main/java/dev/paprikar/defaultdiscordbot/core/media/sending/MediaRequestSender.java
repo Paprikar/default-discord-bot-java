@@ -9,7 +9,6 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.Disc
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
 import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import java.sql.Timestamp;
 import java.time.*;
 import java.util.Optional;
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 
 /**
  * Schedules and sends media requests.
@@ -75,11 +73,7 @@ public class MediaRequestSender {
         // which in both cases causes the sender to stop working externally via events.
         this.requestSendingErrorHandler = RequestErrorHandler.createBuilder()
                 .setMessage("An error occurred while sending the suggestion")
-                .setAction(() -> {
-                    toTerminate = true;
-                    // revert lastSendDateTime changes
-                    lastSendDateTime = LocalDateTime.from(category.getLastSendTimestamp().toInstant());
-                })
+                .setAction(this::stopInternal)
                 .warnOn(ErrorResponse.UNKNOWN_CHANNEL)
                 .build();
     }
@@ -108,15 +102,15 @@ public class MediaRequestSender {
             throw new IllegalStateException(message);
         }
 
-        Timestamp dt = category.getLastSendTimestamp();
-        if (dt == null) {
+        toTerminate = false;
+        this.category = category;
+        Timestamp timestamp = category.getLastSendTimestamp();
+        if (timestamp == null) {
             lastSendDateTime = null;
         } else {
-            lastSendDateTime = dt.toLocalDateTime();
+            lastSendDateTime = timestamp.toLocalDateTime();
         }
-        toTerminate = false;
         taskFuture = executor.schedule(new SenderTask(category, false), 0, TimeUnit.NANOSECONDS);
-        this.category = category;
     }
 
     /**
@@ -131,11 +125,9 @@ public class MediaRequestSender {
                 } catch (InterruptedException | ExecutionException e) {
                     logger.error(e.toString());
                 }
-            }
+            } // todo possible thread duplicate
         }
-        toTerminate = true;
-        taskFuture = null;
-        category = null;
+        stopInternal();
     }
 
     /**
@@ -149,6 +141,13 @@ public class MediaRequestSender {
     public void update(@Nonnull DiscordCategory category) {
         stop();
         start(category);
+    }
+
+    private void stopInternal() {
+        toTerminate = true;
+        taskFuture = null;
+        category = null;
+        lastSendDateTime = null;
     }
 
     private class SenderTask implements Runnable {
@@ -173,24 +172,24 @@ public class MediaRequestSender {
 
             synchronized (monitor) {
                 if (toSend) {
-                    sendRequest();
+                    send();
                 }
                 if (toTerminate) {
-                    taskFuture = null;
-                    MediaRequestSender.this.category = null;
                     return;
                 }
                 schedule();
             }
         }
 
-        private void sendRequest() {
+        private void send() {
             Optional<DiscordMediaRequest> requestOptional = mediaRequestService.findFirstByCategoryId(category.getId());
             if (requestOptional.isEmpty()) {
                 // normally should not happen
+                logger.error("SenderTask#send(): No requests were found to be sent");
+
+                // preparation for an update() call
                 toTerminate = true;
-                lastSendDateTime = LocalDateTime.from(category.getLastSendTimestamp().toInstant());
-                logger.error("SenderTask#sendRequest(): No requests were found to be sent");
+                taskFuture = null;
                 return;
             }
             DiscordMediaRequest request = requestOptional.get();
@@ -199,14 +198,17 @@ public class MediaRequestSender {
             TextChannel channel = jda.getTextChannelById(sendingChannelId);
             if (channel == null) {
                 // can happen if the service has not stopped yet after the channel deletion event
-                toTerminate = true;
-                logger.warn("SenderTask#sendRequest(): The channel with id={} for sending requests cannot be found",
+                logger.warn("SenderTask#send(): The channel with id={} for sending requests cannot be found",
                         sendingChannelId);
+
+                stopInternal();
                 return;
             }
 
-            Consumer<Message> onSendSuccess = message -> {
-                logger.debug("SenderTask#sendRequest(): The request with id={} was successfully sent"
+            try {
+                channel.sendMessage(request.getContent()).complete();
+
+                logger.debug("SenderTask#send(): The request with id={} was successfully sent"
                         + " to text channel with id={}", request.getId(), sendingChannelId);
 
                 mediaRequestService.delete(request);
@@ -214,19 +216,17 @@ public class MediaRequestSender {
                 category.setLastSendTimestamp(
                         Timestamp.from(lastSendDateTime.atZone(ZoneId.systemDefault()).toInstant()));
                 MediaRequestSender.this.category = categoryService.save(category);
-            };
-
-            channel.sendMessage(request.getContent())
-                    .queue(onSendSuccess, requestSendingErrorHandler);
+            } catch (RuntimeException e) {
+                requestSendingErrorHandler.accept(e);
+            }
         }
 
         private void schedule() {
             long queueSize = mediaRequestService.countByCategoryId(category.getId());
             if (queueSize == 0) {
-                // source always calls refresh() when a new request is added to the queue,
+                // service always calls update() when a new request is added to the queue,
                 // so there is no need to wait for the addition event from here
                 taskFuture = null;
-                MediaRequestSender.this.category = null;
                 return;
             }
 
@@ -268,12 +268,8 @@ public class MediaRequestSender {
                 return;
             }
 
-            if (lastSendDateTime == null) {
+            if (lastSendDateTime == null || lastSendDateTime.isBefore(startDateTime)) {
                 lastSendDateTime = startDateTime;
-            } else {
-                if (lastSendDateTime.isBefore(startDateTime)) {
-                    lastSendDateTime = startDateTime;
-                }
             }
             debugMsgBuilder
                     .append(", startDateTime=").append(startDateTime)

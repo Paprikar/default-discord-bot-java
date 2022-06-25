@@ -5,6 +5,7 @@ import dev.paprikar.defaultdiscordbot.config.DdbDefaults;
 import dev.paprikar.defaultdiscordbot.core.media.MediaActionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
+import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
@@ -79,14 +80,14 @@ public class DiscordBotService {
     }
 
     /**
-     * Setting up the bot in a working state.
+     * Sets the bot modules to working state.
      *
      * @param jda
      *         an instance of {@link JDA}
      */
     @Transactional
-    public void initializeBot(@Nonnull JDA jda) {
-        logger.debug("initializeBot(): Initialization is started");
+    public void initialize(@Nonnull JDA jda) {
+        logger.debug("initialize(): Initialization is started");
 
         Set<Long> connectedGuildIds = jda.getGuilds().stream()
                 .map(ISnowflake::getIdLong)
@@ -105,12 +106,12 @@ public class DiscordBotService {
                 .collect(Collectors.toSet());
 
         for (Long id : toSetupGuildIds) {
-            logger.debug("initializeBot(): Setting up the guild={discordId={}} after a period of inactivity", id);
+            logger.debug("initialize(): Setting up the guild={discordId={}} after a period of inactivity", id);
             setupDiscordGuild(id);
         }
 
         for (Long id : toDeleteGuildIds) {
-            logger.debug("initializeBot(): Deleting the guild={discordId={}} after a period of inactivity", id);
+            logger.debug("initialize(): Deleting the guild={discordId={}} after a period of inactivity", id);
             deleteDiscordGuild(id);
         }
 
@@ -118,7 +119,30 @@ public class DiscordBotService {
                 .filter(DiscordCategory::isEnabled)
                 .forEach(mediaActionService::enableCategory);
 
-        logger.debug("initializeBot(): Initialization is finished");
+        logger.debug("initialize(): Initialization is finished");
+    }
+
+    /**
+     * Stops discord bot modules.
+     */
+    public void shutdown() {
+        logger.debug("shutdown(): Shutdown is started");
+
+        categoryService.findAll().forEach(category -> {
+            Long categoryId = category.getId();
+
+            discordProviderService
+                    .findAllByCategoryId(categoryId)
+                    .stream()
+                    .filter(DiscordProviderFromDiscord::isEnabled)
+                    .forEach(mediaActionService::disableDiscordProvider);
+
+            mediaActionService.disableApprove(category);
+
+            mediaActionService.disableSending(category);
+        });
+
+        logger.debug("shutdown(): Shutdown is finished");
     }
 
     /**

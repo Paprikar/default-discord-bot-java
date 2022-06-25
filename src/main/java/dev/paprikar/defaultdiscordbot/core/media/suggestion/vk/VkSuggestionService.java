@@ -78,11 +78,16 @@ public class VkSuggestionService {
 
         synchronized (newMonitor) {
             Object oldMonitor = monitorService.putIfAbsent(monitorKey, newMonitor);
-            if (oldMonitor != null) { // try to reuse the handler before its stopped
+            if (oldMonitor != null) {
+                // try to reuse the handler before its stopped
                 synchronized (oldMonitor) {
                     GroupLongPollApi handler = handlers.get(providerId);
-                    if (handler != null) { // there are only unstopped handlers in the map
-                        if (!handler.isToRun()) { // idempotency
+                    if (handler != null) {
+                        // there are only unstopped handlers in the map
+                        if (handler.isToRun()) {
+                            // idempotency
+                            logger.debug("add(): Provider is already added. Skipping");
+                        } else {
                             handler.start(provider);
                         }
                         return;
@@ -112,15 +117,18 @@ public class VkSuggestionService {
 
         Object monitor = monitorService.get(ConcurrencyScope.CATEGORY_PROVIDER_FROM_VK_CONFIGURATION, providerId);
         if (monitor == null) {
+            logger.debug("remove(): Provider is already removed. Skipping");
             return;
         }
 
         synchronized (monitor) {
             GroupLongPollApi handler = handlers.get(providerId);
-
-            if (handler != null) {
-                handler.stop();
+            if (handler == null) {
+                logger.debug("remove(): Provider is already removed. Skipping");
+                return;
             }
+
+            handler.stop();
         }
     }
 
