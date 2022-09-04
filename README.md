@@ -1,5 +1,7 @@
 # default-discord-bot
 
+[![Build](https://github.com/Paprikar/default-discord-bot-java/actions/workflows/build.yml/badge.svg)](https://github.com/Paprikar/default-discord-bot-java/actions/workflows/build.yml)
+[![Release](https://github.com/Paprikar/default-discord-bot-java/actions/workflows/release.yml/badge.svg)](https://github.com/Paprikar/default-discord-bot-java/actions/workflows/release.yml)
 ![Java Version](https://img.shields.io/badge/java-11-blue)
 [![GitHub License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 

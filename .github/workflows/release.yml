@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_REPOSITORY: paprikar/default-discord-bot
+      DOCKERFILE: |
+        FROM eclipse-temurin:11-jre
+        COPY target/*.jar app.jar
+        ENTRYPOINT ["java", "-jar", "app.jar"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: maven
+
+      - name: Package
+        run: |
+          mvn -B -U package spring-boot:repackage \
+          -Dmaven.test.skip=true
+
+      - name: Upload JARs
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/*.jar
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: arm
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Setup env variables
+        run: |
+          BUILD_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "BUILD_VERSION=$BUILD_VERSION" >> $GITHUB_ENV
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push images to Docker Hub
+        run: |
+          echo "$DOCKERFILE" > Dockerfile
+          docker buildx build . \
+          --platform linux/amd64,linux/arm/v7 \
+          --tag $DOCKER_REPOSITORY:latest \
+          --tag $DOCKER_REPOSITORY:$BUILD_VERSION \
+          --push \
+          --cache-from type=gha \
+          --cache-to type=gha,mode=max
