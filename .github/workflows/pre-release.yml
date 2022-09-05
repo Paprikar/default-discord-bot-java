@@ -1,0 +1,18 @@
+name: Pre-release
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  pre-release:
+    name: Pre-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pre-release
+        uses: marvinpinto/action-automatic-releases@v1.2.1
+        with:
+          prerelease: false
+          draft: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
