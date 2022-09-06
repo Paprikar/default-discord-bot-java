@@ -50,7 +50,11 @@ public class DiscordBot {
             jda.awaitReady();
 
             discordBotService.initialize(jda);
-        } catch (LoginException | InterruptedException e) {
+        } catch (LoginException e) {
+            logger.error("An error occurred while starting the Discord bot", e);
+            System.exit(1);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             logger.error("An error occurred while starting the Discord bot", e);
             System.exit(1);
         }

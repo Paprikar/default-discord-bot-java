@@ -171,6 +171,7 @@ public class ConfigWizardSessionService extends DiscordPrivateSession {
         try {
             session = new ConfigWizardSession(event.getMember(), initialService, guildId);
         } catch (RuntimeException e) {
+            logger.error("An error occurred while creating the session", e);
             return;
         }
 

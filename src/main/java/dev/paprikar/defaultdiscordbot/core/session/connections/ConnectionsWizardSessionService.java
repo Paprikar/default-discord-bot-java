@@ -135,6 +135,7 @@ public class ConnectionsWizardSessionService extends DiscordPrivateSession {
         try {
             session = new ConnectionsWizardSession(member, initialService);
         } catch (RuntimeException e) {
+            logger.error("An error occurred while creating the session", e);
             return;
         }
 
