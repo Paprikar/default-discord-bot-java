@@ -122,10 +122,13 @@ public class MediaRequestSender {
             if (!taskFuture.isDone()) {
                 try {
                     taskFuture.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    logger.error(e.toString());
+                } catch (ExecutionException e) {
+                    logger.error("An error occurred while stopping the sender", e);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    logger.error("An error occurred while stopping the sender", e);
                 }
-            } // todo possible thread duplicate
+            }
         }
         stopInternal();
     }
