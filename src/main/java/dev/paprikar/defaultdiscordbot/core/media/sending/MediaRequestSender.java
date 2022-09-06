@@ -40,13 +40,13 @@ public class MediaRequestSender {
 
     private final RequestErrorHandler requestSendingErrorHandler;
 
-    private volatile boolean toTerminate;
+    private boolean toTerminate;
 
-    private volatile ScheduledFuture<?> taskFuture;
+    private ScheduledFuture<?> taskFuture;
 
-    private volatile DiscordCategory category;
+    private DiscordCategory category;
 
-    private volatile LocalDateTime lastSendDateTime;
+    private LocalDateTime lastSendDateTime;
 
     /**
      * Constructs the sender.
