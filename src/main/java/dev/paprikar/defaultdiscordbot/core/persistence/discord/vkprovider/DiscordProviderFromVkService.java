@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider;
 
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +20,7 @@ public class DiscordProviderFromVkService {
     /**
      * Constructs the service.
      *
-     * @param repository
-     *         an instance of {@link DiscordProviderFromVkRepository}
+     * @param repository an instance of {@link DiscordProviderFromVkRepository}
      */
     @Autowired
     public DiscordProviderFromVkService(DiscordProviderFromVkRepository repository) {
@@ -31,8 +30,7 @@ public class DiscordProviderFromVkService {
     /**
      * Finds the vk provider by its id.
      *
-     * @param id
-     *         the id of the vk provider
+     * @param id the id of the vk provider
      *
      * @return the found vk provider
      *
@@ -45,13 +43,11 @@ public class DiscordProviderFromVkService {
     /**
      * Returns the vk provider by its id.
      *
-     * @param id
-     *         the id of the vk provider
+     * @param id the id of the vk provider
      *
      * @return the found vk provider
      *
-     * @throws EntityNotFoundException
-     *         see {@link EntityManager#getReference(Class, Object)} for more details
+     * @throws EntityNotFoundException see {@link EntityManager#getReference(Class, Object)} for more details
      * @see org.springframework.data.jpa.repository.JpaRepository#getById(Object) JpaRepository#getById(Object)
      * @see EntityManager#getReference(Class, Object)
      */
@@ -73,8 +69,7 @@ public class DiscordProviderFromVkService {
     /**
      * Finds the vk providers by their category id.
      *
-     * @param id
-     *         the category id of the vk providers
+     * @param id the category id of the vk providers
      *
      * @return the {@link List} with all found vk providers
      */
@@ -85,8 +80,7 @@ public class DiscordProviderFromVkService {
     /**
      * Saves the vk provider.
      *
-     * @param provider
-     *         the vk provider
+     * @param provider the vk provider
      *
      * @return the saved vk provider
      */
@@ -97,8 +91,7 @@ public class DiscordProviderFromVkService {
     /**
      * Deletes the vk provider.
      *
-     * @param provider
-     *         the vk provider
+     * @param provider the vk provider
      */
     public void delete(@Nonnull DiscordProviderFromVk provider) {
         repository.delete(provider);
@@ -107,8 +100,7 @@ public class DiscordProviderFromVkService {
     /**
      * Deletes all vk providers by their category id.
      *
-     * @param id
-     *         the category id of the vk providers
+     * @param id the category id of the vk providers
      */
     public void deleteByCategoryId(long id) {
         repository.deleteByCategoryId(id);

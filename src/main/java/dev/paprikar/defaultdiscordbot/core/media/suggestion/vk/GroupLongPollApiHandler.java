@@ -20,16 +20,11 @@ public class GroupLongPollApiHandler extends GroupLongPollApi {
     /**
      * Constructs the handler.
      *
-     * @param actor
-     *         the {@link GroupActor}
-     * @param maxReconnectDelay
-     *         the maximum reconnection delay of the handler in seconds
-     * @param suggestionService
-     *         an instance of {@link VkSuggestionService}
-     * @param suggestionHandler
-     *         an instance of {@link VkSuggestionHandler}
-     * @param monitorService
-     *         an instance of {@link MonitorService}
+     * @param actor the {@link GroupActor}
+     * @param maxReconnectDelay the maximum reconnection delay of the handler in seconds
+     * @param suggestionService an instance of {@link VkSuggestionService}
+     * @param suggestionHandler an instance of {@link VkSuggestionHandler}
+     * @param monitorService an instance of {@link MonitorService}
      */
     public GroupLongPollApiHandler(GroupActor actor,
                                    int maxReconnectDelay,
@@ -44,19 +39,13 @@ public class GroupLongPollApiHandler extends GroupLongPollApi {
     /**
      * Constructs the handler.
      *
-     * @param actor
-     *         the {@link GroupActor}
-     * @param maxReconnectDelay
-     *         the maximum reconnection delay of the handler in seconds
-     * @param waitTime
-     *         the time for which the event request connection is kept. After it expires,
-     *         the connection will be closed and the handler will try to create a new request
-     * @param suggestionService
-     *         an instance of {@link VkSuggestionService}
-     * @param suggestionHandler
-     *         an instance of {@link VkSuggestionHandler}
-     * @param monitorService
-     *         an instance of {@link MonitorService}
+     * @param actor the {@link GroupActor}
+     * @param maxReconnectDelay the maximum reconnection delay of the handler in seconds
+     * @param waitTime the time for which the event request connection is kept. After it expires,
+     * the connection will be closed and the handler will try to create a new request
+     * @param suggestionService an instance of {@link VkSuggestionService}
+     * @param suggestionHandler an instance of {@link VkSuggestionHandler}
+     * @param monitorService an instance of {@link MonitorService}
      */
     public GroupLongPollApiHandler(GroupActor actor,
                                    int maxReconnectDelay,

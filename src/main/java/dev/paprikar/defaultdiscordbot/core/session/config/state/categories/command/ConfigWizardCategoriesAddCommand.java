@@ -10,6 +10,7 @@ import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingRes
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation.ConfigWizardCategoryNameValidator;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -18,8 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -42,14 +42,10 @@ public class ConfigWizardCategoriesAddCommand implements ConfigWizardCategoriesC
     /**
      * Constructs the command.
      *
-     * @param guildService
-     *         an instance of {@link DiscordGuildService}
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param validator
-     *         an instance of {@link ConfigWizardCategoryNameValidator}
-     * @param config
-     *         an instance of {@link DdbConfig}
+     * @param guildService an instance of {@link DiscordGuildService}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param validator an instance of {@link ConfigWizardCategoryNameValidator}
+     * @param config an instance of {@link DdbConfig}
      */
     @Autowired
     public ConfigWizardCategoriesAddCommand(DiscordGuildService guildService,

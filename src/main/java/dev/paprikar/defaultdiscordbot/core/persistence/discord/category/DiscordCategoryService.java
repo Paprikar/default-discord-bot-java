@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.category;
 
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +20,7 @@ public class DiscordCategoryService {
     /**
      * Constructs the service.
      *
-     * @param repository
-     *         an instance of {@link DiscordCategoryRepository}
+     * @param repository an instance of {@link DiscordCategoryRepository}
      */
     @Autowired
     public DiscordCategoryService(DiscordCategoryRepository repository) {
@@ -31,8 +30,7 @@ public class DiscordCategoryService {
     /**
      * Finds the category by its id.
      *
-     * @param id
-     *         the id of the category
+     * @param id the id of the category
      *
      * @return the found category
      *
@@ -45,13 +43,11 @@ public class DiscordCategoryService {
     /**
      * Returns the category by its id.
      *
-     * @param id
-     *         the id of the category
+     * @param id the id of the category
      *
      * @return the found category
      *
-     * @throws EntityNotFoundException
-     *         see {@link EntityManager#getReference(Class, Object)} for more details
+     * @throws EntityNotFoundException see {@link EntityManager#getReference(Class, Object)} for more details
      * @see org.springframework.data.jpa.repository.JpaRepository#getById(Object) JpaRepository#getById(Object)
      * @see EntityManager#getReference(Class, Object)
      */
@@ -73,8 +69,7 @@ public class DiscordCategoryService {
     /**
      * Finds the categories by their guild id.
      *
-     * @param id
-     *         the guild id of the categories
+     * @param id the guild id of the categories
      *
      * @return the {@link List} with all found categories
      */
@@ -85,8 +80,7 @@ public class DiscordCategoryService {
     /**
      * Finds the categories by their discord id of the guild.
      *
-     * @param id
-     *         the guild discord id of the categories
+     * @param id the guild discord id of the categories
      *
      * @return the {@link List} with all found categories
      */
@@ -97,8 +91,7 @@ public class DiscordCategoryService {
     /**
      * Saves the category.
      *
-     * @param category
-     *         the category
+     * @param category the category
      *
      * @return the saved category
      */
@@ -109,8 +102,7 @@ public class DiscordCategoryService {
     /**
      * Deletes the category.
      *
-     * @param category
-     *         the category
+     * @param category the category
      */
     public void delete(@Nonnull DiscordCategory category) {
         repository.delete(category);
@@ -119,8 +111,7 @@ public class DiscordCategoryService {
     /**
      * Deletes the category by its id.
      *
-     * @param id
-     *         the id of the category
+     * @param id the id of the category
      */
     public void deleteById(long id) {
         repository.deleteById(id);

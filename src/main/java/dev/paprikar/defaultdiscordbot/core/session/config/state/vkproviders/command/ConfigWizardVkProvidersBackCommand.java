@@ -2,13 +2,12 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.vkproviders.com
 
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Nonnull;
 
 /**
  * The command for switching from vk providers directory to category directory.

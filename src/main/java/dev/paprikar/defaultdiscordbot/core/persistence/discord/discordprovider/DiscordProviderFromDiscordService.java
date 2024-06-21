@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider;
 
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +20,7 @@ public class DiscordProviderFromDiscordService {
     /**
      * Constructs the service.
      *
-     * @param repository
-     *         an instance of {@link DiscordProviderFromDiscordRepository}
+     * @param repository an instance of {@link DiscordProviderFromDiscordRepository}
      */
     @Autowired
     public DiscordProviderFromDiscordService(DiscordProviderFromDiscordRepository repository) {
@@ -31,8 +30,7 @@ public class DiscordProviderFromDiscordService {
     /**
      * Finds the discord provider by its id.
      *
-     * @param id
-     *         the id of the discord provider
+     * @param id the id of the discord provider
      *
      * @return the found discord provider
      *
@@ -45,13 +43,11 @@ public class DiscordProviderFromDiscordService {
     /**
      * Returns the discord provider by its id.
      *
-     * @param id
-     *         the id of the discord provider
+     * @param id the id of the discord provider
      *
      * @return the found discord provider
      *
-     * @throws EntityNotFoundException
-     *         see {@link EntityManager#getReference(Class, Object)} for more details
+     * @throws EntityNotFoundException see {@link EntityManager#getReference(Class, Object)} for more details
      * @see org.springframework.data.jpa.repository.JpaRepository#getById(Object) JpaRepository#getById(Object)
      * @see EntityManager#getReference(Class, Object)
      */
@@ -73,8 +69,7 @@ public class DiscordProviderFromDiscordService {
     /**
      * Finds the discord providers by their category id.
      *
-     * @param id
-     *         the category id of the discord providers
+     * @param id the category id of the discord providers
      *
      * @return the {@link List} with all found discord providers
      */
@@ -85,8 +80,7 @@ public class DiscordProviderFromDiscordService {
     /**
      * Saves the discord provider.
      *
-     * @param provider
-     *         the discord provider
+     * @param provider the discord provider
      *
      * @return the saved discord provider
      */
@@ -97,8 +91,7 @@ public class DiscordProviderFromDiscordService {
     /**
      * Deletes the discord provider.
      *
-     * @param provider
-     *         the discord provider
+     * @param provider the discord provider
      */
     public void delete(@Nonnull DiscordProviderFromDiscord provider) {
         repository.delete(provider);
@@ -107,8 +100,7 @@ public class DiscordProviderFromDiscordService {
     /**
      * Deletes all discord providers by their category id.
      *
-     * @param id
-     *         the category id of the discord providers
+     * @param id the category id of the discord providers
      */
     public void deleteByCategoryId(long id) {
         repository.deleteByCategoryId(id);

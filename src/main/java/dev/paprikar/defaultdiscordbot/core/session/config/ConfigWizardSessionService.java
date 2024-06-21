@@ -14,10 +14,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -41,10 +44,8 @@ public class ConfigWizardSessionService extends DiscordPrivateSession {
     /**
      * Constructs the service.
      *
-     * @param guildService
-     *         an instance of {@link DiscordGuildService}
-     * @param configWizards
-     *         a {@link List} of instances of {@link ConfigWizard}
+     * @param guildService an instance of {@link DiscordGuildService}
+     * @param configWizards a {@link List} of instances of {@link ConfigWizard}
      */
     @Autowired
     public ConfigWizardSessionService(DiscordGuildService guildService, List<ConfigWizard> configWizards) {
@@ -56,8 +57,7 @@ public class ConfigWizardSessionService extends DiscordPrivateSession {
     /**
      * Handles events of type {@link PrivateMessageReceivedEvent}.
      *
-     * @param event
-     *         the event of type {@link PrivateMessageReceivedEvent} for handling
+     * @param event the event of type {@link PrivateMessageReceivedEvent} for handling
      */
     public void handlePrivateMessageReceivedEvent(PrivateMessageReceivedEvent event) {
         long userId = event.getAuthor().getIdLong();
@@ -99,8 +99,7 @@ public class ConfigWizardSessionService extends DiscordPrivateSession {
     /**
      * Handles events of type {@link GuildMessageReceivedEvent}.
      *
-     * @param event
-     *         the event of type {@link GuildMessageReceivedEvent} for handling
+     * @param event the event of type {@link GuildMessageReceivedEvent} for handling
      */
     public void handleGuildMessageReceivedEvent(GuildMessageReceivedEvent event) {
         Member member = event.getMember();

@@ -14,6 +14,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.D
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -22,8 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,26 +50,16 @@ public class MediaActionService {
     /**
      * Constructs the service.
      *
-     * @param discordProviderService
-     *         an instance of {@link DiscordProviderFromDiscordService}
-     * @param vkProviderService
-     *         an instance of {@link DiscordProviderFromVkService}
-     * @param discordSuggestionService
-     *         an instance of {@link DiscordSuggestionService}
-     * @param vkSuggestionService
-     *         an instance of {@link VkSuggestionService}
-     * @param approveService
-     *         an instance of {@link ApproveService}
-     * @param sendingService
-     *         an instance of {@link SendingService}
-     * @param sendingValidator
-     *         an instance of {@link SendingValidator}
-     * @param approveValidator
-     *         an instance of {@link ApproveValidator}
-     * @param discordSuggestionValidator
-     *         an instance of {@link DiscordSuggestionValidator}
-     * @param vkSuggestionValidator
-     *         an instance of {@link VkSuggestionValidator}
+     * @param discordProviderService an instance of {@link DiscordProviderFromDiscordService}
+     * @param vkProviderService an instance of {@link DiscordProviderFromVkService}
+     * @param discordSuggestionService an instance of {@link DiscordSuggestionService}
+     * @param vkSuggestionService an instance of {@link VkSuggestionService}
+     * @param approveService an instance of {@link ApproveService}
+     * @param sendingService an instance of {@link SendingService}
+     * @param sendingValidator an instance of {@link SendingValidator}
+     * @param approveValidator an instance of {@link ApproveValidator}
+     * @param discordSuggestionValidator an instance of {@link DiscordSuggestionValidator}
+     * @param vkSuggestionValidator an instance of {@link VkSuggestionValidator}
      */
     @Autowired
     public MediaActionService(DiscordProviderFromDiscordService discordProviderService,
@@ -99,8 +89,7 @@ public class MediaActionService {
     /**
      * Enables the category with its children components.
      *
-     * @param category
-     *         the category
+     * @param category the category
      *
      * @return the {@link List} of errors that occurred during category enabling
      */
@@ -145,8 +134,7 @@ public class MediaActionService {
     /**
      * Disables the category with its children components.
      *
-     * @param category
-     *         the category
+     * @param category the category
      */
     public void disableCategory(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
@@ -173,10 +161,8 @@ public class MediaActionService {
     /**
      * Enables the sending module of the category.
      *
-     * @param category
-     *         the category
-     * @param jda
-     *         an instance of {@link JDA}
+     * @param category the category
+     * @param jda an instance of {@link JDA}
      *
      * @return the {@link List} of errors that occurred during sending module enabling
      */
@@ -211,8 +197,7 @@ public class MediaActionService {
     /**
      * Disables the sending module of the category.
      *
-     * @param category
-     *         the category
+     * @param category the category
      */
     public void disableSending(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
@@ -225,8 +210,7 @@ public class MediaActionService {
     /**
      * Enables the approval module of the category.
      *
-     * @param category
-     *         the category
+     * @param category the category
      *
      * @return the {@link List} of errors that occurred during approval module enabling
      */
@@ -248,10 +232,8 @@ public class MediaActionService {
     /**
      * Enables the approval module of the category.
      *
-     * @param category
-     *         the category
-     * @param jda
-     *         an instance of {@link JDA}
+     * @param category the category
+     * @param jda an instance of {@link JDA}
      *
      * @return the {@link List} of errors that occurred during approval module enabling
      */
@@ -286,8 +268,7 @@ public class MediaActionService {
     /**
      * Disables the approval module of the category.
      *
-     * @param category
-     *         the category
+     * @param category the category
      */
     public void disableApprove(@Nonnull DiscordCategory category) {
         approveService.remove(category);
@@ -300,8 +281,7 @@ public class MediaActionService {
     /**
      * Enables the discord provider of the category.
      *
-     * @param provider
-     *         the discord provider
+     * @param provider the discord provider
      *
      * @return the {@link List} of errors that occurred during discord provider enabling
      */
@@ -323,10 +303,8 @@ public class MediaActionService {
     /**
      * Enables the discord provider of the category.
      *
-     * @param provider
-     *         the discord provider
-     * @param jda
-     *         an instance of {@link JDA}
+     * @param provider the discord provider
+     * @param jda an instance of {@link JDA}
      *
      * @return the {@link List} of errors that occurred during discord provider enabling
      */
@@ -361,8 +339,7 @@ public class MediaActionService {
     /**
      * Disables the discord provider of the category.
      *
-     * @param provider
-     *         the discord provider
+     * @param provider the discord provider
      */
     public void disableDiscordProvider(@Nonnull DiscordProviderFromDiscord provider) {
         discordSuggestionService.remove(provider);
@@ -375,8 +352,7 @@ public class MediaActionService {
     /**
      * Enables the vk provider of the category.
      *
-     * @param provider
-     *         the discord provider
+     * @param provider the discord provider
      *
      * @return the {@link List} of errors that occurred during vk provider enabling
      */
@@ -409,8 +385,7 @@ public class MediaActionService {
     /**
      * Disables the vk provider of the category.
      *
-     * @param provider
-     *         the discord provider
+     * @param provider the discord provider
      */
     public void disableVkProvider(@Nonnull DiscordProviderFromVk provider) {
         vkSuggestionService.remove(provider);

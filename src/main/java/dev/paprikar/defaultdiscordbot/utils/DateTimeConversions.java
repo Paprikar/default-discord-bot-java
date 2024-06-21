@@ -1,6 +1,10 @@
 package dev.paprikar.defaultdiscordbot.utils;
 
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 /**
  * Date and time conversion utilities.
@@ -12,12 +16,9 @@ public class DateTimeConversions {
      * <p>
      * The conversion uses the local UTC date (see {@link LocalDate#now()}) to supplement the source time.
      *
-     * @param srcTime
-     *         the source time
-     * @param srcZone
-     *         the source zone id
-     * @param dstZone
-     *         the destination zone id
+     * @param srcTime the source time
+     * @param srcZone the source zone id
+     * @param dstZone the destination zone id
      *
      * @return the converted time
      */

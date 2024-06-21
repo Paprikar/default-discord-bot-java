@@ -1,15 +1,15 @@
 package dev.paprikar.defaultdiscordbot.core.session.validation;
 
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 
 /**
@@ -21,8 +21,7 @@ public class ConfigWizardDiscordTextChannelIdValidator {
     /**
      * Performs initial processing of the value.
      *
-     * @param value
-     *         the value to be processed
+     * @param value the value to be processed
      *
      * @return the validator processing response
      */
@@ -47,12 +46,9 @@ public class ConfigWizardDiscordTextChannelIdValidator {
     /**
      * Performs testing of channel id within the guild.
      *
-     * @param channelId
-     *         the channel id to be tested
-     * @param guildId
-     *         the guild id for testing
-     * @param jda
-     *         an instance of {@link JDA} for testing
+     * @param channelId the channel id to be tested
+     * @param guildId the guild id for testing
+     * @param jda an instance of {@link JDA} for testing
      *
      * @return the validator testing response
      */

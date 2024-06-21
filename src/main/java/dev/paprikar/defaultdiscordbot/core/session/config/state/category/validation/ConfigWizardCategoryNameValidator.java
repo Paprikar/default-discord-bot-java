@@ -3,14 +3,14 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.category.valida
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -28,8 +28,7 @@ public class ConfigWizardCategoryNameValidator {
     /**
      * Constructs a validator.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
+     * @param categoryService an instance of {@link DiscordCategoryService}
      */
     @Autowired
     public ConfigWizardCategoryNameValidator(DiscordCategoryService categoryService) {
@@ -39,10 +38,8 @@ public class ConfigWizardCategoryNameValidator {
     /**
      * Performs initial processing of the value.
      *
-     * @param value
-     *         the value to be processed
-     * @param category
-     *         the category for processing
+     * @param value the value to be processed
+     * @param category the category for processing
      *
      * @return the validator processing response
      */
@@ -94,10 +91,8 @@ public class ConfigWizardCategoryNameValidator {
     /**
      * Performs testing of the category name for uniqueness.
      *
-     * @param name
-     *         the category name to be tested
-     * @param guildId
-     *         the guild id for testing
+     * @param name the category name to be tested
+     * @param guildId the guild id for testing
      *
      * @return the validator testing response
      */

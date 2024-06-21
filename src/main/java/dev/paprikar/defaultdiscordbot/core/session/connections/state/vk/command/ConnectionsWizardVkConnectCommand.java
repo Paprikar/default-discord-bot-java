@@ -6,6 +6,7 @@ import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingRes
 import dev.paprikar.defaultdiscordbot.core.session.connections.ConnectionsWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.connections.ConnectionsWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.connections.state.vk.validation.ConnectionsWizardVkUserIdValidator;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -14,8 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 
 /**
@@ -34,10 +34,8 @@ public class ConnectionsWizardVkConnectCommand implements ConnectionsWizardVkCom
     /**
      * Constructs the command.
      *
-     * @param vkConnectionService
-     *         an instance of {@link DiscordUserVkConnectionService}
-     * @param validator
-     *         an instance of {@link ConnectionsWizardVkUserIdValidator}
+     * @param vkConnectionService an instance of {@link DiscordUserVkConnectionService}
+     * @param validator an instance of {@link ConnectionsWizardVkUserIdValidator}
      */
     @Autowired
     public ConnectionsWizardVkConnectCommand(DiscordUserVkConnectionService vkConnectionService,

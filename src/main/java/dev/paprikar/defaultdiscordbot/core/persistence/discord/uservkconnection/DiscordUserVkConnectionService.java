@@ -1,12 +1,12 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection.DiscordUserVkConnection.ProjectionDiscordUserId;
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,8 +21,7 @@ public class DiscordUserVkConnectionService {
     /**
      * Constructs the service.
      *
-     * @param repository
-     *         an instance of {@link DiscordUserVkConnectionRepository}
+     * @param repository an instance of {@link DiscordUserVkConnectionRepository}
      */
     @Autowired
     public DiscordUserVkConnectionService(DiscordUserVkConnectionRepository repository) {
@@ -32,8 +31,7 @@ public class DiscordUserVkConnectionService {
     /**
      * Finds the connection by its id.
      *
-     * @param id
-     *         the id of the connection
+     * @param id the id of the connection
      *
      * @return the found connection
      *
@@ -46,13 +44,11 @@ public class DiscordUserVkConnectionService {
     /**
      * Returns the connection by its id.
      *
-     * @param id
-     *         the id of the connection
+     * @param id the id of the connection
      *
      * @return the found connection
      *
-     * @throws EntityNotFoundException
-     *         see {@link EntityManager#getReference(Class, Object)} for more details
+     * @throws EntityNotFoundException see {@link EntityManager#getReference(Class, Object)} for more details
      * @see org.springframework.data.jpa.repository.JpaRepository#getById(Object) JpaRepository#getById(Object)
      * @see EntityManager#getReference(Class, Object)
      */
@@ -63,8 +59,7 @@ public class DiscordUserVkConnectionService {
     /**
      * Does the connection exist with the specified discord user id?
      *
-     * @param id
-     *         the discord user id
+     * @param id the discord user id
      *
      * @return {@code true} if connection exists, otherwise {@code false}
      */
@@ -75,8 +70,7 @@ public class DiscordUserVkConnectionService {
     /**
      * Finds all connections by the vk user id.
      *
-     * @param id
-     *         the vk user id
+     * @param id the vk user id
      *
      * @return the {@link List} of entity projections of type {@link ProjectionDiscordUserId}
      */
@@ -87,8 +81,7 @@ public class DiscordUserVkConnectionService {
     /**
      * Saves the connection.
      *
-     * @param connection
-     *         the connection
+     * @param connection the connection
      *
      * @return the saved connection
      */
@@ -99,8 +92,7 @@ public class DiscordUserVkConnectionService {
     /**
      * Deletes the connection.
      *
-     * @param connection
-     *         the connection
+     * @param connection the connection
      */
     public void delete(@Nonnull DiscordUserVkConnection connection) {
         repository.delete(connection);

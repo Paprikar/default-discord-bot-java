@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.config;
 
 import com.vdurmont.emoji.EmojiParser;
+import jakarta.annotation.Nonnull;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -25,8 +25,7 @@ public class DdbDefaults {
      * <p>
      * The supplied {@link Errors errors} instance can be used to report any resulting validation errors.
      *
-     * @param errors
-     *         contextual state about the validation process
+     * @param errors contextual state about the validation process
      *
      * @see ValidationUtils
      * @see org.springframework.validation.Validator#validate(Object, Errors) Validator.validate(Object, Errors)
@@ -52,8 +51,7 @@ public class DdbDefaults {
     }
 
     /**
-     * @param prefix
-     *         the guild commands prefix
+     * @param prefix the guild commands prefix
      */
     public void setPrefix(String prefix) {
         this.prefix = prefix;
@@ -67,8 +65,7 @@ public class DdbDefaults {
     }
 
     /**
-     * @param positiveApprovalEmoji
-     *         the category positive approval emoji
+     * @param positiveApprovalEmoji the category positive approval emoji
      */
     public void setPositiveApprovalEmoji(Character positiveApprovalEmoji) {
         this.positiveApprovalEmoji = positiveApprovalEmoji;
@@ -82,8 +79,7 @@ public class DdbDefaults {
     }
 
     /**
-     * @param negativeApprovalEmoji
-     *         the category negative approval emoji
+     * @param negativeApprovalEmoji the category negative approval emoji
      */
     public void setNegativeApprovalEmoji(Character negativeApprovalEmoji) {
         this.negativeApprovalEmoji = negativeApprovalEmoji;

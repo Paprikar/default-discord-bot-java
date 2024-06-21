@@ -8,6 +8,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordC
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.validation.ConfigWizardTimeValidator;
 import dev.paprikar.defaultdiscordbot.utils.DateTimeConversions;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -16,8 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.sql.Time;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -43,14 +43,10 @@ public class ConfigWizardCategoryStartTimeSetter implements ConfigWizardCategory
     /**
      * Constructs a setter.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param mediaActionService
-     *         an instance of {@link MediaActionService}
-     * @param sendingService
-     *         an instance of {@link SendingService}
-     * @param validator
-     *         an instance of {@link ConfigWizardTimeValidator}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param mediaActionService an instance of {@link MediaActionService}
+     * @param sendingService an instance of {@link SendingService}
+     * @param validator an instance of {@link ConfigWizardTimeValidator}
      */
     @Autowired
     public ConfigWizardCategoryStartTimeSetter(DiscordCategoryService categoryService,

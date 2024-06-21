@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester;
 
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +20,7 @@ public class DiscordTrustedSuggesterService {
     /**
      * Constructs the service.
      *
-     * @param repository
-     *         an instance of {@link DiscordTrustedSuggesterRepository}
+     * @param repository an instance of {@link DiscordTrustedSuggesterRepository}
      */
     @Autowired
     public DiscordTrustedSuggesterService(DiscordTrustedSuggesterRepository repository) {
@@ -31,8 +30,7 @@ public class DiscordTrustedSuggesterService {
     /**
      * Finds the suggester by its id.
      *
-     * @param id
-     *         the id of the suggester
+     * @param id the id of the suggester
      *
      * @return the found suggester
      *
@@ -45,10 +43,8 @@ public class DiscordTrustedSuggesterService {
     /**
      * Finds the suggester by its category id and user id.
      *
-     * @param categoryId
-     *         the category id
-     * @param userId
-     *         the user id
+     * @param categoryId the category id
+     * @param userId the user id
      *
      * @return the found suggester
      */
@@ -59,13 +55,11 @@ public class DiscordTrustedSuggesterService {
     /**
      * Returns the suggester by its id.
      *
-     * @param id
-     *         the id of the suggester
+     * @param id the id of the suggester
      *
      * @return the found suggester
      *
-     * @throws EntityNotFoundException
-     *         see {@link EntityManager#getReference(Class, Object)} for more details
+     * @throws EntityNotFoundException see {@link EntityManager#getReference(Class, Object)} for more details
      * @see org.springframework.data.jpa.repository.JpaRepository#getById(Object) JpaRepository#getById(Object)
      * @see EntityManager#getReference(Class, Object)
      */
@@ -76,10 +70,8 @@ public class DiscordTrustedSuggesterService {
     /**
      * Does the suggester exist with the specified category id and user id?
      *
-     * @param categoryId
-     *         the category id
-     * @param userId
-     *         the user id
+     * @param categoryId the category id
+     * @param userId the user id
      *
      * @return {@code true} if suggester exists, otherwise {@code false}
      */
@@ -90,10 +82,8 @@ public class DiscordTrustedSuggesterService {
     /**
      * Does the suggester exist with the specified category id and any of user ids?
      *
-     * @param categoryId
-     *         the category id
-     * @param userIds
-     *         a {@link List} of user ids
+     * @param categoryId the category id
+     * @param userIds a {@link List} of user ids
      *
      * @return {@code true} if suggester exists, otherwise {@code false}
      */
@@ -115,8 +105,7 @@ public class DiscordTrustedSuggesterService {
     /**
      * Finds all suggesters by their category id.
      *
-     * @param id
-     *         the category id
+     * @param id the category id
      *
      * @return the {@link List} of found suggesters
      */
@@ -127,8 +116,7 @@ public class DiscordTrustedSuggesterService {
     /**
      * Saves the suggester.
      *
-     * @param suggester
-     *         the suggester
+     * @param suggester the suggester
      *
      * @return the saved suggester
      */
@@ -139,8 +127,7 @@ public class DiscordTrustedSuggesterService {
     /**
      * Deletes the suggester.
      *
-     * @param suggester
-     *         the suggester
+     * @param suggester the suggester
      */
     public void delete(@Nonnull DiscordTrustedSuggester suggester) {
         repository.delete(suggester);
@@ -149,8 +136,7 @@ public class DiscordTrustedSuggesterService {
     /**
      * Deletes all suggesters by their category id.
      *
-     * @param id
-     *         the category id
+     * @param id the category id
      */
     public void deleteByCategoryId(long id) {
         repository.deleteByCategoryId(id);

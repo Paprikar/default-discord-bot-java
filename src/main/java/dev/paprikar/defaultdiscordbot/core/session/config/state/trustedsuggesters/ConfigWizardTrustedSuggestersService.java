@@ -8,6 +8,8 @@ import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.trustedsuggesters.command.ConfigWizardTrustedSuggestersCommand;
+import jakarta.annotation.Nonnull;
+import jakarta.transaction.Transactional;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -17,9 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.transaction.Transactional;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,12 +39,9 @@ public class ConfigWizardTrustedSuggestersService extends ConfigWizard {
     /**
      * Constructs a configuration state service.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param trustedSuggesterService
-     *         an instance of {@link DiscordTrustedSuggesterService}
-     * @param commands
-     *         a {@link List} of instances of {@link ConfigWizardTrustedSuggestersCommand}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param trustedSuggesterService an instance of {@link DiscordTrustedSuggesterService}
+     * @param commands a {@link List} of instances of {@link ConfigWizardTrustedSuggestersCommand}
      */
     @Autowired
     public ConfigWizardTrustedSuggestersService(DiscordCategoryService categoryService,

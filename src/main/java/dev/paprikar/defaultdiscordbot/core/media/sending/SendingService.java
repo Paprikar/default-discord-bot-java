@@ -7,6 +7,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordC
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequest;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import org.slf4j.Logger;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,12 +40,9 @@ public class SendingService {
     /**
      * Constructs a sending service.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param mediaRequestService
-     *         an instance of {@link DiscordMediaRequestService}
-     * @param monitorService
-     *         an instance of {@link MonitorService}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param mediaRequestService an instance of {@link DiscordMediaRequestService}
+     * @param monitorService an instance of {@link MonitorService}
      */
     @Autowired
     public SendingService(DiscordCategoryService categoryService,
@@ -59,8 +56,7 @@ public class SendingService {
     /**
      * Handles events of type {@link TextChannelDeleteEvent}.
      *
-     * @param event
-     *         the event of type {@link TextChannelDeleteEvent} for handling
+     * @param event the event of type {@link TextChannelDeleteEvent} for handling
      */
     public void handleTextChannelDeleteEvent(@Nonnull TextChannelDeleteEvent event) {
         Long channelId = event.getChannel().getIdLong();
@@ -93,10 +89,8 @@ public class SendingService {
     /**
      * Submits a suggestion to the queue.
      *
-     * @param category
-     *         the suggestion category
-     * @param url
-     *         the suggestion url
+     * @param category the suggestion category
+     * @param url the suggestion url
      */
     public void submit(DiscordCategory category, String url) {
         logger.debug("submit(): Submitting the suggestion: category={id={}}, url={}", category.getId(), url);
@@ -108,10 +102,8 @@ public class SendingService {
     /**
      * Adds the category to sending processing context.
      *
-     * @param category
-     *         the category
-     * @param jda
-     *         an instance of {@link JDA}
+     * @param category the category
+     * @param jda an instance of {@link JDA}
      */
     public void add(@Nonnull DiscordCategory category, @Nonnull JDA jda) {
         Long categoryId = category.getId();
@@ -138,8 +130,7 @@ public class SendingService {
     /**
      * Removes the category from sending processing context.
      *
-     * @param category
-     *         the category
+     * @param category the category
      */
     public void remove(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
@@ -168,8 +159,7 @@ public class SendingService {
     /**
      * Updates the category in sending processing context.
      *
-     * @param category
-     *         the category
+     * @param category the category
      */
     public void update(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
@@ -204,8 +194,7 @@ public class SendingService {
     /**
      * Does the category exists in sending processing context?
      *
-     * @param category
-     *         the category
+     * @param category the category
      *
      * @return {@code true} if the category exists in sending processing context
      */

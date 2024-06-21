@@ -1,11 +1,10 @@
 package dev.paprikar.defaultdiscordbot.core.command;
 
 import dev.paprikar.defaultdiscordbot.core.session.connections.ConnectionsWizardSessionService;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Nonnull;
 
 /**
  * The command for starting a user connections session.
@@ -20,8 +19,7 @@ public class DiscordConnectionsCommand implements DiscordCommand {
     /**
      * Constructs the command.
      *
-     * @param connectionsWizardSessionService
-     *         an instance of {@link ConnectionsWizardSessionService}
+     * @param connectionsWizardSessionService an instance of {@link ConnectionsWizardSessionService}
      */
     @Autowired
     public DiscordConnectionsCommand(ConnectionsWizardSessionService connectionsWizardSessionService) {

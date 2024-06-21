@@ -2,13 +2,13 @@ package dev.paprikar.defaultdiscordbot.core.media.suggestion.vk;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderCredsValidator;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +24,7 @@ public class VkSuggestionValidator {
     /**
      * Constructs a vk suggestion validator.
      *
-     * @param vkProviderCredsValidator
-     *         an instance of {@link ConfigWizardVkProviderCredsValidator}
+     * @param vkProviderCredsValidator an instance of {@link ConfigWizardVkProviderCredsValidator}
      */
     @Autowired
     public VkSuggestionValidator(ConfigWizardVkProviderCredsValidator vkProviderCredsValidator) {
@@ -35,8 +34,7 @@ public class VkSuggestionValidator {
     /**
      * Performs a preliminary validation of module variables. In most cases a nullability check is performed.
      *
-     * @param provider
-     *         the provider to validate
+     * @param provider the provider to validate
      *
      * @return the {@link List} of detected validation errors
      */
@@ -73,8 +71,7 @@ public class VkSuggestionValidator {
     /**
      * Performs the final validation of the module variables.
      *
-     * @param provider
-     *         the provider to validate
+     * @param provider the provider to validate
      *
      * @return the {@link List} of detected validation errors
      */

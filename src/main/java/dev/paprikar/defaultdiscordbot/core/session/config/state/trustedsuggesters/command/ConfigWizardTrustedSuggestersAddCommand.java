@@ -8,6 +8,7 @@ import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingRes
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.trustedsuggesters.validation.ConfigWizardTrustedSuggesterIdValidator;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -17,8 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +40,9 @@ public class ConfigWizardTrustedSuggestersAddCommand implements ConfigWizardTrus
     /**
      * Constructs the command.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param trustedSuggesterService
-     *         an instance of {@link DiscordTrustedSuggesterService}
-     * @param validator
-     *         an instance of {@link ConfigWizardTrustedSuggesterIdValidator}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param trustedSuggesterService an instance of {@link DiscordTrustedSuggesterService}
+     * @param validator an instance of {@link ConfigWizardTrustedSuggesterIdValidator}
      */
     @Autowired
     public ConfigWizardTrustedSuggestersAddCommand(DiscordCategoryService categoryService,

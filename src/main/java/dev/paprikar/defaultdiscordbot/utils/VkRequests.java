@@ -16,10 +16,8 @@ public class VkRequests {
     /**
      * Executes the request and returns {@code null} in case of any errors.
      *
-     * @param request
-     *         request to execute
-     * @param <T>
-     *         the type of the returned request object
+     * @param request request to execute
+     * @param <T> the type of the returned request object
      *
      * @return the object returned by the request, or {@code null} if error occurred during the request
      */

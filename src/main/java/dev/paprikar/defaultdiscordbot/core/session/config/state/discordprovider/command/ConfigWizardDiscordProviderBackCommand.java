@@ -4,13 +4,13 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.D
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
 import java.util.Optional;
 
 /**
@@ -28,8 +28,7 @@ public class ConfigWizardDiscordProviderBackCommand implements ConfigWizardDisco
     /**
      * Constructs the command.
      *
-     * @param discordProviderService
-     *         an instance of {@link DiscordProviderFromDiscordService}
+     * @param discordProviderService an instance of {@link DiscordProviderFromDiscordService}
      */
     @Autowired
     public ConfigWizardDiscordProviderBackCommand(DiscordProviderFromDiscordService discordProviderService) {

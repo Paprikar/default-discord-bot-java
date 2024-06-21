@@ -3,14 +3,14 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.trustedsuggeste
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.DiscordTrustedSuggester;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.DiscordTrustedSuggesterService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 
@@ -25,8 +25,7 @@ public class ConfigWizardTrustedSuggesterIdValidator {
     /**
      * Constructs a validator.
      *
-     * @param trustedSuggesterService
-     *         an instance of {@link DiscordTrustedSuggesterService}
+     * @param trustedSuggesterService an instance of {@link DiscordTrustedSuggesterService}
      */
     @Autowired
     public ConfigWizardTrustedSuggesterIdValidator(DiscordTrustedSuggesterService trustedSuggesterService) {
@@ -36,8 +35,7 @@ public class ConfigWizardTrustedSuggesterIdValidator {
     /**
      * Performs initial processing of the value.
      *
-     * @param value
-     *         the value to be processed
+     * @param value the value to be processed
      *
      * @return the validator processing response
      */
@@ -62,10 +60,8 @@ public class ConfigWizardTrustedSuggesterIdValidator {
     /**
      * Performs testing of the user for uniqueness.
      *
-     * @param userId
-     *         the user id
-     * @param categoryId
-     *         the category id
+     * @param userId the user id
+     * @param categoryId the category id
      *
      * @return the validator testing response
      */

@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.utils;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * Splits the original string into two - with the first word (before the first space character)
@@ -15,8 +15,7 @@ public class FirstWordAndOther {
     /**
      * Constructs a container with the result of string splitting.
      *
-     * @param s
-     *         the original string
+     * @param s the original string
      */
     public FirstWordAndOther(@Nonnull String s) {
         int index = s.indexOf(' ');

@@ -3,14 +3,14 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.vali
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -28,8 +28,7 @@ public class ConfigWizardVkProviderNameValidator {
     /**
      * Constructs a validator.
      *
-     * @param vkProviderService
-     *         an instance of {@link DiscordProviderFromVkService}
+     * @param vkProviderService an instance of {@link DiscordProviderFromVkService}
      */
     @Autowired
     public ConfigWizardVkProviderNameValidator(DiscordProviderFromVkService vkProviderService) {
@@ -39,10 +38,8 @@ public class ConfigWizardVkProviderNameValidator {
     /**
      * Performs initial processing of the value.
      *
-     * @param value
-     *         the value to be processed
-     * @param provider
-     *         the vk provider for processing
+     * @param value the value to be processed
+     * @param provider the vk provider for processing
      *
      * @return the validator processing response
      */
@@ -94,10 +91,8 @@ public class ConfigWizardVkProviderNameValidator {
     /**
      * Performs testing of the provider name for uniqueness.
      *
-     * @param name
-     *         the provider name to be tested
-     * @param categoryId
-     *         the category id for testing
+     * @param name the provider name to be tested
+     * @param categoryId the category id for testing
      *
      * @return the validator testing response
      */

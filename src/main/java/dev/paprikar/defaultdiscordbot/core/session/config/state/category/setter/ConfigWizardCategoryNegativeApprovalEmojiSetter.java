@@ -7,6 +7,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordC
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation.ConfigWizardCategoryApprovalEmojiValidator;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -15,8 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +39,10 @@ public class ConfigWizardCategoryNegativeApprovalEmojiSetter implements ConfigWi
     /**
      * Constructs a setter.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param mediaActionService
-     *         an instance of {@link MediaActionService}
-     * @param approveService
-     *         an instance of {@link ApproveService}
-     * @param validator
-     *         an instance of {@link ConfigWizardCategoryApprovalEmojiValidator}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param mediaActionService an instance of {@link MediaActionService}
+     * @param approveService an instance of {@link ApproveService}
+     * @param validator an instance of {@link ConfigWizardCategoryApprovalEmojiValidator}
      */
     @Autowired
     public ConfigWizardCategoryNegativeApprovalEmojiSetter(DiscordCategoryService categoryService,

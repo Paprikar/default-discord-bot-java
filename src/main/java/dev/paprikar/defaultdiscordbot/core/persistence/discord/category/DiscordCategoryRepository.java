@@ -14,8 +14,7 @@ public interface DiscordCategoryRepository extends JpaRepository<DiscordCategory
     /**
      * Finds all categories by the id of the guilds they are attached to.
      *
-     * @param id
-     *         the id of the guild
+     * @param id the id of the guild
      *
      * @return the {@link List} of found categories
      */
@@ -24,8 +23,7 @@ public interface DiscordCategoryRepository extends JpaRepository<DiscordCategory
     /**
      * Finds all categories by the discord id of the guilds they are attached to.
      *
-     * @param id
-     *         the discord id of the guild
+     * @param id the discord id of the guild
      *
      * @return the {@link List} of found categories
      */

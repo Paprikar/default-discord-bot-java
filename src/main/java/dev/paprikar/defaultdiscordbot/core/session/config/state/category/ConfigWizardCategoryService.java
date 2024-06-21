@@ -7,6 +7,8 @@ import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.command.ConfigWizardCategoryCommand;
 import dev.paprikar.defaultdiscordbot.utils.DateTimeConversions;
+import jakarta.annotation.Nonnull;
+import jakarta.transaction.Transactional;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -15,9 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.transaction.Transactional;
-import java.awt.*;
+import java.awt.Color;
 import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -40,10 +40,8 @@ public class ConfigWizardCategoryService extends ConfigWizard {
     /**
      * Constructs a configuration state service.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param commands
-     *         a {@link List} of instances of {@link ConfigWizardCategoryCommand}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param commands a {@link List} of instances of {@link ConfigWizardCategoryCommand}
      */
     @Autowired
     public ConfigWizardCategoryService(DiscordCategoryService categoryService,

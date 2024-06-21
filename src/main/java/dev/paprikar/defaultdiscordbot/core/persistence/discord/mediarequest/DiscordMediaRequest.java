@@ -1,8 +1,18 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 
@@ -44,10 +54,8 @@ public class DiscordMediaRequest {
     /**
      * Constructs the entity.
      *
-     * @param category
-     *         the category
-     * @param content
-     *         the content
+     * @param category the category
+     * @param content the content
      */
     public DiscordMediaRequest(DiscordCategory category, String content) {
         this.category = category;
@@ -63,8 +71,7 @@ public class DiscordMediaRequest {
     }
 
     /**
-     * @param id
-     *         the id of the media request
+     * @param id the id of the media request
      */
     public void setId(Long id) {
         this.id = id;
@@ -78,8 +85,7 @@ public class DiscordMediaRequest {
     }
 
     /**
-     * @param category
-     *         the category to which this media request is attached
+     * @param category the category to which this media request is attached
      */
     public void setCategory(DiscordCategory category) {
         this.category = category;
@@ -93,8 +99,7 @@ public class DiscordMediaRequest {
     }
 
     /**
-     * @param content
-     *         the content of the media request
+     * @param content the content of the media request
      */
     public void setContent(String content) {
         this.content = content;
@@ -108,8 +113,7 @@ public class DiscordMediaRequest {
     }
 
     /**
-     * @param creationTimestamp
-     *         the time of creation of the media request
+     * @param creationTimestamp the time of creation of the media request
      */
     public void setCreationTimestamp(Timestamp creationTimestamp) {
         this.creationTimestamp = creationTimestamp;

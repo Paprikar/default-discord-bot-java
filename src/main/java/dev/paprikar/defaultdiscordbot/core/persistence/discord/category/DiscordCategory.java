@@ -1,8 +1,18 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.category;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
-import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;
 
@@ -76,8 +86,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param id
-     *         the id of the category
+     * @param id the id of the category
      */
     public void setId(Long id) {
         this.id = id;
@@ -91,8 +100,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param guild
-     *         the guild to which this category is attached
+     * @param guild the guild to which this category is attached
      */
     public void setGuild(DiscordGuild guild) {
         this.guild = guild;
@@ -106,8 +114,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param name
-     *         the name of the category
+     * @param name the name of the category
      */
     public void setName(String name) {
         this.name = name;
@@ -121,8 +128,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param sendingChannelId
-     *         the sending channel id of the category
+     * @param sendingChannelId the sending channel id of the category
      */
     public void setSendingChannelId(Long sendingChannelId) {
         this.sendingChannelId = sendingChannelId;
@@ -136,8 +142,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param approvalChannelId
-     *         the approval channel id of the category
+     * @param approvalChannelId the approval channel id of the category
      */
     public void setApprovalChannelId(Long approvalChannelId) {
         this.approvalChannelId = approvalChannelId;
@@ -151,8 +156,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param startTime
-     *         the start time for sending of the category
+     * @param startTime the start time for sending of the category
      */
     public void setStartTime(Time startTime) {
         this.startTime = startTime;
@@ -166,8 +170,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param endTime
-     *         the end time for sending of the category
+     * @param endTime the end time for sending of the category
      */
     public void setEndTime(Time endTime) {
         this.endTime = endTime;
@@ -181,8 +184,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param reserveDays
-     *         the number of reserve days for sending of the category
+     * @param reserveDays the number of reserve days for sending of the category
      */
     public void setReserveDays(Integer reserveDays) {
         this.reserveDays = reserveDays;
@@ -196,8 +198,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param positiveApprovalEmoji
-     *         the positive approval emoji of the category
+     * @param positiveApprovalEmoji the positive approval emoji of the category
      */
     public void setPositiveApprovalEmoji(Character positiveApprovalEmoji) {
         this.positiveApprovalEmoji = positiveApprovalEmoji;
@@ -211,8 +212,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param negativeApprovalEmoji
-     *         the negative approval emoji of the category
+     * @param negativeApprovalEmoji the negative approval emoji of the category
      */
     public void setNegativeApprovalEmoji(Character negativeApprovalEmoji) {
         this.negativeApprovalEmoji = negativeApprovalEmoji;
@@ -226,8 +226,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param enabled
-     *         {@code true} if the category should be enabled, otherwise {@code false}
+     * @param enabled {@code true} if the category should be enabled, otherwise {@code false}
      */
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
@@ -241,8 +240,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param lastSendTimestamp
-     *         the last suggestion sending time of the category
+     * @param lastSendTimestamp the last suggestion sending time of the category
      */
     public void setLastSendTimestamp(Timestamp lastSendTimestamp) {
         this.lastSendTimestamp = lastSendTimestamp;
@@ -257,8 +255,7 @@ public class DiscordCategory {
     }
 
     /**
-     * @param bulkSubmit
-     *         {@code true} if the bulk submit is enabled for this category, otherwise {@code false}
+     * @param bulkSubmit {@code true} if the bulk submit is enabled for this category, otherwise {@code false}
      */
     public void setBulkSubmit(Boolean bulkSubmit) {
         this.bulkSubmit = bulkSubmit;

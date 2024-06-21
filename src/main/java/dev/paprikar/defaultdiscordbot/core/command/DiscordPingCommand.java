@@ -1,11 +1,10 @@
 package dev.paprikar.defaultdiscordbot.core.command;
 
 import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Nonnull;
 
 /**
  * The command for testing this bot to see if it works.

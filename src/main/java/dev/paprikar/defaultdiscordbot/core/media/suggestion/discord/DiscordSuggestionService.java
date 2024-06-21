@@ -10,6 +10,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.D
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.DiscordTrustedSuggesterService;
 import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -23,11 +24,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -60,16 +63,11 @@ public class DiscordSuggestionService {
     /**
      * Constructs the service.
      *
-     * @param discordProviderService
-     *         an instance of {@link DiscordProviderFromDiscordService}
-     * @param trustedSuggesterService
-     *         an instance of {@link DiscordTrustedSuggesterService}
-     * @param approveService
-     *         an instance of {@link ApproveService}
-     * @param sendingService
-     *         an instance of {@link SendingService}
-     * @param monitorService
-     *         an instance of {@link MonitorService}
+     * @param discordProviderService an instance of {@link DiscordProviderFromDiscordService}
+     * @param trustedSuggesterService an instance of {@link DiscordTrustedSuggesterService}
+     * @param approveService an instance of {@link ApproveService}
+     * @param sendingService an instance of {@link SendingService}
+     * @param monitorService an instance of {@link MonitorService}
      */
     @Autowired
     public DiscordSuggestionService(DiscordProviderFromDiscordService discordProviderService,
@@ -95,8 +93,7 @@ public class DiscordSuggestionService {
     /**
      * Handles events of type {@link TextChannelDeleteEvent}.
      *
-     * @param event
-     *         the event of type {@link TextChannelDeleteEvent} for handling
+     * @param event the event of type {@link TextChannelDeleteEvent} for handling
      */
     public void handleTextChannelDeleteEvent(@Nonnull TextChannelDeleteEvent event) {
         Long channelId = event.getChannel().getIdLong();
@@ -127,8 +124,7 @@ public class DiscordSuggestionService {
     /**
      * Handles events of type {@link GuildMessageReceivedEvent}.
      *
-     * @param event
-     *         the event of type {@link GuildMessageReceivedEvent} for handling
+     * @param event the event of type {@link GuildMessageReceivedEvent} for handling
      */
     public void handleGuildMessageReceivedEvent(@Nonnull GuildMessageReceivedEvent event) {
         Message message = event.getMessage();
@@ -156,8 +152,7 @@ public class DiscordSuggestionService {
     /**
      * Adds the discord provider to suggestion processing context.
      *
-     * @param provider
-     *         the discord provider
+     * @param provider the discord provider
      */
     public void add(@Nonnull DiscordProviderFromDiscord provider) {
         Long categoryId = provider.getCategory().getId();
@@ -183,8 +178,7 @@ public class DiscordSuggestionService {
     /**
      * Removes the discord provider from suggestion processing context.
      *
-     * @param provider
-     *         the discord provider
+     * @param provider the discord provider
      */
     public void remove(@Nonnull DiscordProviderFromDiscord provider) {
         Long providerId = provider.getId();
@@ -209,8 +203,7 @@ public class DiscordSuggestionService {
     /**
      * Updates the discord provider in suggestion processing context.
      *
-     * @param provider
-     *         the discord provider
+     * @param provider the discord provider
      */
     public void update(@Nonnull DiscordProviderFromDiscord provider) {
         Long providerId = provider.getId();
@@ -236,8 +229,7 @@ public class DiscordSuggestionService {
     /**
      * Does the discord provider exists in suggestion processing context?
      *
-     * @param provider
-     *         the discord provider
+     * @param provider the discord provider
      *
      * @return {@code true} if the discord provider exists in suggestion processing context
      */

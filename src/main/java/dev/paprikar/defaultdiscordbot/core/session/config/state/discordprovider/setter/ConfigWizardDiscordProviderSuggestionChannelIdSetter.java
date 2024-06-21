@@ -7,6 +7,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.D
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.validation.ConfigWizardDiscordTextChannelIdValidator;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -15,8 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,14 +40,10 @@ public class ConfigWizardDiscordProviderSuggestionChannelIdSetter implements Con
     /**
      * Constructs a setter.
      *
-     * @param discordProviderService
-     *         an instance of {@link DiscordProviderFromDiscordService}
-     * @param mediaActionService
-     *         an instance of {@link MediaActionService}
-     * @param discordSuggestionService
-     *         an instance of {@link DiscordSuggestionService}
-     * @param validator
-     *         an instance of {@link ConfigWizardDiscordTextChannelIdValidator}
+     * @param discordProviderService an instance of {@link DiscordProviderFromDiscordService}
+     * @param mediaActionService an instance of {@link MediaActionService}
+     * @param discordSuggestionService an instance of {@link DiscordSuggestionService}
+     * @param validator an instance of {@link ConfigWizardDiscordTextChannelIdValidator}
      */
     @Autowired
     public ConfigWizardDiscordProviderSuggestionChannelIdSetter(

@@ -1,8 +1,16 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
-
-import javax.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
 /**
  * An entity containing information about the trusted suggester.
@@ -42,8 +50,7 @@ public class DiscordTrustedSuggester {
     }
 
     /**
-     * @param id
-     *         the id of the suggester
+     * @param id the id of the suggester
      */
     public void setId(Long id) {
         this.id = id;
@@ -57,8 +64,7 @@ public class DiscordTrustedSuggester {
     }
 
     /**
-     * @param category
-     *         the category to which this suggester is attached
+     * @param category the category to which this suggester is attached
      */
     public void setCategory(DiscordCategory category) {
         this.category = category;
@@ -72,8 +78,7 @@ public class DiscordTrustedSuggester {
     }
 
     /**
-     * @param userId
-     *         the discord id of trusted suggesting user
+     * @param userId the discord id of trusted suggesting user
      */
     public void setUserId(Long userId) {
         this.userId = userId;

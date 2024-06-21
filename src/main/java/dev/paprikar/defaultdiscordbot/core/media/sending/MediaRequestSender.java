@@ -8,18 +8,26 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordC
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequest;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
 import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.sql.Timestamp;
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Schedules and sends media requests.
@@ -51,14 +59,10 @@ public class MediaRequestSender {
     /**
      * Constructs the sender.
      *
-     * @param jda
-     *         an instance of {@link JDA}
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param mediaRequestService
-     *         an instance of {@link DiscordMediaRequestService}
-     * @param monitorService
-     *         an instance of {@link MonitorService}
+     * @param jda an instance of {@link JDA}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param mediaRequestService an instance of {@link DiscordMediaRequestService}
+     * @param monitorService an instance of {@link MonitorService}
      */
     public MediaRequestSender(@Nonnull JDA jda,
                               @Nonnull DiscordCategoryService categoryService,
@@ -89,11 +93,9 @@ public class MediaRequestSender {
     /**
      * Starts the sender.
      *
-     * @param category
-     *         the category
+     * @param category the category
      *
-     * @throws IllegalStateException
-     *         if the sender is already started
+     * @throws IllegalStateException if the sender is already started
      */
     public void start(@Nonnull DiscordCategory category) {
         if (taskFuture != null) {
@@ -138,8 +140,7 @@ public class MediaRequestSender {
      * <p>
      * Causes recalculation of sending time. In fact, it simply restarts the sender.
      *
-     * @param category
-     *         the category
+     * @param category the category
      */
     public void update(@Nonnull DiscordCategory category) {
         stop();

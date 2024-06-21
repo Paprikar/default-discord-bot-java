@@ -4,6 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordC
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -12,8 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
@@ -33,8 +33,7 @@ public class ConfigWizardCategoriesRemoveCommand implements ConfigWizardCategori
     /**
      * Constructs the command.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
+     * @param categoryService an instance of {@link DiscordCategoryService}
      */
     @Autowired
     public ConfigWizardCategoriesRemoveCommand(DiscordCategoryService categoryService) {

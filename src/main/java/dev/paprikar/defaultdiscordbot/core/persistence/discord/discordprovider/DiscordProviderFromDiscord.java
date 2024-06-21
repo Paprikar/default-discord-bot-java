@@ -1,8 +1,16 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
-
-import javax.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
 /**
  * An entity containing information about the discord provider.
@@ -48,8 +56,7 @@ public class DiscordProviderFromDiscord {
     }
 
     /**
-     * @param id
-     *         the id of the discord provider
+     * @param id the id of the discord provider
      */
     public void setId(Long id) {
         this.id = id;
@@ -63,8 +70,7 @@ public class DiscordProviderFromDiscord {
     }
 
     /**
-     * @param category
-     *         the category to which this discord provider is attached
+     * @param category the category to which this discord provider is attached
      */
     public void setCategory(DiscordCategory category) {
         this.category = category;
@@ -78,8 +84,7 @@ public class DiscordProviderFromDiscord {
     }
 
     /**
-     * @param name
-     *         the name of the discord provider
+     * @param name the name of the discord provider
      */
     public void setName(String name) {
         this.name = name;
@@ -93,8 +98,7 @@ public class DiscordProviderFromDiscord {
     }
 
     /**
-     * @param suggestionChannelId
-     *         the suggestion channel id of the discord provider
+     * @param suggestionChannelId the suggestion channel id of the discord provider
      */
     public void setSuggestionChannelId(Long suggestionChannelId) {
         this.suggestionChannelId = suggestionChannelId;
@@ -108,8 +112,7 @@ public class DiscordProviderFromDiscord {
     }
 
     /**
-     * @param enabled
-     *         {@code true} if the discord provider should be enabled, otherwise {@code false}
+     * @param enabled {@code true} if the discord provider should be enabled, otherwise {@code false}
      */
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;

@@ -4,13 +4,13 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.Discor
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
 import java.util.Optional;
 
 /**
@@ -28,8 +28,7 @@ public class ConfigWizardVkProviderBackCommand implements ConfigWizardVkProvider
     /**
      * Constructs the command.
      *
-     * @param vkProviderService
-     *         an instance of {@link DiscordProviderFromVkService}
+     * @param vkProviderService an instance of {@link DiscordProviderFromVkService}
      */
     @Autowired
     public ConfigWizardVkProviderBackCommand(DiscordProviderFromVkService vkProviderService) {

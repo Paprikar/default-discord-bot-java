@@ -1,6 +1,6 @@
 package dev.paprikar.defaultdiscordbot.core.concurrency;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * A composite key for working with concurrency objects.
@@ -19,10 +19,8 @@ public class ConcurrencyKey {
     /**
      * Constructs a key from the concurrency scope and object.
      *
-     * @param scope
-     *         the scope of concurrency
-     * @param key
-     *         the object for the key composition
+     * @param scope the scope of concurrency
+     * @param key the object for the key composition
      *
      * @return the concurrency key
      */

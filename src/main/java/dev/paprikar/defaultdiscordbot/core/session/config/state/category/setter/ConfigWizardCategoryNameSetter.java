@@ -4,6 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordC
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.validation.ConfigWizardCategoryNameValidator;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
@@ -11,8 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 
@@ -32,10 +32,8 @@ public class ConfigWizardCategoryNameSetter implements ConfigWizardCategorySette
     /**
      * Constructs a setter.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param validator
-     *         an instance of {@link ConfigWizardCategoryNameValidator}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param validator an instance of {@link ConfigWizardCategoryNameValidator}
      */
     @Autowired
     public ConfigWizardCategoryNameSetter(DiscordCategoryService categoryService,

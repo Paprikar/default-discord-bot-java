@@ -3,14 +3,14 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscord;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -28,8 +28,7 @@ public class ConfigWizardDiscordProviderNameValidator {
     /**
      * Constructs a validator.
      *
-     * @param discordProviderService
-     *         an instance of {@link DiscordProviderFromDiscordService}
+     * @param discordProviderService an instance of {@link DiscordProviderFromDiscordService}
      */
     @Autowired
     public ConfigWizardDiscordProviderNameValidator(DiscordProviderFromDiscordService discordProviderService) {
@@ -39,10 +38,8 @@ public class ConfigWizardDiscordProviderNameValidator {
     /**
      * Performs initial processing of the value.
      *
-     * @param value
-     *         the value to be processed
-     * @param provider
-     *         the discord provider for processing
+     * @param value the value to be processed
+     * @param provider the discord provider for processing
      *
      * @return the validator processing response
      */
@@ -94,10 +91,8 @@ public class ConfigWizardDiscordProviderNameValidator {
     /**
      * Performs testing of the provider name for uniqueness.
      *
-     * @param name
-     *         the provider name to be tested
-     * @param categoryId
-     *         the category id for testing
+     * @param name the provider name to be tested
+     * @param categoryId the category id for testing
      *
      * @return the validator testing response
      */

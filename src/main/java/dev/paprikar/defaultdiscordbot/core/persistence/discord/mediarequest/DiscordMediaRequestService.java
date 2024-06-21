@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest;
 
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +20,7 @@ public class DiscordMediaRequestService {
     /**
      * Constructs the service.
      *
-     * @param repository
-     *         an instance of {@link DiscordMediaRequestRepository}
+     * @param repository an instance of {@link DiscordMediaRequestRepository}
      */
     @Autowired
     public DiscordMediaRequestService(DiscordMediaRequestRepository repository) {
@@ -31,8 +30,7 @@ public class DiscordMediaRequestService {
     /**
      * Finds the media request by its id.
      *
-     * @param id
-     *         the id of the media request
+     * @param id the id of the media request
      *
      * @return the found media request
      *
@@ -45,8 +43,7 @@ public class DiscordMediaRequestService {
     /**
      * Finds the oldest media request by its category id.
      *
-     * @param id
-     *         the category id of the media request
+     * @param id the category id of the media request
      *
      * @return the found media request
      */
@@ -57,13 +54,11 @@ public class DiscordMediaRequestService {
     /**
      * Returns the media request by its id.
      *
-     * @param id
-     *         the id of the media request
+     * @param id the id of the media request
      *
      * @return the found media request
      *
-     * @throws EntityNotFoundException
-     *         see {@link EntityManager#getReference(Class, Object)} for more details
+     * @throws EntityNotFoundException see {@link EntityManager#getReference(Class, Object)} for more details
      * @see org.springframework.data.jpa.repository.JpaRepository#getById(Object) JpaRepository#getById(Object)
      * @see EntityManager#getReference(Class, Object)
      */
@@ -74,8 +69,7 @@ public class DiscordMediaRequestService {
     /**
      * Counts all media requests with the specified id of their category.
      *
-     * @param id
-     *         the category id of the media requests
+     * @param id the category id of the media requests
      *
      * @return the number of found media requests
      */
@@ -97,8 +91,7 @@ public class DiscordMediaRequestService {
     /**
      * Finds the media requests by their category id.
      *
-     * @param id
-     *         the category id of the media requests
+     * @param id the category id of the media requests
      *
      * @return the {@link List} with all found media requests
      */
@@ -109,8 +102,7 @@ public class DiscordMediaRequestService {
     /**
      * Saves the media request.
      *
-     * @param mediaRequest
-     *         the media request
+     * @param mediaRequest the media request
      *
      * @return the saved media request
      */
@@ -121,8 +113,7 @@ public class DiscordMediaRequestService {
     /**
      * Deletes the media request.
      *
-     * @param mediaRequest
-     *         the media request
+     * @param mediaRequest the media request
      */
     public void delete(@Nonnull DiscordMediaRequest mediaRequest) {
         repository.delete(mediaRequest);
@@ -131,8 +122,7 @@ public class DiscordMediaRequestService {
     /**
      * Deletes all media requests by their category id.
      *
-     * @param id
-     *         the category id of the media requests
+     * @param id the category id of the media requests
      */
     public void deleteByCategoryId(long id) {
         repository.deleteByCategoryId(id);

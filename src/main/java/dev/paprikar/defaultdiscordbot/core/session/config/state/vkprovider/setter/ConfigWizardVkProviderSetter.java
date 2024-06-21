@@ -2,9 +2,9 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.sett
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetter;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -15,10 +15,8 @@ public interface ConfigWizardVkProviderSetter extends ConfigWizardSetter {
     /**
      * Sets the value of the vk provider.
      *
-     * @param value
-     *         the value to set
-     * @param provider
-     *         the vk provider for change
+     * @param value the value to set
+     * @param provider the vk provider for change
      *
      * @return the {@link List} of setting responses
      */

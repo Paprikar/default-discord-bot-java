@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.LoginException;
 
+
 /**
  * Component for launching a discord bot.
  */
@@ -26,12 +27,9 @@ public class DiscordBot {
     /**
      * Constructs the component.
      *
-     * @param discordBotService
-     *         an instance of {@link DiscordBotService}
-     * @param eventListener
-     *         an instance of {@link DiscordEventListener}
-     * @param config
-     *         an instance of {@link DdbConfig}
+     * @param discordBotService an instance of {@link DiscordBotService}
+     * @param eventListener an instance of {@link DiscordEventListener}
+     * @param config an instance of {@link DdbConfig}
      */
     @Autowired
     public DiscordBot(DiscordBotService discordBotService,

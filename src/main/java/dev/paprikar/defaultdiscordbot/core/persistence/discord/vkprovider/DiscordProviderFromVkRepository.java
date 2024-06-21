@@ -14,8 +14,7 @@ public interface DiscordProviderFromVkRepository extends JpaRepository<DiscordPr
     /**
      * Finds all vk providers by the id of the category they are attached to.
      *
-     * @param id
-     *         the id of the category
+     * @param id the id of the category
      *
      * @return the {@link List} of found vk providers
      */
@@ -24,8 +23,7 @@ public interface DiscordProviderFromVkRepository extends JpaRepository<DiscordPr
     /**
      * Deletes all vk providers by the id of the category they are attached to.
      *
-     * @param id
-     *         the id of the category
+     * @param id the id of the category
      */
     void deleteByCategoryId(Long id);
 }

@@ -4,6 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection.
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection.DiscordUserVkConnectionService;
 import dev.paprikar.defaultdiscordbot.core.session.connections.ConnectionsWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.connections.ConnectionsWizardState;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -12,8 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +33,7 @@ public class ConnectionsWizardVkDisconnectCommand implements ConnectionsWizardVk
     /**
      * Constructs the command.
      *
-     * @param vkConnectionService
-     *         an instance of {@link DiscordUserVkConnectionService}
+     * @param vkConnectionService an instance of {@link DiscordUserVkConnectionService}
      */
     @Autowired
     public ConnectionsWizardVkDisconnectCommand(DiscordUserVkConnectionService vkConnectionService) {

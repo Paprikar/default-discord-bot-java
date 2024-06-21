@@ -1,11 +1,10 @@
 package dev.paprikar.defaultdiscordbot.core.command;
 
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSessionService;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Nonnull;
 
 /**
  * The command for starting a guild configuration session.
@@ -20,8 +19,7 @@ public class DiscordConfigCommand implements DiscordCommand {
     /**
      * Constructs the command.
      *
-     * @param configWizardSessionService
-     *         an instance of {@link ConfigWizardSessionService}
+     * @param configWizardSessionService an instance of {@link ConfigWizardSessionService}
      */
     @Autowired
     public DiscordConfigCommand(ConfigWizardSessionService configWizardSessionService) {

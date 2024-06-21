@@ -1,8 +1,16 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.guild;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.ZoneIdConverter;
 
-import javax.persistence.*;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 
@@ -47,8 +55,7 @@ public class DiscordGuild {
     }
 
     /**
-     * @param id
-     *         the id of the guild
+     * @param id the id of the guild
      */
     public void setId(Long id) {
         this.id = id;
@@ -62,8 +69,7 @@ public class DiscordGuild {
     }
 
     /**
-     * @param discordId
-     *         the discord id of the guild
+     * @param discordId the discord id of the guild
      */
     public void setDiscordId(Long discordId) {
         this.discordId = discordId;
@@ -77,8 +83,7 @@ public class DiscordGuild {
     }
 
     /**
-     * @param prefix
-     *         the command prefix of the guild
+     * @param prefix the command prefix of the guild
      */
     public void setPrefix(String prefix) {
         this.prefix = prefix;
@@ -92,8 +97,7 @@ public class DiscordGuild {
     }
 
     /**
-     * @param zoneId
-     *         the zone id of the guild
+     * @param zoneId the zone id of the guild
      */
     public void setZoneId(ZoneId zoneId) {
         this.zoneId = zoneId;

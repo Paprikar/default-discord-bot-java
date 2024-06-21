@@ -4,6 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.D
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.discordprovider.DiscordProviderFromDiscordService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.discordprovider.validation.ConfigWizardDiscordProviderNameValidator;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
@@ -11,8 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 
@@ -32,10 +32,8 @@ public class ConfigWizardDiscordProviderNameSetter implements ConfigWizardDiscor
     /**
      * Constructs a setter.
      *
-     * @param discordProviderService
-     *         an instance of {@link DiscordProviderFromDiscordService}
-     * @param validator
-     *         an instance of {@link ConfigWizardDiscordProviderNameValidator}
+     * @param discordProviderService an instance of {@link DiscordProviderFromDiscordService}
+     * @param validator an instance of {@link ConfigWizardDiscordProviderNameValidator}
      */
     @Autowired
     public ConfigWizardDiscordProviderNameSetter(DiscordProviderFromDiscordService discordProviderService,

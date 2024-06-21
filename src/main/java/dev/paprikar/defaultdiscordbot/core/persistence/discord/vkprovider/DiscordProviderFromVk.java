@@ -1,8 +1,16 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider;
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
-
-import javax.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
 /**
  * An entity containing information about the vk provider.
@@ -51,8 +59,7 @@ public class DiscordProviderFromVk {
     }
 
     /**
-     * @param id
-     *         the id of the vk provider
+     * @param id the id of the vk provider
      */
     public void setId(Long id) {
         this.id = id;
@@ -66,8 +73,7 @@ public class DiscordProviderFromVk {
     }
 
     /**
-     * @param category
-     *         the category to which this vk provider is attached
+     * @param category the category to which this vk provider is attached
      */
     public void setCategory(DiscordCategory category) {
         this.category = category;
@@ -81,8 +87,7 @@ public class DiscordProviderFromVk {
     }
 
     /**
-     * @param name
-     *         the name of the vk provider
+     * @param name the name of the vk provider
      */
     public void setName(String name) {
         this.name = name;
@@ -96,8 +101,7 @@ public class DiscordProviderFromVk {
     }
 
     /**
-     * @param groupId
-     *         the group id of the vk provider
+     * @param groupId the group id of the vk provider
      */
     public void setGroupId(Integer groupId) {
         this.groupId = groupId;
@@ -111,8 +115,7 @@ public class DiscordProviderFromVk {
     }
 
     /**
-     * @param token
-     *         the token of the vk provider
+     * @param token the token of the vk provider
      */
     public void setToken(String token) {
         this.token = token;
@@ -126,8 +129,7 @@ public class DiscordProviderFromVk {
     }
 
     /**
-     * @param enabled
-     *         {@code true} if the vk provider should be enabled, otherwise {@code false}
+     * @param enabled {@code true} if the vk provider should be enabled, otherwise {@code false}
      */
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;

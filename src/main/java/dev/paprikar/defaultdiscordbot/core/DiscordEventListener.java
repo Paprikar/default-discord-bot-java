@@ -6,7 +6,14 @@ import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.discord.DiscordSuggestionService;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSessionService;
 import dev.paprikar.defaultdiscordbot.core.session.connections.ConnectionsWizardSessionService;
-import net.dv8tion.jda.api.events.*;
+import jakarta.annotation.Nonnull;
+import net.dv8tion.jda.api.events.DisconnectEvent;
+import net.dv8tion.jda.api.events.ExceptionEvent;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.ReconnectedEvent;
+import net.dv8tion.jda.api.events.ResumedEvent;
+import net.dv8tion.jda.api.events.ShutdownEvent;
+import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -21,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Nonnull;
 
 /**
  * The component that defines the event listener of the discord bot.
@@ -43,20 +48,13 @@ public class DiscordEventListener extends ListenerAdapter {
     /**
      * Constructs the component.
      *
-     * @param discordBotService
-     *         an instance of {@link DiscordBotService}
-     * @param commandHandler
-     *         an instance of {@link DiscordCommandHandler}
-     * @param discordSuggestionService
-     *         an instance of {@link DiscordSuggestionService}
-     * @param approveService
-     *         an instance of {@link ApproveService}
-     * @param sendingService
-     *         an instance of {@link SendingService}
-     * @param configWizardSessionService
-     *         an instance of {@link ConfigWizardSessionService}
-     * @param connectionsWizardSessionService
-     *         an instance of {@link ConnectionsWizardSessionService}
+     * @param discordBotService an instance of {@link DiscordBotService}
+     * @param commandHandler an instance of {@link DiscordCommandHandler}
+     * @param discordSuggestionService an instance of {@link DiscordSuggestionService}
+     * @param approveService an instance of {@link ApproveService}
+     * @param sendingService an instance of {@link SendingService}
+     * @param configWizardSessionService an instance of {@link ConfigWizardSessionService}
+     * @param connectionsWizardSessionService an instance of {@link ConnectionsWizardSessionService}
      */
     @Autowired
     public DiscordEventListener(DiscordBotService discordBotService,

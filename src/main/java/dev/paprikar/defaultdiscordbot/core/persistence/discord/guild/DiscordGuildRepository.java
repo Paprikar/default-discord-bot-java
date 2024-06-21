@@ -14,8 +14,7 @@ public interface DiscordGuildRepository extends JpaRepository<DiscordGuild, Long
     /**
      * Finds the guild by its discord id.
      *
-     * @param id
-     *         the discord id of the guild
+     * @param id the discord id of the guild
      *
      * @return the found guild
      */
@@ -24,8 +23,7 @@ public interface DiscordGuildRepository extends JpaRepository<DiscordGuild, Long
     /**
      * Deletes the guild by its discord id.
      *
-     * @param id
-     *         the discord id of the guild
+     * @param id the discord id of the guild
      */
     void deleteByDiscordId(Long id);
 }

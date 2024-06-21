@@ -16,10 +16,10 @@ import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -75,14 +75,10 @@ class GroupLongPollApi extends EventsHandler {
     /**
      * Constructs the handler.
      *
-     * @param actor
-     *         the {@link GroupActor}
-     * @param maxReconnectDelay
-     *         the maximum reconnection delay of the handler in seconds
-     * @param suggestionService
-     *         an instance of {@link VkSuggestionService}
-     * @param monitorService
-     *         an instance of {@link MonitorService}
+     * @param actor the {@link GroupActor}
+     * @param maxReconnectDelay the maximum reconnection delay of the handler in seconds
+     * @param suggestionService an instance of {@link VkSuggestionService}
+     * @param monitorService an instance of {@link MonitorService}
      */
     public GroupLongPollApi(GroupActor actor,
                             int maxReconnectDelay,
@@ -94,17 +90,12 @@ class GroupLongPollApi extends EventsHandler {
     /**
      * Constructs the handler.
      *
-     * @param actor
-     *         the {@link GroupActor}
-     * @param maxReconnectDelay
-     *         the maximum reconnection delay of the handler in seconds
-     * @param waitTime
-     *         the time for which the event request connection is kept. After it expires,
-     *         the connection will be closed and the handler will try to create a new request
-     * @param suggestionService
-     *         an instance of {@link VkSuggestionService}
-     * @param monitorService
-     *         an instance of {@link MonitorService}
+     * @param actor the {@link GroupActor}
+     * @param maxReconnectDelay the maximum reconnection delay of the handler in seconds
+     * @param waitTime the time for which the event request connection is kept. After it expires,
+     * the connection will be closed and the handler will try to create a new request
+     * @param suggestionService an instance of {@link VkSuggestionService}
+     * @param monitorService an instance of {@link MonitorService}
      */
     public GroupLongPollApi(GroupActor actor,
                             int maxReconnectDelay,
@@ -148,11 +139,9 @@ class GroupLongPollApi extends EventsHandler {
     /**
      * Starts the handler.
      *
-     * @param provider
-     *         the vk provider
+     * @param provider the vk provider
      *
-     * @throws IllegalStateException
-     *         if the handler is already started
+     * @throws IllegalStateException if the handler is already started
      */
     public void start(@Nonnull DiscordProviderFromVk provider) {
         providerId = provider.getId();
@@ -195,8 +184,7 @@ class GroupLongPollApi extends EventsHandler {
     /**
      * Updates the handler.
      *
-     * @param provider
-     *         the vk provider
+     * @param provider the vk provider
      */
     public void update(@Nonnull DiscordProviderFromVk provider) {
         this.provider = provider;

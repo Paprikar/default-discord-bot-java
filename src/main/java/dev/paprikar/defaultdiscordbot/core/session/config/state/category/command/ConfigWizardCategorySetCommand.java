@@ -6,6 +6,7 @@ import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.category.setter.ConfigWizardCategorySetter;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -14,8 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -40,10 +40,8 @@ public class ConfigWizardCategorySetCommand implements ConfigWizardCategoryComma
     /**
      * Constructs the command.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param setters
-     *         a {@link List} of instances of {@link ConfigWizardCategorySetter}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param setters a {@link List} of instances of {@link ConfigWizardCategorySetter}
      */
     @Autowired
     public ConfigWizardCategorySetCommand(DiscordCategoryService categoryService,

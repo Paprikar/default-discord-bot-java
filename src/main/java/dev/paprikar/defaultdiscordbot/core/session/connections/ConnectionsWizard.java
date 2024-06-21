@@ -4,9 +4,9 @@ import dev.paprikar.defaultdiscordbot.core.session.connections.command.Connectio
 import dev.paprikar.defaultdiscordbot.core.session.connections.command.ConnectionsWizardExitCommand;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,10 +40,8 @@ public abstract class ConnectionsWizard {
     /**
      * Handles private messages within a connections session.
      *
-     * @param event
-     *         the event of type {@link PrivateMessageReceivedEvent} for handling
-     * @param session
-     *         the conenctions session
+     * @param event the event of type {@link PrivateMessageReceivedEvent} for handling
+     * @param session the conenctions session
      *
      * @return the state of type {@link ConnectionsWizardState} after handling
      */
@@ -65,10 +63,8 @@ public abstract class ConnectionsWizard {
     /**
      * Sends a response as part of a connections session.
      *
-     * @param session
-     *         the conenctions session
-     * @param addStateEmbed
-     *         {@code true} to add information about the state description
+     * @param session the conenctions session
+     * @param addStateEmbed {@code true} to add information about the state description
      */
     public abstract void print(@Nonnull ConnectionsWizardSession session, boolean addStateEmbed);
 

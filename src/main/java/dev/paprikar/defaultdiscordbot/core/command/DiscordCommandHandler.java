@@ -3,13 +3,13 @@ package dev.paprikar.defaultdiscordbot.core.command;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuild;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuildService;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +30,8 @@ public class DiscordCommandHandler {
     /**
      * Constructs a discord command handler.
      *
-     * @param guildService
-     *         an instance of {@link DiscordGuildService}
-     * @param commands
-     *         a {@link List} of instances of {@link DiscordCommand}
+     * @param guildService an instance of {@link DiscordGuildService}
+     * @param commands a {@link List} of instances of {@link DiscordCommand}
      */
     @Autowired
     public DiscordCommandHandler(DiscordGuildService guildService, List<DiscordCommand> commands) {
@@ -45,8 +43,7 @@ public class DiscordCommandHandler {
     /**
      * Handles events of type {@link GuildMessageReceivedEvent}.
      *
-     * @param event
-     *         the event of type {@link GuildMessageReceivedEvent} for handling
+     * @param event the event of type {@link GuildMessageReceivedEvent} for handling
      */
     public void handleGuildMessageReceivedEvent(@Nonnull GuildMessageReceivedEvent event) {
         long guildId = event.getGuild().getIdLong();

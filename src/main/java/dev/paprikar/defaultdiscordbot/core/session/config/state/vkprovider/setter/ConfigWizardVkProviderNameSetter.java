@@ -4,6 +4,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.Discor
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderNameValidator;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
@@ -11,8 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 
@@ -32,10 +32,8 @@ public class ConfigWizardVkProviderNameSetter implements ConfigWizardVkProviderS
     /**
      * Constructs a setter.
      *
-     * @param vkProviderService
-     *         an instance of {@link DiscordProviderFromVkService}
-     * @param validator
-     *         an instance of {@link ConfigWizardVkProviderNameValidator}
+     * @param vkProviderService an instance of {@link DiscordProviderFromVkService}
+     * @param validator an instance of {@link ConfigWizardVkProviderNameValidator}
      */
     @Autowired
     public ConfigWizardVkProviderNameSetter(DiscordProviderFromVkService vkProviderService,

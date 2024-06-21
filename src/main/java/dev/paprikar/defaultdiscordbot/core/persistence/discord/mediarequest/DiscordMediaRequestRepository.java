@@ -15,8 +15,7 @@ public interface DiscordMediaRequestRepository extends JpaRepository<DiscordMedi
     /**
      * Finds the oldest media request by its category id.
      *
-     * @param id
-     *         the category id of the media request
+     * @param id the category id of the media request
      *
      * @return the found media request
      */
@@ -25,8 +24,7 @@ public interface DiscordMediaRequestRepository extends JpaRepository<DiscordMedi
     /**
      * Counts all media requests with the specified id of their category.
      *
-     * @param id
-     *         the category id of the media requests
+     * @param id the category id of the media requests
      *
      * @return the number of found media requests
      */
@@ -35,8 +33,7 @@ public interface DiscordMediaRequestRepository extends JpaRepository<DiscordMedi
     /**
      * Finds all media requests by the id of the category they are attached to.
      *
-     * @param id
-     *         the id of the category
+     * @param id the id of the category
      *
      * @return the {@link List} of found media requests
      */
@@ -45,8 +42,7 @@ public interface DiscordMediaRequestRepository extends JpaRepository<DiscordMedi
     /**
      * Deletes all media requests by the id of the category they are attached to.
      *
-     * @param id
-     *         the id of the category
+     * @param id the id of the category
      */
     void deleteByCategoryId(Long id);
 }

@@ -7,6 +7,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.Discor
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderCredsValidator;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.vkprovider.validation.ConfigWizardVkProviderGroupIdValidator;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
@@ -14,8 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,16 +39,11 @@ public class ConfigWizardVkProviderGroupIdSetter implements ConfigWizardVkProvid
     /**
      * Constructs a setter.
      *
-     * @param vkProviderService
-     *         an instance of {@link DiscordProviderFromVkService}
-     * @param mediaActionService
-     *         an instance of {@link MediaActionService}
-     * @param vkSuggestionService
-     *         an instance of {@link VkSuggestionService}
-     * @param validator
-     *         an instance of {@link ConfigWizardVkProviderGroupIdValidator}
-     * @param credsValidator
-     *         an instance of {@link ConfigWizardVkProviderCredsValidator}
+     * @param vkProviderService an instance of {@link DiscordProviderFromVkService}
+     * @param mediaActionService an instance of {@link MediaActionService}
+     * @param vkSuggestionService an instance of {@link VkSuggestionService}
+     * @param validator an instance of {@link ConfigWizardVkProviderGroupIdValidator}
+     * @param credsValidator an instance of {@link ConfigWizardVkProviderCredsValidator}
      */
     @Autowired
     public ConfigWizardVkProviderGroupIdSetter(DiscordProviderFromVkService vkProviderService,

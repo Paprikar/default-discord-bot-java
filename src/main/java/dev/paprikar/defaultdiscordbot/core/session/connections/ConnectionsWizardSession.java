@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.session.connections;
 
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.requests.RestAction;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,14 +27,11 @@ public class ConnectionsWizardSession {
     /**
      * Constructs the container.
      *
-     * @param member
-     *         the user of the session
-     * @param service
-     *         the state instance of {@link ConnectionsWizard} the session is in
+     * @param member the user of the session
+     * @param service the state instance of {@link ConnectionsWizard} the session is in
      *
-     * @throws RuntimeException
-     *         in case of any errors of opening a private channel with the target user.
-     *         See {@link RestAction#complete()} for more details
+     * @throws RuntimeException in case of any errors of opening a private channel with the target user.
+     * See {@link RestAction#complete()} for more details
      * @see RestAction#complete()
      */
     public ConnectionsWizardSession(@Nonnull Member member, @Nonnull ConnectionsWizard service)
@@ -53,8 +50,7 @@ public class ConnectionsWizardSession {
     }
 
     /**
-     * @param channel
-     *         the private channel with the target user of the session
+     * @param channel the private channel with the target user of the session
      */
     public void setChannel(PrivateChannel channel) {
         this.channel = channel;
@@ -68,8 +64,7 @@ public class ConnectionsWizardSession {
     }
 
     /**
-     * @param userId
-     *         the discord user id for which the session is created
+     * @param userId the discord user id for which the session is created
      */
     public void setUserId(Long userId) {
         this.userId = userId;
@@ -83,8 +78,7 @@ public class ConnectionsWizardSession {
     }
 
     /**
-     * @param guildId
-     *         the id of the guild with which the current session will be associated
+     * @param guildId the id of the guild with which the current session will be associated
      */
     public void setGuildId(Long guildId) {
         this.guildId = guildId;
@@ -98,8 +92,7 @@ public class ConnectionsWizardSession {
     }
 
     /**
-     * @param service
-     *         the state instance that the session will be in
+     * @param service the state instance that the session will be in
      */
     public void setService(ConnectionsWizard service) {
         this.service = service;
@@ -113,8 +106,7 @@ public class ConnectionsWizardSession {
     }
 
     /**
-     * @param responses
-     *         the {@link List} of session responses
+     * @param responses the {@link List} of session responses
      */
     public void setResponses(List<MessageEmbed> responses) {
         this.responses = responses;

@@ -4,9 +4,9 @@ import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardCo
 import dev.paprikar.defaultdiscordbot.core.session.config.command.ConfigWizardExitCommand;
 import dev.paprikar.defaultdiscordbot.utils.FirstWordAndOther;
 import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,10 +40,8 @@ public abstract class ConfigWizard {
     /**
      * Handles private messages within a configuration session.
      *
-     * @param event
-     *         the event of type {@link PrivateMessageReceivedEvent} for handling
-     * @param session
-     *         the configuration session
+     * @param event the event of type {@link PrivateMessageReceivedEvent} for handling
+     * @param session the configuration session
      *
      * @return the state of type {@link ConfigWizardState} after handling
      */
@@ -64,10 +62,8 @@ public abstract class ConfigWizard {
     /**
      * Sends a response as part of a configuration session.
      *
-     * @param session
-     *         the configuration session
-     * @param addStateEmbed
-     *         {@code true} to add information about the state description
+     * @param session the configuration session
+     * @param addStateEmbed {@code true} to add information about the state description
      */
     public abstract void print(@Nonnull ConfigWizardSession session, boolean addStateEmbed);
 

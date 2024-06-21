@@ -6,6 +6,8 @@ import dev.paprikar.defaultdiscordbot.core.session.connections.ConnectionsWizard
 import dev.paprikar.defaultdiscordbot.core.session.connections.ConnectionsWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.connections.ConnectionsWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.connections.state.vk.command.ConnectionsWizardVkCommand;
+import jakarta.annotation.Nonnull;
+import jakarta.transaction.Transactional;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -14,9 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.transaction.Transactional;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +34,8 @@ public class ConnectionsWizardVkService extends ConnectionsWizard {
     /**
      * Constructs a connections state service.
      *
-     * @param vkConnectionService
-     *         an instance of {@link DiscordUserVkConnectionService}
-     * @param commands
-     *         a {@link List} of instances of {@link ConnectionsWizardVkCommand}
+     * @param vkConnectionService an instance of {@link DiscordUserVkConnectionService}
+     * @param commands a {@link List} of instances of {@link ConnectionsWizardVkCommand}
      */
     @Autowired
     public ConnectionsWizardVkService(DiscordUserVkConnectionService vkConnectionService,

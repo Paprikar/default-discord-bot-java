@@ -22,6 +22,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection.
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection.DiscordUserVkConnectionService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
 import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.slf4j.Logger;
@@ -29,11 +30,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static dev.paprikar.defaultdiscordbot.utils.VkRequests.executeRequest;
@@ -63,16 +68,11 @@ public class VkSuggestionHandler {
     /**
      * Constructs the service.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param trustedSuggesterService
-     *         an instance of {@link DiscordTrustedSuggesterService}
-     * @param vkConnectionService
-     *         an instance of {@link DiscordUserVkConnectionService}
-     * @param approveService
-     *         an instance of {@link ApproveService}
-     * @param sendingService
-     *         an instance of {@link SendingService}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param trustedSuggesterService an instance of {@link DiscordTrustedSuggesterService}
+     * @param vkConnectionService an instance of {@link DiscordUserVkConnectionService}
+     * @param approveService an instance of {@link ApproveService}
+     * @param sendingService an instance of {@link SendingService}
      */
     @Autowired
     public VkSuggestionHandler(DiscordCategoryService categoryService,
@@ -108,12 +108,9 @@ public class VkSuggestionHandler {
     /**
      * Handles new vk messages.
      *
-     * @param message
-     *         the {@link Message}
-     * @param actor
-     *         the {@link GroupActor}
-     * @param provider
-     *         the vk provider
+     * @param message the {@link Message}
+     * @param actor the {@link GroupActor}
+     * @param provider the vk provider
      */
     public void handleMessageNewEvent(@Nonnull Message message,
                                       @Nonnull GroupActor actor,

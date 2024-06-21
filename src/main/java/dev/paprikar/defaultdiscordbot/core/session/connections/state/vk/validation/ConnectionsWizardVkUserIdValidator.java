@@ -2,14 +2,14 @@ package dev.paprikar.defaultdiscordbot.core.session.connections.state.vk.validat
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection.DiscordUserVkConnectionService;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 
 /**
@@ -23,8 +23,7 @@ public class ConnectionsWizardVkUserIdValidator {
     /**
      * Constructs a validator.
      *
-     * @param vkConnectionService
-     *         an instance of {@link DiscordUserVkConnectionService}
+     * @param vkConnectionService an instance of {@link DiscordUserVkConnectionService}
      */
     @Autowired
     public ConnectionsWizardVkUserIdValidator(DiscordUserVkConnectionService vkConnectionService) {
@@ -34,8 +33,7 @@ public class ConnectionsWizardVkUserIdValidator {
     /**
      * Performs initial processing of the value.
      *
-     * @param value
-     *         the value to be processed
+     * @param value the value to be processed
      *
      * @return the validator processing response
      */
@@ -60,8 +58,7 @@ public class ConnectionsWizardVkUserIdValidator {
     /**
      * Performs testing of the vk connection for uniqueness.
      *
-     * @param userId
-     *         the discord user id
+     * @param userId the discord user id
      *
      * @return the validator testing response
      */

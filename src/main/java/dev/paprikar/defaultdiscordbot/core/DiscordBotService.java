@@ -12,6 +12,8 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.guild.DiscordGuil
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.mediarequest.DiscordMediaRequestService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.DiscordTrustedSuggesterService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
+import jakarta.annotation.Nonnull;
+import jakarta.transaction.Transactional;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import org.slf4j.Logger;
@@ -19,8 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.transaction.Transactional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,22 +43,14 @@ public class DiscordBotService {
 
 
     /**
-     * @param guildService
-     *         an instance of {@link DiscordGuildService}
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param mediaRequestService
-     *         an instance of {@link DiscordMediaRequestService}
-     * @param discordProviderService
-     *         an instance of {@link DiscordProviderFromDiscordService}
-     * @param vkProviderService
-     *         an instance of {@link DiscordProviderFromVkService}
-     * @param trustedSuggesterService
-     *         an instance of {@link DiscordTrustedSuggesterService}
-     * @param mediaActionService
-     *         an instance of {@link MediaActionService}
-     * @param config
-     *         an instance of {@link DdbConfig}
+     * @param guildService an instance of {@link DiscordGuildService}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param mediaRequestService an instance of {@link DiscordMediaRequestService}
+     * @param discordProviderService an instance of {@link DiscordProviderFromDiscordService}
+     * @param vkProviderService an instance of {@link DiscordProviderFromVkService}
+     * @param trustedSuggesterService an instance of {@link DiscordTrustedSuggesterService}
+     * @param mediaActionService an instance of {@link MediaActionService}
+     * @param config an instance of {@link DdbConfig}
      */
     @Autowired
     public DiscordBotService(DiscordGuildService guildService,
@@ -82,8 +74,7 @@ public class DiscordBotService {
     /**
      * Sets the bot modules to working state.
      *
-     * @param jda
-     *         an instance of {@link JDA}
+     * @param jda an instance of {@link JDA}
      */
     @Transactional
     public void initialize(@Nonnull JDA jda) {
@@ -148,8 +139,7 @@ public class DiscordBotService {
     /**
      * Prepares the bot to work with the new guild.
      *
-     * @param guildDiscordId
-     *         the guild discord id
+     * @param guildDiscordId the guild discord id
      */
     @Transactional
     public void setupDiscordGuild(long guildDiscordId) {
@@ -167,8 +157,7 @@ public class DiscordBotService {
     /**
      * Deletes guild data.
      *
-     * @param guildDiscordId
-     *         the guild discord id
+     * @param guildDiscordId the guild discord id
      */
     @Transactional
     public void deleteDiscordGuild(long guildDiscordId) {

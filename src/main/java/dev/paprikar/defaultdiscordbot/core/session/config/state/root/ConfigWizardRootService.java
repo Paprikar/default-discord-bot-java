@@ -6,6 +6,8 @@ import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizard;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
 import dev.paprikar.defaultdiscordbot.core.session.config.state.root.command.ConfigWizardRootCommand;
+import jakarta.annotation.Nonnull;
+import jakarta.transaction.Transactional;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -14,9 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import javax.transaction.Transactional;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -40,10 +40,8 @@ public class ConfigWizardRootService extends ConfigWizard {
     /**
      * Constructs a configuration state service.
      *
-     * @param guildService
-     *         an instance of {@link DiscordGuildService}
-     * @param commands
-     *         a {@link List} of instances of {@link ConfigWizardRootCommand}
+     * @param guildService an instance of {@link DiscordGuildService}
+     * @param commands a {@link List} of instances of {@link ConfigWizardRootCommand}
      */
     @Autowired
     public ConfigWizardRootService(DiscordGuildService guildService,

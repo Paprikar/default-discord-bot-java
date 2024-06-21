@@ -8,6 +8,7 @@ import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.utils.JdaRequests.RequestErrorHandler;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -20,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,12 +50,9 @@ public class ApproveService {
     /**
      * Constructs an approval service.
      *
-     * @param categoryService
-     *         an instance of {@link DiscordCategoryService}
-     * @param sendingService
-     *         an instance of {@link SendingService}
-     * @param monitorService
-     *         an instance of {@link MonitorService}
+     * @param categoryService an instance of {@link DiscordCategoryService}
+     * @param sendingService an instance of {@link SendingService}
+     * @param monitorService an instance of {@link MonitorService}
      */
     @Autowired
     public ApproveService(DiscordCategoryService categoryService,
@@ -73,8 +70,7 @@ public class ApproveService {
     /**
      * Handles events of type {@link TextChannelDeleteEvent}.
      *
-     * @param event
-     *         the event of type {@link TextChannelDeleteEvent} for handling
+     * @param event the event of type {@link TextChannelDeleteEvent} for handling
      */
     public void handleTextChannelDeleteEvent(@Nonnull TextChannelDeleteEvent event) {
         Long channelId = event.getChannel().getIdLong();
@@ -103,8 +99,7 @@ public class ApproveService {
     /**
      * Handles events of type {@link GuildMessageReactionAddEvent}.
      *
-     * @param event
-     *         the event of type {@link GuildMessageReactionAddEvent} for handling
+     * @param event the event of type {@link GuildMessageReactionAddEvent} for handling
      */
     public void handleGuildMessageReactionAddEvent(@Nonnull GuildMessageReactionAddEvent event) {
         MessageReaction.ReactionEmote emote = event.getReactionEmote();
@@ -153,13 +148,10 @@ public class ApproveService {
     /**
      * Submits suggestion for further approval.
      *
-     * @param category
-     *         the suggestion category
-     * @param suggestion
-     *         suggestion embed, which includes information about the suggestion and
-     *         the suggester, allowing it to be tracked within a particular provider
-     * @param onSubmitError
-     *         the handler for errors during submission
+     * @param category the suggestion category
+     * @param suggestion suggestion embed, which includes information about the suggestion and
+     * the suggester, allowing it to be tracked within a particular provider
+     * @param onSubmitError the handler for errors during submission
      */
     public void submit(@Nonnull DiscordCategory category,
                        @Nonnull MessageEmbed suggestion,
@@ -188,8 +180,7 @@ public class ApproveService {
     /**
      * Adds the category to approval processing context.
      *
-     * @param category
-     *         the category
+     * @param category the category
      */
     public void add(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
@@ -213,8 +204,7 @@ public class ApproveService {
     /**
      * Removes the category from approval processing context.
      *
-     * @param category
-     *         the category
+     * @param category the category
      */
     public void remove(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
@@ -238,8 +228,7 @@ public class ApproveService {
     /**
      * Updates the category in approval processing context.
      *
-     * @param category
-     *         the category
+     * @param category the category
      */
     public void update(@Nonnull DiscordCategory category) {
         Long categoryId = category.getId();
@@ -264,8 +253,7 @@ public class ApproveService {
     /**
      * Does the category exists in approval processing context?
      *
-     * @param category
-     *         the category
+     * @param category the category
      *
      * @return {@code true} if the category exists in approval processing context
      */

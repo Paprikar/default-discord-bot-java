@@ -2,9 +2,9 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.trustedsuggeste
 
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSetter;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -15,10 +15,8 @@ public interface ConfigWizardTrustedSuggestersSetter extends ConfigWizardSetter 
     /**
      * Sets the value of the trusted suggesters.
      *
-     * @param value
-     *         the value to set
-     * @param category
-     *         the category for change
+     * @param value the value to set
+     * @param category the category for change
      *
      * @return the {@link List} of setting responses
      */

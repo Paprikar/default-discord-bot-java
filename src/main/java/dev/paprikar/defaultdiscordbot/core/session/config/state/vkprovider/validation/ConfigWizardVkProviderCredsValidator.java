@@ -5,13 +5,13 @@ import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.VkSuggestionService;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 
 /**
@@ -25,10 +25,8 @@ public class ConfigWizardVkProviderCredsValidator {
     /**
      * Performs testing of credentials.
      *
-     * @param groupId
-     *         the group id to be tested
-     * @param token
-     *         the token to be tested
+     * @param groupId the group id to be tested
+     * @param token the token to be tested
      *
      * @return the validator testing response
      */

@@ -5,6 +5,7 @@ import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.Discor
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVkService;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardSession;
 import dev.paprikar.defaultdiscordbot.core.session.config.ConfigWizardState;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -13,8 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -35,10 +35,8 @@ public class ConfigWizardVkProviderDisableCommand implements ConfigWizardVkProvi
     /**
      * Constructs the command.
      *
-     * @param vkProviderService
-     *         an instance of {@link DiscordProviderFromVkService}
-     * @param mediaActionService
-     *         an instance of {@link MediaActionService}
+     * @param vkProviderService an instance of {@link DiscordProviderFromVkService}
+     * @param mediaActionService an instance of {@link MediaActionService}
      */
     @Autowired
     public ConfigWizardVkProviderDisableCommand(DiscordProviderFromVkService vkProviderService,

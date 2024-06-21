@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core.session.config;
 
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.requests.RestAction;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,16 +27,12 @@ public class ConfigWizardSession {
     /**
      * Constructs the container.
      *
-     * @param member
-     *         the user of the session
-     * @param service
-     *         the state instance of {@link ConfigWizard} the session is in
-     * @param entityId
-     *         the id of the entity with which the current session state is associated
+     * @param member the user of the session
+     * @param service the state instance of {@link ConfigWizard} the session is in
+     * @param entityId the id of the entity with which the current session state is associated
      *
-     * @throws RuntimeException
-     *         in case of any errors of opening a private channel with the target user.
-     *         See {@link RestAction#complete()} for more details
+     * @throws RuntimeException in case of any errors of opening a private channel with the target user.
+     * See {@link RestAction#complete()} for more details
      * @see RestAction#complete()
      */
     public ConfigWizardSession(@Nonnull Member member,
@@ -57,8 +53,7 @@ public class ConfigWizardSession {
     }
 
     /**
-     * @param channel
-     *         the private channel with the target user of the session
+     * @param channel the private channel with the target user of the session
      */
     public void setChannel(PrivateChannel channel) {
         this.channel = channel;
@@ -72,8 +67,7 @@ public class ConfigWizardSession {
     }
 
     /**
-     * @param guildDiscordId
-     *         the guild discord id for which the session is created
+     * @param guildDiscordId the guild discord id for which the session is created
      */
     public void setGuildDiscordId(Long guildDiscordId) {
         this.guildDiscordId = guildDiscordId;
@@ -87,8 +81,7 @@ public class ConfigWizardSession {
     }
 
     /**
-     * @param service
-     *         the state instance that the session will be in
+     * @param service the state instance that the session will be in
      */
     public void setService(ConfigWizard service) {
         this.service = service;
@@ -102,8 +95,7 @@ public class ConfigWizardSession {
     }
 
     /**
-     * @param entityId
-     *         the id of the entity with which the current session state will be associated
+     * @param entityId the id of the entity with which the current session state will be associated
      */
     public void setEntityId(Long entityId) {
         this.entityId = entityId;
@@ -117,8 +109,7 @@ public class ConfigWizardSession {
     }
 
     /**
-     * @param responses
-     *         the {@link List} of session responses
+     * @param responses the {@link List} of session responses
      */
     public void setResponses(List<MessageEmbed> responses) {
         this.responses = responses;

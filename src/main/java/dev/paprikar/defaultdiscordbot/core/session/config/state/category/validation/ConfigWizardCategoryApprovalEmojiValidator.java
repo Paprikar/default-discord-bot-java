@@ -2,12 +2,12 @@ package dev.paprikar.defaultdiscordbot.core.session.config.state.category.valida
 
 import com.vdurmont.emoji.EmojiParser;
 import dev.paprikar.defaultdiscordbot.core.session.DiscordValidatorProcessingResponse;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
 
@@ -20,8 +20,7 @@ public class ConfigWizardCategoryApprovalEmojiValidator {
     /**
      * Performs initial processing of the value.
      *
-     * @param value
-     *         the value to be processed
+     * @param value the value to be processed
      *
      * @return the validator processing response
      */

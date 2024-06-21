@@ -1,6 +1,10 @@
 package dev.paprikar.defaultdiscordbot.core.persistence.discord.uservkconnection;
 
-import javax.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 
 /**
  * An entity containing information about vk connections of discord users.
@@ -32,8 +36,7 @@ public class DiscordUserVkConnection {
     }
 
     /**
-     * @param discordUserId
-     *         the discord user id
+     * @param discordUserId the discord user id
      */
     public void setDiscordUserId(Long discordUserId) {
         this.discordUserId = discordUserId;
@@ -47,8 +50,7 @@ public class DiscordUserVkConnection {
     }
 
     /**
-     * @param vkUserId
-     *         the vk user id
+     * @param vkUserId the vk user id
      */
     public void setVkUserId(Integer vkUserId) {
         this.vkUserId = vkUserId;

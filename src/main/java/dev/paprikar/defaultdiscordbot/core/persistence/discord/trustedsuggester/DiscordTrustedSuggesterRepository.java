@@ -15,10 +15,8 @@ public interface DiscordTrustedSuggesterRepository extends JpaRepository<Discord
     /**
      * Finds the suggester by its category id and user id.
      *
-     * @param categoryId
-     *         the category id
-     * @param userId
-     *         the user id
+     * @param categoryId the category id
+     * @param userId the user id
      *
      * @return the found suggester
      */
@@ -27,10 +25,8 @@ public interface DiscordTrustedSuggesterRepository extends JpaRepository<Discord
     /**
      * Does the suggester exist with the specified category id and user id?
      *
-     * @param categoryId
-     *         the category id
-     * @param userId
-     *         the user id
+     * @param categoryId the category id
+     * @param userId the user id
      *
      * @return {@code true} if suggester exists, otherwise {@code false}
      */
@@ -39,10 +35,8 @@ public interface DiscordTrustedSuggesterRepository extends JpaRepository<Discord
     /**
      * Does the suggester exist with the specified category id and any of user ids?
      *
-     * @param categoryId
-     *         the category id
-     * @param userIds
-     *         a {@link List} of user ids
+     * @param categoryId the category id
+     * @param userIds a {@link List} of user ids
      *
      * @return {@code true} if suggester exists, otherwise {@code false}
      */
@@ -51,8 +45,7 @@ public interface DiscordTrustedSuggesterRepository extends JpaRepository<Discord
     /**
      * Finds all suggesters by their category id.
      *
-     * @param id
-     *         the category id
+     * @param id the category id
      *
      * @return the {@link List} of found suggesters
      */
@@ -61,8 +54,7 @@ public interface DiscordTrustedSuggesterRepository extends JpaRepository<Discord
     /**
      * Deletes all suggesters by their category id.
      *
-     * @param id
-     *         the category id
+     * @param id the category id
      */
     void deleteByCategoryId(Long id);
 }

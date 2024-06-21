@@ -1,11 +1,11 @@
 package dev.paprikar.defaultdiscordbot.core;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.security.auth.login.LoginException;
 import java.util.concurrent.Executors;
 
@@ -25,20 +25,15 @@ public class JDAService {
     /**
      * Builds an instance of {@link JDA}.
      *
-     * @param token
-     *         the token of the discord bot
-     * @param eventPoolSize
-     *         the event pool size of the discord bot
-     * @param maxReconnectDelay
-     *         the maximum reconnection delay of the discord bot in seconds
-     * @param eventListener
-     *         the event listener of the discord bot
+     * @param token the token of the discord bot
+     * @param eventPoolSize the event pool size of the discord bot
+     * @param maxReconnectDelay the maximum reconnection delay of the discord bot in seconds
+     * @param eventListener the event listener of the discord bot
      *
      * @return the built instance of {@link JDA}
      *
-     * @throws LoginException
-     *         in case of any {@link JDA} instance building errors.
-     *         See {@link JDABuilder#build()} for more details
+     * @throws LoginException in case of any {@link JDA} instance building errors.
+     * See {@link JDABuilder#build()} for more details
      * @see JDABuilder#build()
      * @see LoginException
      */

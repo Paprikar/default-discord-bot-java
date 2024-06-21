@@ -1,8 +1,8 @@
 package dev.paprikar.defaultdiscordbot.core.concurrency;
 
+import jakarta.annotation.Nonnull;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,8 +20,7 @@ public class MonitorService {
     /**
      * Returns the monitor object that is associated with the corresponding concurrency key.
      *
-     * @param key
-     *         the concurrency key whose associated monitor object is to be returned
+     * @param key the concurrency key whose associated monitor object is to be returned
      *
      * @return the monitor object that is associated with the specified
      * concurrency key, or {@code null} if there is no association
@@ -33,10 +32,8 @@ public class MonitorService {
     /**
      * Returns the monitor object that is associated with the corresponding concurrency scope and object.
      *
-     * @param scope
-     *         the concurrency scope to use with an object to return the associated monitor object
-     * @param key
-     *         the object to use with a concurrency scope to return the associated monitor object
+     * @param scope the concurrency scope to use with an object to return the associated monitor object
+     * @param key the object to use with a concurrency scope to return the associated monitor object
      *
      * @return the monitor object that is associated with the specified
      * concurrency scope and object, or {@code null} if there is no association
@@ -48,8 +45,7 @@ public class MonitorService {
     /**
      * Constructs and returns a new monitor object.
      *
-     * @param key
-     *         the concurrency key whose associated monitor object is to be created and returned
+     * @param key the concurrency key whose associated monitor object is to be created and returned
      *
      * @return the new monitor object that is associated with the specified concurrency key
      */
@@ -60,10 +56,8 @@ public class MonitorService {
     /**
      * Constructs and returns a new monitor object.
      *
-     * @param scope
-     *         the concurrency scope to use with an object to create and return the associated monitor object
-     * @param key
-     *         the object to use with a concurrency scope to create and return the associated monitor object
+     * @param scope the concurrency scope to use with an object to create and return the associated monitor object
+     * @param key the object to use with a concurrency scope to create and return the associated monitor object
      *
      * @return the new monitor object that is associated with the specified concurrency scope and object
      */
@@ -75,10 +69,8 @@ public class MonitorService {
      * If the specified concurrency key is not already associated with a monitor object associates it
      * with the given monitor object and returns {@code null}, else returns the current monitor object.
      *
-     * @param key
-     *         the concurrency key with which the specified monitor object will be associated
-     * @param monitor
-     *         monitor object to be associated with the specified concurrency key
+     * @param key the concurrency key with which the specified monitor object will be associated
+     * @param monitor monitor object to be associated with the specified concurrency key
      *
      * @return the previous monitor object associated with the specified concurrency
      * key, or {@code null} if there was no association for the concurrency key
@@ -93,12 +85,9 @@ public class MonitorService {
      * If the specified concurrency scope and object is not already associated with a monitor object associates
      * it with the given monitor object and returns {@code null}, else returns the current monitor object.
      *
-     * @param scope
-     *         the concurrency scope to use with an object with which the specified monitor object will be associated
-     * @param key
-     *         the object to use with a concurrency scope with which the specified monitor object will be associated
-     * @param monitor
-     *         monitor object to be associated with the specified concurrency scope and object
+     * @param scope the concurrency scope to use with an object with which the specified monitor object will be associated
+     * @param key the object to use with a concurrency scope with which the specified monitor object will be associated
+     * @param monitor monitor object to be associated with the specified concurrency scope and object
      *
      * @return the previous monitor object associated with the specified concurrency scope and
      * object, or {@code null} if there was no association for the concurrency scope and object
@@ -112,8 +101,7 @@ public class MonitorService {
     /**
      * Removes and returns the monitor object.
      *
-     * @param key
-     *         the concurrency key whose associated monitor object is to be removed and returned
+     * @param key the concurrency key whose associated monitor object is to be removed and returned
      *
      * @return the monitor object that was associated with the specified concurrency key
      */
@@ -124,10 +112,8 @@ public class MonitorService {
     /**
      * Removes and returns the monitor object.
      *
-     * @param scope
-     *         the concurrency scope to use with an object to remove and return the associated monitor object
-     * @param key
-     *         the object to use with a concurrency scope to remove and return the associated monitor object
+     * @param scope the concurrency scope to use with an object to remove and return the associated monitor object
+     * @param key the object to use with a concurrency scope to remove and return the associated monitor object
      *
      * @return the monitor object that was associated with the specified concurrency scope and object
      */

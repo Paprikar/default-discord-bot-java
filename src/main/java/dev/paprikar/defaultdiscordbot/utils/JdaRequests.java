@@ -30,13 +30,10 @@ public class JdaRequests {
         /**
          * Constructs a request error handler.
          *
-         * @param message
-         *         the message for error logging
-         * @param action
-         *         the action on an error
-         * @param warningResponses
-         *         a set of errors of type {@link ErrorResponse},
-         *         which will be processed as warnings
+         * @param message the message for error logging
+         * @param action the action on an error
+         * @param warningResponses a set of errors of type {@link ErrorResponse},
+         * which will be processed as warnings
          */
         RequestErrorHandler(String message, Runnable action, EnumSet<ErrorResponse> warningResponses) {
             this.message = message;
@@ -57,8 +54,7 @@ public class JdaRequests {
         public void accept(Throwable throwable) {
             action.run();
 
-            if (throwable instanceof ErrorResponseException) {
-                ErrorResponseException ere = (ErrorResponseException) throwable;
+            if (throwable instanceof ErrorResponseException ere) {
                 if (warningResponses.contains(ere.getErrorResponse())) {
                     logger.warn(message, throwable);
                     return;
@@ -77,11 +73,11 @@ public class JdaRequests {
 
             private String message = "An error occurred while executing the request";
 
-            private Runnable action = () -> {};
+            private Runnable action = () -> {
+            };
 
             /**
-             * @param message
-             *         the message for error logging
+             * @param message the message for error logging
              *
              * @return the current {@link RequestErrorHandlerBuilder} instance. Useful for chaining
              */
@@ -92,8 +88,7 @@ public class JdaRequests {
 
 
             /**
-             * @param action
-             *         the action on an error
+             * @param action the action on an error
              *
              * @return the current {@link RequestErrorHandlerBuilder} instance. Useful for chaining
              */
@@ -105,8 +100,7 @@ public class JdaRequests {
             /**
              * Adds an error response to the warning error set.
              *
-             * @param response
-             *         error response to add to the warning error set
+             * @param response error response to add to the warning error set
              *
              * @return the current {@link RequestErrorHandlerBuilder} instance. Useful for chaining
              */
@@ -118,8 +112,7 @@ public class JdaRequests {
             /**
              * Adds error responses to the warning error set.
              *
-             * @param responses
-             *         error responses to add to the warning error set
+             * @param responses error responses to add to the warning error set
              *
              * @return the current {@link RequestErrorHandlerBuilder} instance. Useful for chaining
              */

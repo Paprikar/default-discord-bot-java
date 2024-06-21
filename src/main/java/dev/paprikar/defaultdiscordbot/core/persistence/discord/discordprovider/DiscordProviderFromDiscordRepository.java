@@ -14,8 +14,7 @@ public interface DiscordProviderFromDiscordRepository extends JpaRepository<Disc
     /**
      * Finds all discord providers by the id of the category they are attached to.
      *
-     * @param id
-     *         the id of the category
+     * @param id the id of the category
      *
      * @return the {@link List} of found discord providers
      */
@@ -24,8 +23,7 @@ public interface DiscordProviderFromDiscordRepository extends JpaRepository<Disc
     /**
      * Deletes all discord providers by the id of the category they are attached to.
      *
-     * @param id
-     *         the id of the category
+     * @param id the id of the category
      */
     void deleteByCategoryId(Long id);
 }

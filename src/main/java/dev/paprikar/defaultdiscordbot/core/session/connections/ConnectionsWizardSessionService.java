@@ -1,6 +1,7 @@
 package dev.paprikar.defaultdiscordbot.core.session.connections;
 
 import dev.paprikar.defaultdiscordbot.core.session.DiscordPrivateSession;
+import jakarta.annotation.Nonnull;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -11,8 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +35,7 @@ public class ConnectionsWizardSessionService extends DiscordPrivateSession {
     /**
      * Constructs the service.
      *
-     * @param connectionsWizards
-     *         a {@link List} of instances of {@link ConnectionsWizard}
+     * @param connectionsWizards a {@link List} of instances of {@link ConnectionsWizard}
      */
     @Autowired
     public ConnectionsWizardSessionService(List<ConnectionsWizard> connectionsWizards) {
@@ -46,8 +45,7 @@ public class ConnectionsWizardSessionService extends DiscordPrivateSession {
     /**
      * Handles events of type {@link PrivateMessageReceivedEvent}.
      *
-     * @param event
-     *         the event of type {@link PrivateMessageReceivedEvent} for handling
+     * @param event the event of type {@link PrivateMessageReceivedEvent} for handling
      */
     public void handlePrivateMessageReceivedEvent(@Nonnull PrivateMessageReceivedEvent event) {
         long userId = event.getAuthor().getIdLong();
@@ -88,8 +86,7 @@ public class ConnectionsWizardSessionService extends DiscordPrivateSession {
     /**
      * Handles events of type {@link GuildMessageReceivedEvent}.
      *
-     * @param event
-     *         the event of type {@link GuildMessageReceivedEvent} for handling
+     * @param event the event of type {@link GuildMessageReceivedEvent} for handling
      */
     public void handleGuildMessageReceivedEvent(@Nonnull GuildMessageReceivedEvent event) {
         Member member = event.getMember();
