@@ -41,7 +41,7 @@ public class VkSuggestionValidator {
     public List<MessageEmbed> validateInitially(@Nonnull DiscordProviderFromVk provider) {
         List<MessageEmbed> errors = new ArrayList<>();
 
-        Integer groupId = provider.getGroupId();
+        Long groupId = provider.getGroupId();
         if (groupId == null) {
             errors.add(new EmbedBuilder()
                     .setColor(Color.RED)

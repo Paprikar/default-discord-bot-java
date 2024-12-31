@@ -1,9 +1,12 @@
 package dev.paprikar.defaultdiscordbot.core.media.suggestion.vk;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.vk.api.sdk.client.GsonHolder;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
-import com.vk.api.sdk.events.EventsHandler;
+import com.vk.api.sdk.events.CallbackEvent;
+import com.vk.api.sdk.events.Events;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ApiGroupAuthException;
 import com.vk.api.sdk.exceptions.ClientException;
@@ -15,7 +18,9 @@ import com.vk.api.sdk.objects.groups.responses.GetLongPollServerResponse;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyKey;
 import dev.paprikar.defaultdiscordbot.core.concurrency.ConcurrencyScope;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
+import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.dtofix.MessageNewFixed;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.vkprovider.DiscordProviderFromVk;
+import dev.paprikar.defaultdiscordbot.utils.MessageNewExclusionStrategy;
 import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  * Does not react to events after stopping. Allows to reuse a previously
  * stopped handler, taking into account possible changes in credentials.
  */
-class GroupLongPollApi extends EventsHandler {
+class GroupLongPollApi implements CallbackEvent {
 
     /**
      * An instance of {@link VkApiClient}.
@@ -53,6 +58,8 @@ class GroupLongPollApi extends EventsHandler {
     private final MonitorService monitorService;
 
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+    private final Gson gson = new GsonHolder().getGson();
 
     private final int maxReconnectDelay; // in seconds
 
@@ -107,6 +114,10 @@ class GroupLongPollApi extends EventsHandler {
         this.waitTime = waitTime;
         this.suggestionService = suggestionService;
         this.monitorService = monitorService;
+    }
+
+    public void messageNewFixed(Integer groupId, MessageNewFixed message) {
+        LOG.error(OVERRIDING_ERR);
     }
 
     /**
@@ -367,8 +378,15 @@ class GroupLongPollApi extends EventsHandler {
                 }
 
                 updates.forEach(update -> {
+                    logger.debug("UpdaterTask#parseUpdates(): update={}", providerId);
                     try {
-                        parse(gson.fromJson(update, CallbackMessage.class));
+                        CallbackMessage message = gson.fromJson(update, CallbackMessage.class);
+
+                        if (message.getType() == Events.MESSAGE_NEW) {
+                            parseMessageNew(message);
+                        } else {
+                            parse(message);
+                        }
                     } catch (RuntimeException e) {
                         logger.error("UpdaterTask#parseUpdates(): provider={id={}}. " +
                                 "An error occurred while parsing the update", providerId, e);
@@ -377,6 +395,21 @@ class GroupLongPollApi extends EventsHandler {
 
                 return false;
             }
+        }
+
+        /**
+         * bruh.
+         *
+         * @param message already of type MESSAGE_NEW
+         */
+        private void parseMessageNew(CallbackMessage message) {
+            assert message.getType() == Events.MESSAGE_NEW;
+
+            String objectToDeserialize = "{ \"object\": " + message.getObject().toString() + "}";
+
+            MessageNewFixed event = MessageNewExclusionStrategy.GSON_INSTANCE.fromJson(objectToDeserialize, MessageNewFixed.class);
+
+            messageNewFixed(message.getGroupId(), event);
         }
     }
 }

@@ -20,7 +20,7 @@ public class DiscordUserVkConnection {
     private Long discordUserId;
 
     @Column(name = "vk_user_id", nullable = false)
-    private Integer vkUserId;
+    private Long vkUserId;
 
     /**
      * Constructs the entity.
@@ -45,14 +45,14 @@ public class DiscordUserVkConnection {
     /**
      * @return the vk user id
      */
-    public Integer getVkUserId() {
+    public Long getVkUserId() {
         return vkUserId;
     }
 
     /**
      * @param vkUserId the vk user id
      */
-    public void setVkUserId(Integer vkUserId) {
+    public void setVkUserId(Long vkUserId) {
         this.vkUserId = vkUserId;
     }
 

@@ -3,18 +3,18 @@ package dev.paprikar.defaultdiscordbot.core.media.suggestion.vk;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.objects.messages.Message;
-import com.vk.api.sdk.objects.messages.MessageAttachment;
 import com.vk.api.sdk.objects.photos.Photo;
 import com.vk.api.sdk.objects.photos.PhotoSizes;
 import com.vk.api.sdk.objects.photos.PhotoSizesType;
 import com.vk.api.sdk.objects.users.Fields;
 import com.vk.api.sdk.objects.users.responses.GetResponse;
-import com.vk.api.sdk.objects.wall.Wallpost;
 import com.vk.api.sdk.objects.wall.WallpostAttachment;
 import com.vk.api.sdk.objects.wall.WallpostAttachmentType;
 import com.vk.api.sdk.objects.wall.WallpostFull;
 import dev.paprikar.defaultdiscordbot.core.media.approve.ApproveService;
 import dev.paprikar.defaultdiscordbot.core.media.sending.SendingService;
+import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.dtofix.MessageAttachmentFixed;
+import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.dtofix.MessageFixed;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategory;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.category.DiscordCategoryService;
 import dev.paprikar.defaultdiscordbot.core.persistence.discord.trustedsuggester.DiscordTrustedSuggesterService;
@@ -112,12 +112,12 @@ public class VkSuggestionHandler {
      * @param actor the {@link GroupActor}
      * @param provider the vk provider
      */
-    public void handleMessageNewEvent(@Nonnull Message message,
+    public void handleMessageNewEvent(@Nonnull MessageFixed message,
                                       @Nonnull GroupActor actor,
                                       @Nonnull DiscordProviderFromVk provider) {
         List<String> urls = new ArrayList<>();
 
-        for (MessageAttachment attachment : message.getAttachments()) {
+        for (MessageAttachmentFixed attachment : message.getAttachmentsFixed()) {
             boolean pass = true;
             switch (attachment.getType()) {
                 case WALL: {
@@ -136,7 +136,7 @@ public class VkSuggestionHandler {
         }
 
         if (urls.isEmpty()) {
-            executeRequest(client.messages().send(actor)
+            executeRequest(client.messages().sendDeprecated(actor)
                     .randomId(random.nextInt())
                     .peerId(message.getPeerId())
                     .message("Error. The message must contain at least one image")
@@ -152,7 +152,7 @@ public class VkSuggestionHandler {
         }
         DiscordCategory category = categoryOptional.get();
 
-        Integer vkUserId = message.getFromId();
+        Long vkUserId = message.getFromId();
         List<Long> discordUserIds = vkConnectionService.findAllByVkUserId(vkUserId).stream()
                 .map(ProjectionDiscordUserId::getDiscordUserId)
                 .collect(Collectors.toList());
@@ -190,7 +190,7 @@ public class VkSuggestionHandler {
             }
         });
 
-        executeRequest(client.messages().send(actor)
+        executeRequest(client.messages().sendDeprecated(actor)
                 .randomId(random.nextInt())
                 .peerId(message.getPeerId())
                 .message("Suggestion sent successfully")
@@ -201,9 +201,9 @@ public class VkSuggestionHandler {
                                              List<String> urls,
                                              Message message,
                                              GroupActor actor) {
-        List<Wallpost> copyHistory = wallpostFull.getCopyHistory();
+        List<WallpostFull> copyHistory = wallpostFull.getCopyHistory();
         if (copyHistory != null) {
-            for (Wallpost wallpost : copyHistory) {
+            for (WallpostFull wallpost : copyHistory) {
                 boolean pass = handleWallpostAttachmentsPhotos(wallpost.getAttachments(), urls, message, actor);
                 if (!pass) {
                     return false;
@@ -241,7 +241,7 @@ public class VkSuggestionHandler {
         if (sizeOptional.isEmpty()) {
             logger.warn("handlePhotoAttachment(): Failed to get URL of the photo={}", photo);
 
-            executeRequest(client.messages().send(actor)
+            executeRequest(client.messages().sendDeprecated(actor)
                     .randomId(random.nextInt())
                     .peerId(message.getPeerId())
                     .message("Error. Failed to get URL of the photo")

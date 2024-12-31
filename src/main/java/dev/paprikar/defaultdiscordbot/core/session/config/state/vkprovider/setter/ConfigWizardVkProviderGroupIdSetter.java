@@ -60,8 +60,8 @@ public class ConfigWizardVkProviderGroupIdSetter implements ConfigWizardVkProvid
 
     @Override
     public List<MessageEmbed> set(@Nonnull String value, @Nonnull DiscordProviderFromVk provider) {
-        DiscordValidatorProcessingResponse<Integer> response = validator.process(value);
-        Integer groupId = response.getValue();
+        DiscordValidatorProcessingResponse<Long> response = validator.process(value);
+        Long groupId = response.getValue();
         MessageEmbed error = response.getError();
 
         if (error != null) {

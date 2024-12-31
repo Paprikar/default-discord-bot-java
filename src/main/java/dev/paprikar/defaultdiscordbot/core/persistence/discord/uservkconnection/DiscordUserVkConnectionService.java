@@ -74,7 +74,7 @@ public class DiscordUserVkConnectionService {
      *
      * @return the {@link List} of entity projections of type {@link ProjectionDiscordUserId}
      */
-    public List<ProjectionDiscordUserId> findAllByVkUserId(Integer id) {
+    public List<ProjectionDiscordUserId> findAllByVkUserId(Long id) {
         return repository.findAllByVkUserId(id);
     }
 

@@ -53,8 +53,8 @@ public class ConnectionsWizardVkConnectCommand implements ConnectionsWizardVkCom
         Long discordUserId = session.getUserId();
         java.util.List<MessageEmbed> responses = session.getResponses();
 
-        DiscordValidatorProcessingResponse<Integer> response = validator.process(argsString);
-        Integer vkUserId = response.getValue();
+        DiscordValidatorProcessingResponse<Long> response = validator.process(argsString);
+        Long vkUserId = response.getValue();
         MessageEmbed error = response.getError();
 
         if (error != null) {

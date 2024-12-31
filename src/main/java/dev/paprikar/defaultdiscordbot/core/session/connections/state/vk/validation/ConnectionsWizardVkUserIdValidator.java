@@ -37,11 +37,11 @@ public class ConnectionsWizardVkUserIdValidator {
      *
      * @return the validator processing response
      */
-    public DiscordValidatorProcessingResponse<Integer> process(@Nonnull String value) {
-        int id;
+    public DiscordValidatorProcessingResponse<Long> process(@Nonnull String value) {
+        long id;
 
         try {
-            id = Integer.parseInt(value);
+            id = Long.parseLong(value);
         } catch (NumberFormatException e) {
             MessageEmbed error = new EmbedBuilder()
                     .setColor(Color.RED)

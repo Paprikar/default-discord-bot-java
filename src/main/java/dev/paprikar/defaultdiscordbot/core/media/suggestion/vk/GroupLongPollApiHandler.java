@@ -1,8 +1,9 @@
 package dev.paprikar.defaultdiscordbot.core.media.suggestion.vk;
 
 import com.vk.api.sdk.client.actors.GroupActor;
-import com.vk.api.sdk.objects.messages.Message;
 import dev.paprikar.defaultdiscordbot.core.concurrency.MonitorService;
+import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.dtofix.MessageFixed;
+import dev.paprikar.defaultdiscordbot.core.media.suggestion.vk.dtofix.MessageNewFixed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,11 +60,15 @@ public class GroupLongPollApiHandler extends GroupLongPollApi {
     }
 
     @Override
-    protected void messageNew(Integer groupId, Message message) {
-        logger.debug("messageNew(): groupId={}, message={}", groupId, message);
+    public void messageNewFixed(Integer groupId, MessageNewFixed messageNew) {
+        logger.debug("messageNew(): groupId={}, messageNew={}", groupId, messageNew);
 
-        executeRequest(client.messages().markAsRead(actor)
-                .peerId(message.getPeerId()));
+        MessageFixed message = messageNew.getObjectFixed().getMessageFixed();
+
+        executeRequest(
+                client.messages().markAsRead(actor)
+                        .peerId(message.getPeerId())
+        );
 
         suggestionHandler.handleMessageNewEvent(message, actor, getProviderCached());
     }
