@@ -31,7 +31,7 @@ public class ConfigWizardVkProviderCredsValidator {
      * @return the validator testing response
      */
     @Nullable
-    public MessageEmbed test(@Nonnull Integer groupId, @Nonnull String token) {
+    public MessageEmbed test(@Nonnull Long groupId, @Nonnull String token) {
         try {
             client.groupsLongPoll().getLongPollServer(new GroupActor(groupId, token), groupId).execute();
         } catch (ApiException | ClientException e) {

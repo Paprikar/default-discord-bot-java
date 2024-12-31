@@ -34,7 +34,7 @@ public class DiscordGuild {
     @Column(name = "discord_id", nullable = false)
     private Long discordId;
 
-    @Column(length = 32, nullable = false)
+    @Column(name = "prefix", length = 32, nullable = false)
     private String prefix = "!";
 
     @Convert(converter = ZoneIdConverter.class)

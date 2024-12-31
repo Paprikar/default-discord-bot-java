@@ -64,7 +64,7 @@ public class VkSuggestionService {
      */
     public void add(@Nonnull DiscordProviderFromVk provider) {
         Long providerId = provider.getId();
-        Integer groupId = provider.getGroupId();
+        Long groupId = provider.getGroupId();
         String token = provider.getToken();
         Integer vkMaxReconnectDelay = config.getVkMaxReconnectDelay();
 

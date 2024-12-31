@@ -33,13 +33,13 @@ public class DiscordProviderFromDiscord {
             nullable = false)
     private DiscordCategory category;
 
-    @Column(length = 32, nullable = false)
+    @Column(name = "name", length = 32, nullable = false)
     private String name;
 
     @Column(name = "suggestion_channel_id")
     private Long suggestionChannelId;
 
-    @Column(nullable = false)
+    @Column(name = "enabled", nullable = false)
     private Boolean enabled = false;
 
     /**

@@ -39,7 +39,7 @@ public class DiscordMediaRequest {
             nullable = false)
     private DiscordCategory category;
 
-    @Column(nullable = false)
+    @Column(name = "content", nullable = false)
     private String content;
 
     @Column(name = "creation_timestamp", nullable = false)

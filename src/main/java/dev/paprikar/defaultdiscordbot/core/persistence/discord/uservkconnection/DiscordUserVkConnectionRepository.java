@@ -19,5 +19,5 @@ public interface DiscordUserVkConnectionRepository extends JpaRepository<Discord
      *
      * @return the {@link List} of entity projections of type {@link ProjectionDiscordUserId}
      */
-    List<ProjectionDiscordUserId> findAllByVkUserId(Integer id);
+    List<ProjectionDiscordUserId> findAllByVkUserId(Long id);
 }

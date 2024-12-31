@@ -33,16 +33,16 @@ public class DiscordProviderFromVk {
             nullable = false)
     private DiscordCategory category;
 
-    @Column(length = 32, nullable = false)
+    @Column(name = "name", length = 32, nullable = false)
     private String name;
 
-    @Column
-    private Integer groupId;
+    @Column(name = "group_id")
+    private Long groupId;
 
-    @Column
+    @Column(name = "token")
     private String token;
 
-    @Column(nullable = false)
+    @Column(name = "enabled", nullable = false)
     private Boolean enabled = false;
 
     /**
@@ -96,14 +96,14 @@ public class DiscordProviderFromVk {
     /**
      * @return the group id of the vk provider
      */
-    public Integer getGroupId() {
+    public Long getGroupId() {
         return groupId;
     }
 
     /**
      * @param groupId the group id of the vk provider
      */
-    public void setGroupId(Integer groupId) {
+    public void setGroupId(Long groupId) {
         this.groupId = groupId;
     }
 

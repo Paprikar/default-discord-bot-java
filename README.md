@@ -31,7 +31,6 @@ publication in the Discord text channel.
 SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/postgres
 SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=postgres
-SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQL10Dialect
 ```
 
 - Go to the project directory and run:

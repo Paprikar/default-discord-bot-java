@@ -39,7 +39,7 @@ public class DiscordCategory {
             nullable = false)
     private DiscordGuild guild;
 
-    @Column(length = 32, nullable = false)
+    @Column(name = "name", length = 32, nullable = false)
     private String name;
 
     @Column(name = "sending_channel_id")
@@ -63,7 +63,7 @@ public class DiscordCategory {
     @Column(name = "negative_approval_emoji", nullable = false)
     private Character negativeApprovalEmoji = 0x274E; // ❎
 
-    @Column(nullable = false)
+    @Column(name = "enabled", nullable = false)
     private Boolean enabled = false;
 
     @Column(name = "last_send_timestamp")
