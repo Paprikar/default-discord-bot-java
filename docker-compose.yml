@@ -2,14 +2,14 @@ version: "3.8"
 services:
   app:
     image: paprikar/default-discord-bot:latest
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
       - database
   database:
     image: postgres:15
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
